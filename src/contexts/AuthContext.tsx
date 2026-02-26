@@ -39,8 +39,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       // CRITICAL: Handle redirect callback IMMEDIATELY after MSAL initializes
       // This must happen before anything else, or MSAL will consume the hash fragment
-      const isCallbackRoute = window.location.pathname === '/auth/callback';
-      console.log('AuthContext: Is callback route?', isCallbackRoute);
+      const callbackPath = `${import.meta.env.BASE_URL}auth/callback`.replace(/\/+/g, '/');
+      const isCallbackRoute = window.location.pathname === callbackPath || window.location.pathname === '/auth/callback';
+      console.log('AuthContext: Is callback route?', isCallbackRoute, '(path:', window.location.pathname, 'expected:', callbackPath, ')');
 
       if (isCallbackRoute) {
         console.log('AuthContext: On callback route - handling redirect...');
