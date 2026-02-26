@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>planner</title>
+    <script>
+      // CRITICAL: Log URL immediately on page load, before ANY React code runs
+      console.log('=== PAGE LOAD ===');
+      console.log('URL:', window.location.href);
+      console.log('Pathname:', window.location.pathname);
+      console.log('Hash:', window.location.hash);
+      console.log('Search:', window.location.search);
+      console.log('=================');
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
