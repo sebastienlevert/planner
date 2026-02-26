@@ -16,6 +16,7 @@ class AuthService {
         auth: {
           clientId: appConfig.microsoft.clientId,
           authority: appConfig.microsoft.authority,
+          redirectUri: window.location.origin + import.meta.env.BASE_URL,
         },
         cache: {
           cacheLocation: 'localStorage',
