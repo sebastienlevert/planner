@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { authService } from '../services/auth.service';
 import type { AuthAccount, AuthContextType } from '../types/auth.types';
 import { StorageService } from '../services/storage.service';

@@ -26,17 +26,6 @@ export const TaskList: React.FC<TaskListProps> = ({ showCompleted = false }) => 
     return acc;
   }, {} as Record<string, TodoTask[]>);
 
-  const getImportanceColor = (importance: string) => {
-    switch (importance) {
-      case 'high':
-        return 'text-red-600';
-      case 'low':
-        return 'text-gray-400';
-      default:
-        return 'text-gray-600';
-    }
-  };
-
   const handleToggle = async (task: TodoTask) => {
     try {
       await toggleTaskComplete(task);

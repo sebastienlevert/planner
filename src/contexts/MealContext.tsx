@@ -1,7 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useCalendar } from './CalendarContext';
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { openaiService } from '../services/openai.service';
-import type { FridgeItem, Recipe, MealContextType, FridgeCategory } from '../types/meal.types';
+import type { FridgeItem, Recipe, MealContextType } from '../types/meal.types';
 import { StorageService } from '../services/storage.service';
 
 const MealContext = createContext<MealContextType | undefined>(undefined);
@@ -19,7 +18,6 @@ interface MealProviderProps {
 }
 
 export const MealProvider: React.FC<MealProviderProps> = ({ children }) => {
-  const { createEvent } = useCalendar();
   const [fridgeItems, setFridgeItems] = useState<FridgeItem[]>([]);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -112,7 +110,7 @@ export const MealProvider: React.FC<MealProviderProps> = ({ children }) => {
     setRecipes(prev => prev.filter(recipe => recipe.id !== recipeId));
   };
 
-  const addRecipeToCalendar = async (recipe: Recipe, dateTime: Date): Promise<void> => {
+  const addRecipeToCalendar = async (_recipe: Recipe, _dateTime: Date): Promise<void> => {
     try {
       // For now, we'll need to get the calendar and account from somewhere
       // This is a simplified version - you might want to let the user select

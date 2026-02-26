@@ -24,10 +24,9 @@ class AuthService {
           storeAuthStateInCookie: false,
         },
         system: {
-          allowNativeBroker: false, // Disable WAM broker
           loggerOptions: {
             logLevel: 3, // Verbose logging for debugging
-            loggerCallback: (level: any, message: string, containsPii: boolean) => {
+            loggerCallback: (_level: any, message: string, containsPii: boolean) => {
               if (!containsPii) {
                 console.log('[MSAL]', message);
               }
@@ -180,7 +179,7 @@ class AuthService {
 
   // Save account to storage
   saveAccount(account: AuthAccount): void {
-    const accounts = StorageService.getAuthAccounts();
+    const accounts: AuthAccount[] = StorageService.getAuthAccounts();
     const existingIndex = accounts.findIndex(
       (acc: AuthAccount) => acc.homeAccountId === account.homeAccountId
     );

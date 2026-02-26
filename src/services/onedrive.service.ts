@@ -19,7 +19,7 @@ export interface DriveItem {
 export class OneDriveService {
   // Get root folder
   async getRootFolder(accessToken: string): Promise<DriveItem> {
-    return graphService.getDriveRoot(accessToken);
+    return graphService.getDriveRoot(accessToken) as Promise<DriveItem>;
   }
 
   // Get folder contents

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 import { onedriveService } from '../services/onedrive.service';
 import type { DriveItem } from '../services/onedrive.service';
@@ -34,7 +34,7 @@ export const PhotoProvider: React.FC<PhotoProviderProps> = ({ children }) => {
     const savedFolder = StorageService.getPhotoFolder();
     if (savedFolder) {
       setSelectedFolderId(savedFolder.id);
-      setSelectedFolderName(savedFolder.name);
+      setSelectedFolderName(savedFolder.name ?? null);
     }
   }, []);
 

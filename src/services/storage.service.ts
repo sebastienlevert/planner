@@ -88,12 +88,12 @@ export class StorageService {
     return this.set(appConfig.storage.keys.calendarCache, { ...cache, timestamp: Date.now() });
   }
 
-  static getPhotoFolder() {
-    return this.get(appConfig.storage.keys.photoFolder, null);
+  static getPhotoFolder(): { id: string; name?: string } | null {
+    return this.get<{ id: string; name?: string } | null>(appConfig.storage.keys.photoFolder, null);
   }
 
-  static setPhotoFolder(folderId: string) {
-    return this.set(appConfig.storage.keys.photoFolder, folderId);
+  static setPhotoFolder(folder: { id: string; name: string }) {
+    return this.set(appConfig.storage.keys.photoFolder, folder);
   }
 
   static getFridgeInventory() {

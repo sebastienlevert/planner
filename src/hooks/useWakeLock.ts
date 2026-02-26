@@ -5,7 +5,7 @@ export const useWakeLock = () => {
   const [isSupported, setIsSupported] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
-  const inactivityTimeoutRef = useRef<NodeJS.Timeout>();
+  const inactivityTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Check if Wake Lock API is supported
   useEffect(() => {
