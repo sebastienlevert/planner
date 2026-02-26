@@ -1,5 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { useCalendar } from '../../contexts/CalendarContext';
+import { useLocale } from '../../contexts/LocaleContext';
 import { dateHelpers } from '../../utils/dateHelpers';
 import type { CalendarEvent } from '../../types/calendar.types';
 
@@ -10,17 +11,24 @@ interface MonthViewProps {
 }
 
 export const MonthView: React.FC<MonthViewProps> = ({ currentDate, onDateClick, onEventClick }) => {
-  const { events, getEventsForDateRange } = useCalendar();
+  const { events, getEventsForDateRange, ensureDateRange } = useCalendar();
+  const { locale } = useLocale();
 
   const calendarGrid = useMemo(() => {
     return dateHelpers.getMonthCalendarGrid(currentDate);
   }, [currentDate]);
 
+  const gridStart = useMemo(() => calendarGrid[0][0], [calendarGrid]);
+  const gridEnd = useMemo(() => calendarGrid[calendarGrid.length - 1][6], [calendarGrid]);
+
+  // Ensure events are loaded for the visible month grid
+  useEffect(() => {
+    ensureDateRange(gridStart, gridEnd);
+  }, [gridStart, gridEnd, ensureDateRange]);
+
   const monthEvents = useMemo(() => {
-    const gridStart = calendarGrid[0][0];
-    const gridEnd = calendarGrid[calendarGrid.length - 1][6];
     return getEventsForDateRange(gridStart, gridEnd);
-  }, [calendarGrid, events]);
+  }, [gridStart, gridEnd, events]);
 
   const getEventsForDate = (date: Date): CalendarEvent[] => {
     const dayStart = dateHelpers.getDayStart(date);
@@ -48,9 +56,9 @@ export const MonthView: React.FC<MonthViewProps> = ({ currentDate, onDateClick, 
     <div className="flex flex-col h-full">
       {/* Day headers */}
       <div className="grid grid-cols-7 border-b bg-card">
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-          <div key={day} className="p-3 text-center text-sm font-medium text-muted-foreground border-r border-border last:border-r-0">
-            {day}
+        {dateHelpers.getWeekDays(currentDate).map(day => (
+          <div key={day.toISOString()} className="p-3 text-center text-base font-medium text-muted-foreground border-r border-border last:border-r-0">
+            {dateHelpers.formatDate(day, 'EEE', locale)}
           </div>
         ))}
       </div>
@@ -77,14 +85,14 @@ export const MonthView: React.FC<MonthViewProps> = ({ currentDate, onDateClick, 
                 return (
                   <div
                     key={dayIndex}
-                    className={`border-r border-border last:border-r-0 p-2 cursor-pointer hover:bg-secondary/20 transition-colors touch-optimized ${
+                    className={`border-r border-border last:border-r-0 p-3 cursor-pointer hover:bg-secondary/20 transition-colors touch-optimized ${
                       !inCurrentMonth ? 'bg-muted' : 'bg-card'
                     } ${isToday ? 'bg-secondary border-2 border-muted-foreground/30' : ''}`}
                     onClick={() => handleDateClick(date)}
                   >
                     <div className="flex flex-col h-full">
                       {/* Date number */}
-                      <div className={`text-sm font-medium mb-1 ${
+                      <div className={`text-base font-medium mb-1 ${
                         isToday
                           ? 'bg-muted-foreground text-background rounded-full w-6 h-6 flex items-center justify-center font-bold'
                           : !inCurrentMonth
@@ -104,7 +112,7 @@ export const MonthView: React.FC<MonthViewProps> = ({ currentDate, onDateClick, 
                               .map((event) => (
                                 <div
                                   key={event.id}
-                                  className="text-xs px-1 py-0.5 rounded cursor-pointer hover:opacity-80 transition-opacity break-words font-semibold"
+                                  className="text-sm px-2 py-1 rounded cursor-pointer hover:opacity-80 transition-opacity break-words font-semibold"
                                   style={{
                                     backgroundColor: `${event.color || '#0ea5e9'}50`,
                                   }}
@@ -128,7 +136,7 @@ export const MonthView: React.FC<MonthViewProps> = ({ currentDate, onDateClick, 
                                 return (
                                   <div
                                     key={event.id}
-                                    className="text-xs px-1 py-0.5 rounded cursor-pointer hover:opacity-80 transition-opacity break-words"
+                                    className="text-sm px-2 py-1 rounded cursor-pointer hover:opacity-80 transition-opacity break-words"
                                     style={{
                                       backgroundColor: `${event.color || '#0ea5e9'}40`,
                                     }}

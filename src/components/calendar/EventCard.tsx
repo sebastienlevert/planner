@@ -23,7 +23,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, compact = false, on
   if (compact) {
     return (
       <div
-        className={`rounded p-2 text-xs cursor-pointer transition-opacity hover:opacity-80 h-full relative ${isPast ? 'opacity-50 bg-muted' : ''}`}
+        className={`rounded-lg p-3 text-sm cursor-pointer transition-opacity hover:opacity-80 relative ${isPast ? 'opacity-50 bg-muted' : ''}`}
         style={{
           backgroundColor: isPast ? undefined : `${eventColor}40`,
         }}
@@ -32,11 +32,16 @@ export const EventCard: React.FC<EventCardProps> = ({ event, compact = false, on
           onClick?.();
         }}
       >
-        <div className={`font-semibold truncate ${isPast ? 'text-muted-foreground' : ''}`} style={isPast ? {} : { color: eventColor }}>
+        <div className={`font-semibold line-clamp-2 ${isPast ? 'text-muted-foreground' : ''}`} style={isPast ? {} : { color: eventColor }}>
           {event.subject}
         </div>
+        {!event.isAllDay && (
+          <div className={`text-xs mt-0.5 ${isPast ? 'text-muted-foreground/70' : 'opacity-70'}`} style={isPast ? {} : { color: eventColor }}>
+            {startTime} – {endTime}
+          </div>
+        )}
         {event.recurrence && (
-          <Repeat size={10} className="absolute bottom-1 right-1 opacity-70" />
+          <Repeat size={14} className="absolute bottom-2 right-2 opacity-70" />
         )}
       </div>
     );
@@ -44,7 +49,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, compact = false, on
 
   return (
     <div
-      className={`rounded p-2 text-sm font-medium cursor-pointer transition-opacity hover:opacity-80 relative ${isPast ? 'opacity-60 bg-muted' : ''}`}
+      className={`rounded-lg p-4 text-base font-medium cursor-pointer transition-opacity hover:opacity-80 relative ${isPast ? 'opacity-60 bg-muted' : ''}`}
       style={{
         backgroundColor: isPast ? undefined : `${eventColor}35`,
       }}
@@ -54,12 +59,12 @@ export const EventCard: React.FC<EventCardProps> = ({ event, compact = false, on
       }}
     >
       <div className="flex justify-between items-start mb-2">
-        <h3 className={`font-semibold ${isPast ? 'text-muted-foreground' : 'text-foreground'}`}>
+        <h3 className={`font-semibold text-base ${isPast ? 'text-muted-foreground' : 'text-foreground'}`}>
           {event.subject}
         </h3>
         {calendar && (
           <span
-            className="text-xs px-2 py-1 rounded flex-shrink-0"
+            className="text-sm px-3 py-1 rounded flex-shrink-0"
             style={{
               backgroundColor: isPast ? 'hsl(var(--muted))' : eventColor,
               color: 'white',
@@ -70,10 +75,10 @@ export const EventCard: React.FC<EventCardProps> = ({ event, compact = false, on
         )}
       </div>
 
-      <div className="space-y-1 text-sm text-muted-foreground">
+      <div className="space-y-1.5 text-sm text-muted-foreground">
         {!event.isAllDay && (
           <div className="flex items-center gap-2">
-            <Clock size={14} />
+            <Clock size={18} />
             <span>
               {startTime} - {endTime}
             </span>
@@ -82,32 +87,32 @@ export const EventCard: React.FC<EventCardProps> = ({ event, compact = false, on
 
         {event.isAllDay && (
           <div className="flex items-center gap-2">
-            <Clock size={14} />
+            <Clock size={18} />
             <span>All day</span>
           </div>
         )}
 
         {event.location && event.location.displayName && (
           <div className="flex items-center gap-2">
-            <MapPin size={14} />
+            <MapPin size={18} />
             <span className="truncate">{event.location.displayName}</span>
           </div>
         )}
 
         {event.attendees && event.attendees.length > 0 && (
           <div className="flex items-center gap-2">
-            <Users size={14} />
+            <Users size={18} />
             <span>{event.attendees.length} attendees</span>
           </div>
         )}
       </div>
 
       {event.bodyPreview && (
-        <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{event.bodyPreview}</p>
+        <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{event.bodyPreview}</p>
       )}
 
       {event.recurrence && (
-        <Repeat size={12} className="absolute bottom-2 right-2 opacity-70" />
+        <Repeat size={16} className="absolute bottom-3 right-3 opacity-70" />
       )}
     </div>
   );

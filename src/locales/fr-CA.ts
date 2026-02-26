@@ -5,7 +5,6 @@ export const frCA: TranslationKeys = {
   nav: {
     calendar: 'Calendrier',
     todos: 'Tâches',
-    sleep: 'Sommeil',
     settings: 'Paramètres',
   },
 
@@ -77,6 +76,12 @@ export const frCA: TranslationKeys = {
     today: 'Aujourd\'hui',
     refresh: 'Actualiser',
     close: 'Fermer',
+    confirm: 'Confirmer',
+    processing: 'Traitement...',
+    saving: 'Enregistrement...',
+    creating: 'Création...',
+    signingIn: 'Connexion...',
+    saveChanges: 'Enregistrer les modifications',
   },
 
   // Calendar
@@ -84,9 +89,13 @@ export const frCA: TranslationKeys = {
     title: 'Calendrier familial',
     lastSynced: 'Dernière synchronisation',
     allDay: 'Toute la journée',
+    allDayEvent: 'Événement toute la journée',
+    allDayEvents: 'Événements toute la journée',
     attendees: 'participants',
     location: 'Lieu',
     time: 'Heure',
+    more: 'de plus',
+    lastSync: 'Dernière sync.',
   },
 
   // Settings
@@ -100,6 +109,7 @@ export const frCA: TranslationKeys = {
     calendarSync: 'Synchronisation des calendriers',
     calendarSyncHelp: 'Sélectionnez les calendriers à synchroniser et à afficher',
     noCalendars: 'Aucun calendrier disponible. Veuillez vous connecter pour voir vos calendriers.',
+    noCalendarsForAccount: 'Aucun calendrier trouvé pour ce compte.',
     language: 'Langue',
     languageLabel: 'Langue d\'affichage',
     languageHelp: 'Modifier la langue utilisée dans l\'application',
@@ -109,6 +119,9 @@ export const frCA: TranslationKeys = {
     appDescription: 'Votre outil d\'organisation familiale tout-en-un',
     version: 'Version',
     aboutDescription: 'Cette application s\'intègre avec les services Microsoft 365, y compris le calendrier Outlook, OneDrive et Azure OpenAI pour la planification des repas.',
+    theme: 'Thème',
+    themeHelp: 'Choisissez un thème pour personnaliser votre expérience de calendrier',
+    applicationSettings: 'Paramètres de l\'application',
   },
 
   // Auth
@@ -119,12 +132,62 @@ export const frCA: TranslationKeys = {
     signOut: 'Se déconnecter',
     accounts: 'Comptes',
     account: 'Compte',
+    addAccount: 'Ajouter un compte',
+    connectedAccounts: 'Comptes connectés',
+    noAccountsConnected: 'Aucun compte connecté',
+    signOutConfirm: 'Êtes-vous sûr de vouloir déconnecter {name}?',
+    microsoftAccounts: 'Comptes Microsoft',
+    microsoftAccountsHelp: 'Gérez vos comptes Microsoft 365 connectés. Ajoutez plusieurs comptes pour synchroniser les calendriers et les tâches de différentes organisations.',
+    filterByAccount: 'Filtrer par compte',
+    allAccounts: 'Tous les comptes',
   },
 
-  // Sleep Page
-  sleep: {
-    title: 'Mode sommeil',
-    comingSoon: 'Fonctionnalité de suivi du sommeil à venir...',
+  // Events
+  events: {
+    createEvent: 'Créer un événement',
+    editEvent: 'Modifier l\'événement',
+    eventDetails: 'Détails de l\'événement',
+    addEventDescription: 'Ajouter un nouvel événement à votre calendrier',
+    noCalendarsWarning: 'Aucun calendrier disponible. Veuillez ajouter un compte dans les paramètres pour créer des événements.',
+    title: 'Titre',
+    calendar: 'Calendrier',
+    startDate: 'Date de début',
+    startTime: 'Heure de début',
+    endDate: 'Date de fin',
+    endTime: 'Heure de fin',
+    location: 'Lieu',
+    addLocation: 'Ajouter un lieu',
+    description: 'Description',
+    addDescription: 'Ajouter une description',
+    eventTitle: 'Titre de l\'événement',
+    endTimeError: 'L\'heure de fin doit être après l\'heure de début',
+    noCalendarsError: 'Aucun calendrier disponible. Veuillez ajouter un compte dans les paramètres.',
+    selectCalendarError: 'Veuillez sélectionner un calendrier.',
+    accountNotFoundError: 'Compte introuvable. Veuillez vous reconnecter dans les paramètres.',
+    organizer: 'Organisateur',
+    attendees: 'Participants',
+    cancelled: 'Annulé',
+    youAreOrganizer: 'Vous êtes l\'organisateur',
+    readOnly: 'Lecture seule',
+    deleteEvent: 'Supprimer l\'événement',
+    deleteEventConfirm: 'Êtes-vous sûr de vouloir supprimer « {name} »? Cette action est irréversible.',
+    unknown: 'Inconnu',
+  },
+
+  // Tabs
+  tabs: {
+    accounts: 'Comptes',
+    calendars: 'Calendriers',
+    todos: 'Tâches',
+    general: 'Général',
+  },
+
+  // Todos
+  todos: {
+    title: 'Listes de tâches',
+    description: 'Gérez vos listes et tâches Microsoft To Do.',
+    comingSoon: 'Fonctionnalité à venir',
+    comingSoonDescription: 'La gestion des listes de tâches sera disponible dans une mise à jour future.',
   },
 
   // Common

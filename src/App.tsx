@@ -12,10 +12,12 @@ import { CalendarPage } from './pages/CalendarPage';
 import { PhotosPage } from './pages/PhotosPage';
 import { MealsPage } from './pages/MealsPage';
 import { TasksPage } from './pages/TasksPage';
-import { SleepPage } from './pages/SleepPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { useAutoReload } from './hooks/useAutoReload';
 
 function App() {
+  useAutoReload();
+
   // Debug: Log all navigation
   React.useEffect(() => {
     console.log('App: Current location:', window.location.href);
@@ -39,7 +41,6 @@ function App() {
                         <Route path="photos" element={<PhotosPage />} />
                         <Route path="meals" element={<MealsPage />} />
                         <Route path="tasks" element={<TasksPage />} />
-                        <Route path="sleep" element={<SleepPage />} />
                         <Route path="settings" element={<SettingsPage />} />
                       </Route>
                     </Routes>

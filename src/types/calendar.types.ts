@@ -80,6 +80,7 @@ export interface CalendarContextType extends CalendarState {
   deleteEvent: (eventId: string, accountId: string) => Promise<void>;
   toggleCalendar: (calendarId: string) => void;
   getEventsForDateRange: (start: Date, end: Date) => CalendarEvent[];
+  ensureDateRange: (start: Date, end: Date) => void;
 }
 
 export type CalendarView = 'week' | 'day' | 'month' | 'agenda';

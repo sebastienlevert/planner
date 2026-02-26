@@ -3,7 +3,6 @@ export const en = {
   nav: {
     calendar: 'Calendar',
     todos: 'To Dos',
-    sleep: 'Sleep',
     settings: 'Settings',
   },
 
@@ -75,6 +74,12 @@ export const en = {
     today: 'Today',
     refresh: 'Refresh',
     close: 'Close',
+    confirm: 'Confirm',
+    processing: 'Processing...',
+    saving: 'Saving...',
+    creating: 'Creating...',
+    signingIn: 'Signing in...',
+    saveChanges: 'Save Changes',
   },
 
   // Calendar
@@ -82,9 +87,13 @@ export const en = {
     title: 'Family Calendar',
     lastSynced: 'Last synced',
     allDay: 'All day',
+    allDayEvent: 'All day event',
+    allDayEvents: 'All-day events',
     attendees: 'attendees',
     location: 'Location',
     time: 'Time',
+    more: 'more',
+    lastSync: 'Last sync',
   },
 
   // Settings
@@ -98,6 +107,7 @@ export const en = {
     calendarSync: 'Calendar Sync',
     calendarSyncHelp: 'Select which calendars to sync and display',
     noCalendars: 'No calendars available. Please sign in to see your calendars.',
+    noCalendarsForAccount: 'No calendars found for this account.',
     language: 'Language',
     languageLabel: 'Display Language',
     languageHelp: 'Change the language used throughout the app',
@@ -107,6 +117,9 @@ export const en = {
     appDescription: 'Your all-in-one family organization tool',
     version: 'Version',
     aboutDescription: 'This app integrates with Microsoft 365 services including Outlook Calendar, OneDrive, and Azure OpenAI for meal planning.',
+    theme: 'Theme',
+    themeHelp: 'Choose a theme to personalize your calendar experience',
+    applicationSettings: 'Application Settings',
   },
 
   // Auth
@@ -117,12 +130,62 @@ export const en = {
     signOut: 'Sign Out',
     accounts: 'Accounts',
     account: 'Account',
+    addAccount: 'Add Account',
+    connectedAccounts: 'Connected Accounts',
+    noAccountsConnected: 'No accounts connected',
+    signOutConfirm: 'Are you sure you want to sign out {name}?',
+    microsoftAccounts: 'Microsoft Accounts',
+    microsoftAccountsHelp: 'Manage your connected Microsoft 365 accounts. Add multiple accounts to sync calendars and tasks from different organizations.',
+    filterByAccount: 'Filter by Account',
+    allAccounts: 'All Accounts',
   },
 
-  // Sleep Page
-  sleep: {
-    title: 'Sleep Mode',
-    comingSoon: 'Sleep tracking feature coming soon...',
+  // Events
+  events: {
+    createEvent: 'Create Event',
+    editEvent: 'Edit Event',
+    eventDetails: 'Event Details',
+    addEventDescription: 'Add a new event to your calendar',
+    noCalendarsWarning: 'No calendars available. Please add an account in Settings to create events.',
+    title: 'Title',
+    calendar: 'Calendar',
+    startDate: 'Start Date',
+    startTime: 'Start Time',
+    endDate: 'End Date',
+    endTime: 'End Time',
+    location: 'Location',
+    addLocation: 'Add location',
+    description: 'Description',
+    addDescription: 'Add description',
+    eventTitle: 'Event title',
+    endTimeError: 'End time must be after start time',
+    noCalendarsError: 'No calendars available. Please add an account in Settings.',
+    selectCalendarError: 'Please select a calendar.',
+    accountNotFoundError: 'Account not found. Please try signing in again in Settings.',
+    organizer: 'Organizer',
+    attendees: 'Attendees',
+    cancelled: 'Cancelled',
+    youAreOrganizer: "You're the organizer",
+    readOnly: 'Read-only',
+    deleteEvent: 'Delete Event',
+    deleteEventConfirm: 'Are you sure you want to delete "{name}"? This action cannot be undone.',
+    unknown: 'Unknown',
+  },
+
+  // Tabs
+  tabs: {
+    accounts: 'Accounts',
+    calendars: 'Calendars',
+    todos: 'To Dos',
+    general: 'General',
+  },
+
+  // Todos
+  todos: {
+    title: 'To Do Lists',
+    description: 'Manage your Microsoft To Do lists and tasks.',
+    comingSoon: 'Feature Coming Later',
+    comingSoonDescription: 'To Do list management will be available in a future update.',
   },
 
   // Common

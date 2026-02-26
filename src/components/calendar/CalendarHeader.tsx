@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCalendar } from '../../contexts/CalendarContext';
 import { useLocale } from '../../contexts/LocaleContext';
@@ -25,7 +25,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   monthYearDisplay
 }) => {
   const { accounts } = useAuth();
-  const { isSyncing, lastSyncTime } = useCalendar();
+  const { isSyncing, isLoading, lastSyncTime } = useCalendar();
   const { t } = useLocale();
   const [calendarName, setCalendarName] = useState('');
   const [showSyncTooltip, setShowSyncTooltip] = useState<string | null>(null);
@@ -58,9 +58,9 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   };
 
   const handlePrevious = () => {
-    if (currentView === 'agenda' || currentView === 'day') {
+    if (currentView === 'day') {
       onDateChange(dateHelpers.previousDay(currentDate));
-    } else if (currentView === 'week') {
+    } else if (currentView === 'agenda' || currentView === 'week') {
       onDateChange(dateHelpers.previousWeek(currentDate));
     } else if (currentView === 'month') {
       onDateChange(dateHelpers.previousMonth(currentDate));
@@ -68,9 +68,9 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   };
 
   const handleNext = () => {
-    if (currentView === 'agenda' || currentView === 'day') {
+    if (currentView === 'day') {
       onDateChange(dateHelpers.nextDay(currentDate));
-    } else if (currentView === 'week') {
+    } else if (currentView === 'agenda' || currentView === 'week') {
       onDateChange(dateHelpers.nextWeek(currentDate));
     } else if (currentView === 'month') {
       onDateChange(dateHelpers.nextMonth(currentDate));
@@ -84,25 +84,25 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   return (
     <div className="bg-card border-b border-border">
       {/* Single Row: All Header Components */}
-      <div className="flex items-center gap-4 px-4 py-2">
+      <div className="flex items-center gap-4 px-5 py-3">
         {/* Calendar Name */}
-        <h1 className="text-xl font-bold text-foreground">{calendarName}</h1>
+        <h1 className="text-2xl font-bold text-foreground">{calendarName}</h1>
 
         {/* Navigation Controls */}
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={handlePrevious} aria-label="Previous">
-            <ChevronLeft size={20} />
+          <Button variant="ghost" size="icon" className="h-11 w-11" onClick={handlePrevious} aria-label="Previous">
+            <ChevronLeft size={24} />
           </Button>
-          <Button variant="secondary" size="sm" onClick={handleToday}>
+          <Button variant="secondary" className="h-11 px-5 text-base" onClick={handleToday}>
             {t.actions.today}
           </Button>
-          <Button variant="ghost" size="icon" onClick={handleNext} aria-label="Next">
-            <ChevronRight size={20} />
+          <Button variant="ghost" size="icon" className="h-11 w-11" onClick={handleNext} aria-label="Next">
+            <ChevronRight size={24} />
           </Button>
         </div>
 
         {/* Month/Year Display */}
-        <h2 className="text-base font-semibold text-foreground">
+        <h2 className="text-lg font-semibold text-foreground">
           {monthYearDisplay}
         </h2>
 
@@ -113,7 +113,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         <ViewSwitcher currentView={currentView} onViewChange={onViewChange} />
 
         {/* Account List */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {accounts.map((account) => {
             const initials = getInitials(account.username);
             const isSynced = !isSyncing && lastSyncTime;
@@ -126,21 +126,28 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
                   variant="ghost"
                   size="icon"
                   onClick={() => setShowSyncTooltip(showingTooltip ? null : account.homeAccountId)}
-                  className="w-10 h-10 rounded-full bg-primary/10 text-primary hover:bg-primary/20 font-semibold text-xs"
+                  className="w-11 h-11 rounded-full bg-primary/10 text-primary hover:bg-primary/20 font-semibold text-sm"
                 >
                   {initials}
                 </Button>
 
+                {/* Sync spinner while syncing */}
+                {(isSyncing || isLoading) && (
+                  <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-card rounded-full flex items-center justify-center border-2 border-card pointer-events-none">
+                    <Loader2 size={12} className="text-primary animate-spin" />
+                  </div>
+                )}
+
                 {/* Green checkmark if synced */}
-                {isSynced && (
-                  <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center border-2 border-card pointer-events-none">
-                    <Check size={10} className="text-white" strokeWidth={3} />
+                {!isSyncing && !isLoading && isSynced && (
+                  <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center border-2 border-card pointer-events-none">
+                    <Check size={12} className="text-white" strokeWidth={3} />
                   </div>
                 )}
 
                 {/* Tooltip */}
                 {showingTooltip && lastSyncTime && (
-                  <div className="absolute top-full mt-2 right-0 bg-popover border border-border text-popover-foreground text-xs px-3 py-2 rounded-lg shadow-lg whitespace-nowrap z-50">
+                  <div className="absolute top-full mt-2 right-0 bg-popover border border-border text-popover-foreground text-sm px-4 py-3 rounded-lg shadow-lg whitespace-nowrap z-50">
                     <div className="font-medium mb-1">{account.username}</div>
                     <div className="text-muted-foreground">
                       Last sync: {new Date(lastSyncTime).toLocaleString()}

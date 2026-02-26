@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 import { calendarService } from '../services/calendar.service';
 import type { Calendar, CalendarEvent, CreateEventInput, CalendarContextType } from '../types/calendar.types';
@@ -33,6 +33,10 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Track the date range we've already fetched events for
+  const fetchedRangeRef = useRef<{ start: Date; end: Date } | null>(null);
+  const isFetchingRef = useRef(false);
 
   // Save selected calendars to settings whenever they change
   useEffect(() => {
@@ -83,7 +87,8 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
       const weekEnd = dateHelpers.getWeekEnd();
       const extendedEnd = new Date(weekEnd);
       extendedEnd.setDate(extendedEnd.getDate() + 14); // Add 2 more weeks
-      await fetchEventsForDateRange(weekStart, extendedEnd, allCalendars);
+      await fetchEventsForDateRange(weekStart, extendedEnd, allCalendars, true);
+      fetchedRangeRef.current = { start: weekStart, end: extendedEnd };
 
       setLastSyncTime(Date.now());
       StorageService.setCalendarCache({ calendars: allCalendars, events, timestamp: Date.now() });
@@ -100,7 +105,8 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
   const fetchEventsForDateRange = async (
     startDate: Date,
     endDate: Date,
-    cals?: Calendar[]
+    cals?: Calendar[],
+    replace?: boolean
   ): Promise<void> => {
     const calendarsToFetch = cals || calendars;
     if (calendarsToFetch.length === 0 || accounts.length === 0) return;
@@ -121,12 +127,60 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
         allEvents.push(...calendarEvents);
       }
 
-      setEvents(allEvents);
+      if (replace) {
+        setEvents(allEvents);
+      } else {
+        // Merge: add new events, avoid duplicates by id
+        setEvents(prev => {
+          const existingIds = new Set(prev.map(e => e.id));
+          const newEvents = allEvents.filter(e => !existingIds.has(e.id));
+          return [...prev, ...newEvents];
+        });
+      }
     } catch (err) {
       console.error('Failed to fetch events:', err);
       throw err;
     }
   };
+
+  // Ensure events are loaded for a given date range, fetching if needed
+  const ensureDateRange = useCallback((start: Date, end: Date) => {
+    const range = fetchedRangeRef.current;
+    if (!range || isFetchingRef.current || calendars.length === 0 || accounts.length === 0) return;
+
+    let fetchStart: Date | null = null;
+    let fetchEnd: Date | null = null;
+
+    // Need to fetch earlier data
+    if (start < range.start) {
+      fetchStart = start;
+      fetchEnd = new Date(range.start.getTime() - 1);
+    }
+
+    // Need to fetch later data
+    if (end > range.end) {
+      fetchStart = fetchStart || new Date(range.end.getTime() + 1);
+      fetchEnd = end;
+    }
+
+    if (fetchStart && fetchEnd) {
+      // Extend tracked range immediately to prevent duplicate fetches
+      fetchedRangeRef.current = {
+        start: start < range.start ? start : range.start,
+        end: end > range.end ? end : range.end,
+      };
+
+      isFetchingRef.current = true;
+      setIsSyncing(true);
+
+      fetchEventsForDateRange(fetchStart, fetchEnd)
+        .catch(err => console.error('Failed to load additional events:', err))
+        .finally(() => {
+          isFetchingRef.current = false;
+          setIsSyncing(false);
+        });
+    }
+  }, [calendars, accounts, getAccessToken]);
 
   // Create a new event
   const createEvent = async (input: CreateEventInput): Promise<CalendarEvent> => {
@@ -212,6 +266,7 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
     deleteEvent,
     toggleCalendar,
     getEventsForDateRange,
+    ensureDateRange,
   };
 
   return <CalendarContext.Provider value={value}>{children}</CalendarContext.Provider>;

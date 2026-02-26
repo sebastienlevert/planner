@@ -17,22 +17,32 @@ import {
   isSameMonth,
   parseISO,
 } from 'date-fns';
+import { enUS, frCA } from 'date-fns/locale';
+import type { Locale as DateFnsLocale } from 'date-fns';
+import type { Locale } from '../locales';
+
+const dateFnsLocales: Record<Locale, DateFnsLocale> = {
+  en: enUS,
+  'fr-CA': frCA,
+};
+
+export const getDateFnsLocale = (locale: Locale): DateFnsLocale => dateFnsLocales[locale] || enUS;
 
 export const dateHelpers = {
   // Format dates
-  formatDate(date: Date | string, formatStr: string = 'PPP'): string {
+  formatDate(date: Date | string, formatStr: string = 'PPP', locale?: Locale): string {
     const dateObj = typeof date === 'string' ? parseISO(date) : date;
-    return format(dateObj, formatStr);
+    return format(dateObj, formatStr, locale ? { locale: getDateFnsLocale(locale) } : undefined);
   },
 
-  formatTime(date: Date | string): string {
+  formatTime(date: Date | string, locale?: Locale): string {
     const dateObj = typeof date === 'string' ? parseISO(date) : date;
-    return format(dateObj, 'p');
+    return format(dateObj, 'p', locale ? { locale: getDateFnsLocale(locale) } : undefined);
   },
 
-  formatDateTime(date: Date | string): string {
+  formatDateTime(date: Date | string, locale?: Locale): string {
     const dateObj = typeof date === 'string' ? parseISO(date) : date;
-    return format(dateObj, 'PPp');
+    return format(dateObj, 'PPp', locale ? { locale: getDateFnsLocale(locale) } : undefined);
   },
 
   // Week operations

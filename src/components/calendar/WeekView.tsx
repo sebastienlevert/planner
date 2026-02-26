@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useCalendar } from '../../contexts/CalendarContext';
+import { useLocale } from '../../contexts/LocaleContext';
 import { dateHelpers } from '../../utils/dateHelpers';
 import type { CalendarEvent } from '../../types/calendar.types';
 import { EventCard } from './EventCard';
@@ -27,7 +28,8 @@ interface PositionedEvent {
 }
 
 export const WeekView: React.FC<WeekViewProps> = ({ currentDate, onCreateEvent, onEventClick }) => {
-  const { events, getEventsForDateRange, calendars } = useCalendar();
+  const { events, getEventsForDateRange, calendars, ensureDateRange } = useCalendar();
+  const { locale, t } = useLocale();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const sevenAmRef = useRef<HTMLDivElement>(null);
   const [allDayDialogOpen, setAllDayDialogOpen] = useState(false);
@@ -46,6 +48,11 @@ export const WeekView: React.FC<WeekViewProps> = ({ currentDate, onCreateEvent, 
   const weekEnd = useMemo(() => {
     return dateHelpers.getWeekEnd(currentWeekStart);
   }, [currentWeekStart]);
+
+  // Ensure events are loaded for the visible week
+  useEffect(() => {
+    ensureDateRange(currentWeekStart, weekEnd);
+  }, [currentWeekStart, weekEnd, ensureDateRange]);
 
   const weekEvents = useMemo(() => {
     return getEventsForDateRange(currentWeekStart, weekEnd);
@@ -190,7 +197,7 @@ export const WeekView: React.FC<WeekViewProps> = ({ currentDate, onCreateEvent, 
     <div className="flex flex-col h-full">
       {/* Day headers */}
       <div className="flex border-b border-border bg-card sticky top-0 z-10">
-        <div className="w-16 flex-shrink-0 p-1 text-right pr-1 text-xs font-medium text-muted-foreground border-r border-border flex items-center justify-end">Time</div>
+        <div className="w-20 flex-shrink-0 p-2 text-right pr-2 text-sm font-medium text-muted-foreground border-r border-border flex items-center justify-end">{t.calendar.time}</div>
         {weekDays.map((day, index) => {
           const isToday = dateHelpers.isToday(day);
           return (
@@ -200,11 +207,11 @@ export const WeekView: React.FC<WeekViewProps> = ({ currentDate, onCreateEvent, 
                 isToday ? 'flex-[2] bg-secondary' : 'flex-1'
               } ${index > 0 ? 'border-l border-border' : ''}`}
             >
-              <div className="text-xs font-medium text-muted-foreground">
-                {dateHelpers.formatDate(day, 'EEE')}
+              <div className="text-sm font-medium text-muted-foreground">
+                {dateHelpers.formatDate(day, 'EEE', locale)}
               </div>
               <div
-                className={`text-lg font-semibold mt-1 ${
+                className={`text-xl font-semibold mt-1 ${
                   isToday ? 'text-foreground' : 'text-foreground'
                 }`}
               >
@@ -219,8 +226,8 @@ export const WeekView: React.FC<WeekViewProps> = ({ currentDate, onCreateEvent, 
       {Array.from(dayAllDayEvents.values()).some(events => events.length > 0) && (
         <div className="border-b border-border bg-card">
           <div className="flex">
-            <div className="w-16 flex-shrink-0 py-1 px-1 text-xs font-medium text-muted-foreground border-r border-border flex items-center justify-end">
-              All day
+            <div className="w-20 flex-shrink-0 py-2 px-2 text-sm font-medium text-muted-foreground border-r border-border flex items-center justify-end">
+              {t.calendar.allDay}
             </div>
             {weekDays.map((day, dayIndex) => {
               const isToday = dateHelpers.isToday(day);
@@ -242,7 +249,7 @@ export const WeekView: React.FC<WeekViewProps> = ({ currentDate, onCreateEvent, 
                     return (
                       <div
                         key={event.id}
-                        className="rounded px-2 py-0.5 text-xs cursor-pointer transition-opacity hover:opacity-80 truncate"
+                        className="rounded px-2 py-1 text-sm cursor-pointer transition-opacity hover:opacity-80 truncate"
                         style={{
                           backgroundColor: `${eventColor}40`,
                           color: eventColor,
@@ -260,13 +267,13 @@ export const WeekView: React.FC<WeekViewProps> = ({ currentDate, onCreateEvent, 
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-5 w-full text-xs hover:bg-muted/50 py-0"
+                      className="h-7 w-full text-sm hover:bg-muted/50 py-0"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleShowAllDayEvents(day, allDayEvents);
                       }}
                     >
-                      +{remainingCount} more
+                      +{remainingCount} {t.calendar.more}
                     </Button>
                   )}
                 </div>
@@ -283,16 +290,15 @@ export const WeekView: React.FC<WeekViewProps> = ({ currentDate, onCreateEvent, 
       >
         <div className="flex min-h-full">
           {/* Hour labels */}
-          <div className="w-16 flex-shrink-0 bg-card border-r border-border">
+          <div className="w-20 flex-shrink-0 bg-card border-r border-border">
             {hours.map(hour => (
               <div
                 key={hour}
                 ref={hour === 7 ? sevenAmRef : null}
-                className="p-1 text-xs text-muted-foreground text-right pr-1 border-b border-border"
+                className="p-2 text-sm text-muted-foreground text-right pr-2 border-b border-border"
                 style={{ minHeight: '70px' }}
               >
-                {hour === 0 ? '12 AM' : hour < 12 ? `${hour} AM` : hour === 12 ? '12 PM' : `${hour - 12} PM`}
-              </div>
+                {dateHelpers.formatDate(new Date(2000, 0, 1, hour), 'h a', locale)}              </div>
             ))}
           </div>
 
@@ -358,7 +364,7 @@ export const WeekView: React.FC<WeekViewProps> = ({ currentDate, onCreateEvent, 
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>
-              All-day events - {selectedDayAllDayEvents ? dateHelpers.formatDate(selectedDayAllDayEvents.date, 'EEEE, MMMM d') : ''}
+              {t.calendar.allDayEvents} - {selectedDayAllDayEvents ? dateHelpers.formatDate(selectedDayAllDayEvents.date, 'EEEE, MMMM d', locale) : ''}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-2 max-h-[60vh] overflow-y-auto">

@@ -32,18 +32,18 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({ currentView, onViewC
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="flex items-center gap-2 min-w-[120px]"
+          className="flex items-center gap-2 min-w-[140px] h-11"
         >
-          <span className="text-sm font-medium">{currentViewLabel}</span>
-          <ChevronDown size={16} className="text-muted-foreground" />
+          <span className="text-base font-medium">{currentViewLabel}</span>
+          <ChevronDown size={18} className="text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-40">
+      <DropdownMenuContent align="end" className="w-48">
         {views.map(view => (
           <DropdownMenuItem
             key={view.value}
             onClick={() => onViewChange(view.value)}
-            className="flex items-center justify-between cursor-pointer"
+            className="flex items-center justify-between cursor-pointer py-3 text-base"
           >
             <span>{t.views[view.labelKey]}</span>
             {currentView === view.value && (

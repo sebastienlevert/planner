@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Calendar as CalendarIcon, Loader2 } from 'lucide-react';
+import { Calendar as CalendarIcon } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { useCalendar } from '../contexts/CalendarContext';
 import { useLocale } from '../contexts/LocaleContext';
 import { LoginButton } from '../components/auth/LoginButton';
 import { AgendaView } from '../components/calendar/AgendaView';
@@ -16,7 +15,6 @@ import type { CalendarView, CalendarEvent } from '../types/calendar.types';
 
 export const CalendarPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
-  const { isLoading, isSyncing } = useCalendar();
   const { t } = useLocale();
   const [currentView, setCurrentView] = useState<CalendarView>('agenda');
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
@@ -69,33 +67,24 @@ export const CalendarPage: React.FC = () => {
   // Calculate month/year display based on current view and date
   const getMonthYearDisplay = (): string => {
     if (currentView === 'agenda') {
-      // For agenda view, show range of visible days (5 days)
-      const visibleDays = Array.from({ length: 5 }, (_, i) => {
-        const day = new Date(currentDate);
-        day.setDate(day.getDate() + i);
-        return day;
-      });
+      // For agenda view, show the week range (Sun–Sat)
+      const weekStart = dateHelpers.getWeekStart(currentDate);
+      const weekEnd = dateHelpers.getWeekEnd(currentDate);
 
-      const firstDay = visibleDays[0];
-      const lastDay = visibleDays[visibleDays.length - 1];
+      const firstMonth = weekStart.getMonth();
+      const firstYear = weekStart.getFullYear();
+      const lastMonth = weekEnd.getMonth();
+      const lastYear = weekEnd.getFullYear();
 
-      const firstMonth = firstDay.getMonth();
-      const firstYear = firstDay.getFullYear();
-      const lastMonth = lastDay.getMonth();
-      const lastYear = lastDay.getFullYear();
-
-      // Same month and year
       if (firstMonth === lastMonth && firstYear === lastYear) {
-        return dateHelpers.formatDate(firstDay, 'MMMM yyyy');
+        return dateHelpers.formatDate(weekStart, 'MMMM yyyy');
       }
 
-      // Different months, same year
       if (firstYear === lastYear) {
-        return `${dateHelpers.formatDate(firstDay, 'MMMM')} / ${dateHelpers.formatDate(lastDay, 'MMMM yyyy')}`;
+        return `${dateHelpers.formatDate(weekStart, 'MMMM')} / ${dateHelpers.formatDate(weekEnd, 'MMMM yyyy')}`;
       }
 
-      // Different years
-      return `${dateHelpers.formatDate(firstDay, 'MMMM yyyy')} / ${dateHelpers.formatDate(lastDay, 'MMMM yyyy')}`;
+      return `${dateHelpers.formatDate(weekStart, 'MMMM yyyy')} / ${dateHelpers.formatDate(weekEnd, 'MMMM yyyy')}`;
     } else if (currentView === 'week') {
       return dateHelpers.formatDate(currentDate, 'MMMM yyyy');
     } else if (currentView === 'day') {
@@ -154,15 +143,6 @@ export const CalendarPage: React.FC = () => {
           />
         )}
 
-        {/* Loading Overlay - appears on top of calendar content */}
-        {(isLoading || isSyncing) && (
-          <div className="absolute inset-0 bg-background/30 flex items-center justify-center z-20 pointer-events-none">
-            <div className="text-center bg-card rounded-2xl shadow-2xl p-8 pointer-events-auto border border-border">
-              <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-              <p className="text-lg font-medium text-foreground">Loading events...</p>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Create Event Modal */}

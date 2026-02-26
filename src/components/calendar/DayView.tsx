@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useCalendar } from '../../contexts/CalendarContext';
+import { useLocale } from '../../contexts/LocaleContext';
 import { dateHelpers } from '../../utils/dateHelpers';
 import type { CalendarEvent } from '../../types/calendar.types';
 import { EventCard } from './EventCard';
@@ -27,7 +28,8 @@ interface PositionedEvent {
 }
 
 export const DayView: React.FC<DayViewProps> = ({ currentDate, onCreateEvent, onEventClick }) => {
-  const { events, getEventsForDateRange, calendars } = useCalendar();
+  const { events, getEventsForDateRange, calendars, ensureDateRange } = useCalendar();
+  const { locale, t } = useLocale();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const sevenAmRef = useRef<HTMLDivElement>(null);
   const [allDayDialogOpen, setAllDayDialogOpen] = useState(false);
@@ -41,6 +43,11 @@ export const DayView: React.FC<DayViewProps> = ({ currentDate, onCreateEvent, on
   const dayEnd = useMemo(() => {
     return dateHelpers.getDayEnd(currentDate);
   }, [currentDate]);
+
+  // Ensure events are loaded for the visible day
+  useEffect(() => {
+    ensureDateRange(dayStart, dayEnd);
+  }, [dayStart, dayEnd, ensureDateRange]);
 
   const dayEvents = useMemo(() => {
     return getEventsForDateRange(dayStart, dayEnd);
@@ -154,10 +161,10 @@ export const DayView: React.FC<DayViewProps> = ({ currentDate, onCreateEvent, on
       {allDayEvents.length > 0 && (
         <div className="border-b border-border bg-card sticky top-0 z-10">
           <div className="flex">
-            <div className="w-24 flex-shrink-0 py-1 px-2 text-xs font-medium text-muted-foreground border-r border-border flex items-center justify-end">
-              All day
+            <div className="w-24 flex-shrink-0 py-2 px-3 text-sm font-medium text-muted-foreground border-r border-border flex items-center justify-end">
+              {t.calendar.allDay}
             </div>
-            <div className="flex-1 py-0.5 px-2 space-y-0.5">
+            <div className="flex-1 py-1 px-3 space-y-1">
               {allDayEvents.slice(0, MAX_VISIBLE_ALL_DAY).map(event => {
                 const calendar = calendars.find(cal => cal.id === event.calendarId);
                 const eventColor = calendar?.color || '#0ea5e9';
@@ -165,7 +172,7 @@ export const DayView: React.FC<DayViewProps> = ({ currentDate, onCreateEvent, on
                 return (
                   <div
                     key={event.id}
-                    className="rounded px-2 py-0.5 text-xs cursor-pointer transition-opacity hover:opacity-80 truncate"
+                    className="rounded px-3 py-1 text-sm cursor-pointer transition-opacity hover:opacity-80 truncate"
                     style={{
                       backgroundColor: `${eventColor}40`,
                       color: eventColor,
@@ -183,10 +190,10 @@ export const DayView: React.FC<DayViewProps> = ({ currentDate, onCreateEvent, on
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-5 w-full text-xs hover:bg-muted/50 py-0"
+                  className="h-8 w-full text-sm hover:bg-muted/50"
                   onClick={() => setAllDayDialogOpen(true)}
                 >
-                  +{allDayEvents.length - MAX_VISIBLE_ALL_DAY} more
+                  +{allDayEvents.length - MAX_VISIBLE_ALL_DAY} {t.calendar.more}
                 </Button>
               )}
             </div>
@@ -203,10 +210,10 @@ export const DayView: React.FC<DayViewProps> = ({ currentDate, onCreateEvent, on
               <div
                 key={hour}
                 ref={hour === 7 ? sevenAmRef : null}
-                className="p-2 text-xs text-muted-foreground text-right border-b border-border"
+                className="p-2 text-sm text-muted-foreground text-right border-b border-border"
                 style={{ minHeight: '70px' }}
               >
-                {hour === 0 ? '12 AM' : hour < 12 ? `${hour} AM` : hour === 12 ? '12 PM' : `${hour - 12} PM`}
+                {dateHelpers.formatDate(new Date(2000, 0, 1, hour), 'h a', locale)}
               </div>
             ))}
           </div>
@@ -261,7 +268,7 @@ export const DayView: React.FC<DayViewProps> = ({ currentDate, onCreateEvent, on
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>
-              All-day events - {dateHelpers.formatDate(currentDate, 'EEEE, MMMM d')}
+              {t.calendar.allDayEvents} - {dateHelpers.formatDate(currentDate, 'EEEE, MMMM d', locale)}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-2 max-h-[60vh] overflow-y-auto">
