@@ -33,7 +33,6 @@ jobs:
       - name: Build
         env:
           VITE_MICROSOFT_CLIENT_ID: ${{ vars.VITE_MICROSOFT_CLIENT_ID }}
-          VITE_MICROSOFT_REDIRECT_URI: ${{ vars.VITE_MICROSOFT_REDIRECT_URI }}
         run: npm run build
 
       - name: Upload artifact

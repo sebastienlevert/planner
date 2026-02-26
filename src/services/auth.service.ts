@@ -16,8 +16,6 @@ class AuthService {
         auth: {
           clientId: appConfig.microsoft.clientId,
           authority: appConfig.microsoft.authority,
-          redirectUri: appConfig.microsoft.redirectUri,
-          navigateToLoginRequestUrl: false, // Stay on /auth/callback instead of redirecting back
         },
         cache: {
           cacheLocation: 'localStorage',
