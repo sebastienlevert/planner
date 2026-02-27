@@ -13,7 +13,7 @@ import type { CalendarView, CalendarEvent } from '../types/calendar.types';
 
 export const CalendarPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const [currentView, setCurrentView] = useState<CalendarView>('agenda');
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -62,16 +62,16 @@ export const CalendarPage: React.FC = () => {
       const lastYear = weekEnd.getFullYear();
 
       if (firstMonth === lastMonth && firstYear === lastYear) {
-        return dateHelpers.formatDate(weekStart, 'MMMM yyyy');
+        return dateHelpers.formatDate(weekStart, 'MMMM yyyy', locale);
       }
 
       if (firstYear === lastYear) {
-        return `${dateHelpers.formatDate(weekStart, 'MMMM')} / ${dateHelpers.formatDate(weekEnd, 'MMMM yyyy')}`;
+        return `${dateHelpers.formatDate(weekStart, 'MMMM', locale)} / ${dateHelpers.formatDate(weekEnd, 'MMMM yyyy', locale)}`;
       }
 
-      return `${dateHelpers.formatDate(weekStart, 'MMMM yyyy')} / ${dateHelpers.formatDate(weekEnd, 'MMMM yyyy')}`;
+      return `${dateHelpers.formatDate(weekStart, 'MMMM yyyy', locale)} / ${dateHelpers.formatDate(weekEnd, 'MMMM yyyy', locale)}`;
     } else if (currentView === 'month') {
-      return dateHelpers.formatDate(currentDate, 'MMMM yyyy');
+      return dateHelpers.formatDate(currentDate, 'MMMM yyyy', locale);
     }
     return '';
   };
