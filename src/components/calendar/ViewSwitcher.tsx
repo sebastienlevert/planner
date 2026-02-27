@@ -20,8 +20,6 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({ currentView, onViewC
 
   const views: { value: CalendarView; labelKey: keyof typeof t.views }[] = [
     { value: 'agenda', labelKey: 'agenda' },
-    { value: 'day', labelKey: 'day' },
-    { value: 'week', labelKey: 'week' },
     { value: 'month', labelKey: 'month' },
   ];
 

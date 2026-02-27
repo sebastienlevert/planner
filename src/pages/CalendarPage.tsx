@@ -4,8 +4,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLocale } from '../contexts/LocaleContext';
 import { LoginButton } from '../components/auth/LoginButton';
 import { AgendaView } from '../components/calendar/AgendaView';
-import { WeekView } from '../components/calendar/WeekView';
-import { DayView } from '../components/calendar/DayView';
 import { MonthView } from '../components/calendar/MonthView';
 import { CreateEventModal } from '../components/calendar/CreateEventModal';
 import { EventDetailsModal } from '../components/calendar/EventDetailsModal';
@@ -23,18 +21,6 @@ export const CalendarPage: React.FC = () => {
   const [createEventHour, setCreateEventHour] = useState<number>(9);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
-
-  // Listen for create-event custom event from FAB
-  React.useEffect(() => {
-    const handleCreateEventFromFAB = () => {
-      setCreateEventDate(new Date());
-      setCreateEventHour(new Date().getHours());
-      setIsCreateModalOpen(true);
-    };
-
-    window.addEventListener('create-event', handleCreateEventFromFAB);
-    return () => window.removeEventListener('create-event', handleCreateEventFromFAB);
-  }, []);
 
   if (!isAuthenticated) {
     return (
@@ -67,7 +53,6 @@ export const CalendarPage: React.FC = () => {
   // Calculate month/year display based on current view and date
   const getMonthYearDisplay = (): string => {
     if (currentView === 'agenda') {
-      // For agenda view, show the week range (Sun–Sat)
       const weekStart = dateHelpers.getWeekStart(currentDate);
       const weekEnd = dateHelpers.getWeekEnd(currentDate);
 
@@ -85,10 +70,6 @@ export const CalendarPage: React.FC = () => {
       }
 
       return `${dateHelpers.formatDate(weekStart, 'MMMM yyyy')} / ${dateHelpers.formatDate(weekEnd, 'MMMM yyyy')}`;
-    } else if (currentView === 'week') {
-      return dateHelpers.formatDate(currentDate, 'MMMM yyyy');
-    } else if (currentView === 'day') {
-      return dateHelpers.formatDate(currentDate, 'EEEE, MMMM d, yyyy');
     } else if (currentView === 'month') {
       return dateHelpers.formatDate(currentDate, 'MMMM yyyy');
     }
@@ -97,7 +78,6 @@ export const CalendarPage: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Calendar Header with View Switcher */}
       <CalendarHeader
         currentView={currentView}
         onViewChange={setCurrentView}
@@ -106,28 +86,12 @@ export const CalendarPage: React.FC = () => {
         monthYearDisplay={getMonthYearDisplay()}
       />
 
-      {/* Calendar View */}
       <div className="flex-1 overflow-hidden relative">
-        {/* Always render calendar view */}
         {currentView === 'agenda' && (
           <AgendaView
             currentDate={currentDate}
             onCreateEvent={handleCreateEvent}
             onDateChange={setCurrentDate}
-            onEventClick={handleEventClick}
-          />
-        )}
-        {currentView === 'week' && (
-          <WeekView
-            currentDate={currentDate}
-            onCreateEvent={handleCreateEvent}
-            onEventClick={handleEventClick}
-          />
-        )}
-        {currentView === 'day' && (
-          <DayView
-            currentDate={currentDate}
-            onCreateEvent={handleCreateEvent}
             onEventClick={handleEventClick}
           />
         )}
@@ -142,10 +106,8 @@ export const CalendarPage: React.FC = () => {
             onEventClick={handleEventClick}
           />
         )}
-
       </div>
 
-      {/* Create Event Modal */}
       <CreateEventModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
@@ -153,7 +115,6 @@ export const CalendarPage: React.FC = () => {
         initialHour={createEventHour}
       />
 
-      {/* Event Details Modal */}
       <EventDetailsModal
         isOpen={isDetailsModalOpen}
         onClose={() => setIsDetailsModalOpen(false)}

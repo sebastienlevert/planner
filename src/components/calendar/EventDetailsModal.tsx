@@ -63,7 +63,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
   const calendar = calendars.find(cal => cal.id === event.calendarId);
   const eventColor = calendar?.color || '#0ea5e9';
-  const canEdit = event.isOrganizer && calendar?.canEdit;
+  const canEdit = calendar?.canEdit;
 
   const startDate = new Date(event.start.dateTime);
   const endDate = new Date(event.end.dateTime);
@@ -442,11 +442,6 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                 {event.isCancelled && (
                   <Badge variant="destructive" className="text-xs">
                     {t.events.cancelled}
-                  </Badge>
-                )}
-                {event.isOrganizer && (
-                  <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
-                    {t.events.youAreOrganizer}
                   </Badge>
                 )}
                 {!canEdit && (
