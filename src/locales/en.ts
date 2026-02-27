@@ -221,14 +221,24 @@ export const en = {
     noCompletedTasks: 'No completed tasks',
     deleteConfirm: 'Delete this task?',
     failedToCreate: 'Failed to create task',
+    checklist: 'Checklist',
+    checklistItems: 'Checklist Items',
+    addChecklistItem: 'Add item...',
+    noChecklistItems: 'No checklist items',
+    deleteChecklistItem: 'Delete item',
+    taskDetails: 'Task Details',
+    due: 'Due',
   },
 
   // Todos (settings section)
   todos: {
     title: 'To Do Lists',
-    description: 'Manage your Microsoft To Do lists and tasks.',
-    comingSoon: 'Feature Coming Later',
-    comingSoonDescription: 'To Do list management will be available in a future update.',
+    description: 'Select which To Do lists to display and configure editing permissions.',
+    selectLists: 'Select Lists',
+    selectListsHelp: 'Choose which lists appear on the Tasks page.',
+    allowTopLevelEdit: 'Allow editing tasks',
+    allowTopLevelEditHelp: 'When disabled, tasks in this list cannot be completed or deleted (useful for category-style lists like shopping).',
+    noLists: 'No To Do lists found. Sign in to sync your lists.',
   },
 
   // Meals

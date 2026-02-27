@@ -1,5 +1,5 @@
 import { graphService } from './graph.service';
-import type { TodoList, TodoTask, CreateTaskInput } from '../types/task.types';
+import type { TodoList, TodoTask, CreateTaskInput, ChecklistItem } from '../types/task.types';
 
 export class TodoService {
   // Fetch all To Do lists for an account
@@ -163,6 +163,97 @@ export class TodoService {
       console.error('Failed to toggle task:', error);
       throw error;
     }
+  }
+
+  // Checklist item operations
+  async getChecklistItems(
+    listId: string,
+    taskId: string,
+    accessToken: string,
+    accountId: string
+  ): Promise<ChecklistItem[]> {
+    try {
+      const response: any = await graphService.get(
+        `/me/todo/lists/${listId}/tasks/${taskId}/checklistItems`,
+        accessToken
+      );
+
+      return response.value.map((item: any) => this.mapChecklistItem(item, taskId, listId, accountId));
+    } catch (error) {
+      console.error('Failed to fetch checklist items:', error);
+      throw error;
+    }
+  }
+
+  async createChecklistItem(
+    listId: string,
+    taskId: string,
+    displayName: string,
+    accessToken: string,
+    accountId: string
+  ): Promise<ChecklistItem> {
+    try {
+      const response: any = await graphService.post(
+        `/me/todo/lists/${listId}/tasks/${taskId}/checklistItems`,
+        accessToken,
+        { displayName }
+      );
+
+      return this.mapChecklistItem(response, taskId, listId, accountId);
+    } catch (error) {
+      console.error('Failed to create checklist item:', error);
+      throw error;
+    }
+  }
+
+  async deleteChecklistItem(
+    listId: string,
+    taskId: string,
+    itemId: string,
+    accessToken: string
+  ): Promise<void> {
+    try {
+      await graphService.delete(
+        `/me/todo/lists/${listId}/tasks/${taskId}/checklistItems/${itemId}`,
+        accessToken
+      );
+    } catch (error) {
+      console.error('Failed to delete checklist item:', error);
+      throw error;
+    }
+  }
+
+  async toggleChecklistItem(
+    listId: string,
+    taskId: string,
+    item: ChecklistItem,
+    accessToken: string
+  ): Promise<ChecklistItem> {
+    try {
+      const response: any = await graphService.patch(
+        `/me/todo/lists/${listId}/tasks/${taskId}/checklistItems/${item.id}`,
+        accessToken,
+        { isChecked: !item.isChecked }
+      );
+
+      return this.mapChecklistItem(response, taskId, listId, item.accountId);
+    } catch (error) {
+      console.error('Failed to toggle checklist item:', error);
+      throw error;
+    }
+  }
+
+  // Helper: Map Graph API checklist item
+  private mapChecklistItem(item: any, taskId: string, listId: string, accountId: string): ChecklistItem {
+    return {
+      id: item.id,
+      displayName: item.displayName,
+      isChecked: item.isChecked || false,
+      taskId,
+      listId,
+      accountId,
+      createdDateTime: item.createdDateTime,
+    };
   }
 
   // Helper: Map Graph API task to our TodoTask type

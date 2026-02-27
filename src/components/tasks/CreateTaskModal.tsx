@@ -22,24 +22,29 @@ interface CreateTaskModalProps {
 }
 
 export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose }) => {
-  const { lists, createTask } = useTask();
+  const { lists, selectedLists, listSettings, createTask } = useTask();
   const { accounts } = useAuth();
   const { t } = useLocale();
+
+  // Only show selected lists that allow editing
+  const editableLists = lists.filter(
+    list => selectedLists.includes(list.id) && (listSettings[list.id]?.allowTopLevelEdit !== false)
+  );
 
   const [formData, setFormData] = useState({
     title: '',
     body: '',
     importance: 'normal' as 'low' | 'normal' | 'high',
     dueDate: '',
-    listId: lists[0]?.id || '',
-    accountId: lists[0]?.accountId || '',
+    listId: editableLists[0]?.id || '',
+    accountId: editableLists[0]?.accountId || '',
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleListChange = (listId: string) => {
-    const selectedList = lists.find(list => list.id === listId);
+    const selectedList = editableLists.find(list => list.id === listId);
     if (selectedList) {
       setFormData(prev => ({
         ...prev,
@@ -73,8 +78,8 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClos
         body: '',
         importance: 'normal',
         dueDate: '',
-        listId: lists[0]?.id || '',
-        accountId: lists[0]?.accountId || '',
+        listId: editableLists[0]?.id || '',
+        accountId: editableLists[0]?.accountId || '',
       });
     } catch (err: any) {
       setError(err.message || t.tasks.failedToCreate);
@@ -123,7 +128,7 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClos
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               required
             >
-              {lists.map(list => {
+              {editableLists.map(list => {
                 const account = accounts.find(acc => acc.homeAccountId === list.accountId);
                 return (
                   <option key={list.id} value={list.id}>

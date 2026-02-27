@@ -6,6 +6,20 @@ export interface TodoList {
   accountId: string;
 }
 
+export interface ChecklistItem {
+  id: string;
+  displayName: string;
+  isChecked: boolean;
+  taskId: string;
+  listId: string;
+  accountId: string;
+  createdDateTime?: string;
+}
+
+export interface TodoListSettings {
+  allowTopLevelEdit: boolean;
+}
+
 export interface TodoTask {
   id: string;
   listId: string;
@@ -51,6 +65,7 @@ export interface TaskState {
   lastSyncTime: number | null;
   error: string | null;
   selectedLists: string[];
+  listSettings: Record<string, TodoListSettings>;
 }
 
 export interface TaskContextType extends TaskState {
@@ -60,4 +75,9 @@ export interface TaskContextType extends TaskState {
   deleteTask: (taskId: string, accountId: string) => Promise<void>;
   toggleTaskComplete: (task: TodoTask) => Promise<void>;
   toggleList: (listId: string) => void;
+  setListSettings: (listId: string, settings: TodoListSettings) => void;
+  getChecklistItems: (task: TodoTask) => Promise<ChecklistItem[]>;
+  createChecklistItem: (task: TodoTask, displayName: string) => Promise<ChecklistItem>;
+  deleteChecklistItem: (task: TodoTask, itemId: string) => Promise<void>;
+  toggleChecklistItem: (task: TodoTask, item: ChecklistItem) => Promise<ChecklistItem>;
 }

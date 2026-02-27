@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 import { todoService } from '../services/todo.service';
-import type { TodoList, TodoTask, CreateTaskInput, TaskContextType } from '../types/task.types';
+import { StorageService } from '../services/storage.service';
+import type { TodoList, TodoTask, CreateTaskInput, ChecklistItem, TodoListSettings, TaskContextType } from '../types/task.types';
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
@@ -21,7 +22,14 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
   const { accounts, getAccessToken } = useAuth();
   const [lists, setLists] = useState<TodoList[]>([]);
   const [tasks, setTasks] = useState<TodoTask[]>([]);
-  const [selectedLists, setSelectedLists] = useState<string[]>([]);
+  const [selectedLists, setSelectedLists] = useState<string[]>(() => {
+    const settings = StorageService.getSettings();
+    return settings.selectedTodoLists || [];
+  });
+  const [listSettings, setListSettingsState] = useState<Record<string, TodoListSettings>>(() => {
+    const settings = StorageService.getSettings();
+    return settings.todoListSettings || {};
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<number | null>(null);
@@ -52,12 +60,16 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
 
       setLists(allLists);
 
-      // If first sync, select all lists by default
-      if (selectedLists.length === 0) {
-        setSelectedLists(allLists.map(list => list.id));
+      // If no persisted selection, select all lists by default
+      const currentSettings = StorageService.getSettings();
+      let activeSelectedLists = currentSettings.selectedTodoLists;
+      if (!activeSelectedLists || activeSelectedLists.length === 0) {
+        activeSelectedLists = allLists.map(list => list.id);
+        setSelectedLists(activeSelectedLists);
+        StorageService.setSettings({ ...currentSettings, selectedTodoLists: activeSelectedLists });
       }
 
-      // Fetch tasks from selected lists
+      // Fetch tasks from all lists (not just selected — we need them for settings)
       const allTasks: TodoTask[] = [];
       for (const account of accounts) {
         const accessToken = await getAccessToken(account.homeAccountId);
@@ -82,7 +94,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
       setIsSyncing(false);
       setIsLoading(false);
     }
-  }, [accounts, getAccessToken, selectedLists.length]);
+  }, [accounts, getAccessToken]);
 
   // Create a new task
   const createTask = async (input: CreateTaskInput): Promise<TodoTask> => {
@@ -152,13 +164,47 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
     }
   };
 
-  // Toggle list visibility
+  // Toggle list visibility (persists to storage)
   const toggleList = (listId: string) => {
-    setSelectedLists(prev =>
-      prev.includes(listId)
+    setSelectedLists(prev => {
+      const updated = prev.includes(listId)
         ? prev.filter(id => id !== listId)
-        : [...prev, listId]
-    );
+        : [...prev, listId];
+      const settings = StorageService.getSettings();
+      StorageService.setSettings({ ...settings, selectedTodoLists: updated });
+      return updated;
+    });
+  };
+
+  // Set per-list settings (persists to storage)
+  const setListSettings = (listId: string, newSettings: TodoListSettings) => {
+    setListSettingsState(prev => {
+      const updated = { ...prev, [listId]: newSettings };
+      const settings = StorageService.getSettings();
+      StorageService.setSettings({ ...settings, todoListSettings: updated });
+      return updated;
+    });
+  };
+
+  // Checklist item operations
+  const getChecklistItems = async (task: TodoTask): Promise<ChecklistItem[]> => {
+    const accessToken = await getAccessToken(task.accountId);
+    return todoService.getChecklistItems(task.listId, task.id, accessToken, task.accountId);
+  };
+
+  const createChecklistItem = async (task: TodoTask, displayName: string): Promise<ChecklistItem> => {
+    const accessToken = await getAccessToken(task.accountId);
+    return todoService.createChecklistItem(task.listId, task.id, displayName, accessToken, task.accountId);
+  };
+
+  const deleteChecklistItem = async (task: TodoTask, itemId: string): Promise<void> => {
+    const accessToken = await getAccessToken(task.accountId);
+    await todoService.deleteChecklistItem(task.listId, task.id, itemId, accessToken);
+  };
+
+  const toggleChecklistItem = async (task: TodoTask, item: ChecklistItem): Promise<ChecklistItem> => {
+    const accessToken = await getAccessToken(task.accountId);
+    return todoService.toggleChecklistItem(task.listId, task.id, item, accessToken);
   };
 
   const value: TaskContextType = {
@@ -169,12 +215,18 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
     lastSyncTime,
     error,
     selectedLists,
+    listSettings,
     syncTasks,
     createTask,
     updateTask,
     deleteTask,
     toggleTaskComplete,
     toggleList,
+    setListSettings,
+    getChecklistItems,
+    createChecklistItem,
+    deleteChecklistItem,
+    toggleChecklistItem,
   };
 
   return <TaskContext.Provider value={value}>{children}</TaskContext.Provider>;

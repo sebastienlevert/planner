@@ -3,6 +3,7 @@ import { Settings as SettingsIcon, Save, Users, Calendar as CalendarIcon, CheckS
 import { AccountManager } from '../components/auth/AccountManager';
 import { useAuth } from '../contexts/AuthContext';
 import { useCalendar } from '../contexts/CalendarContext';
+import { useTask } from '../contexts/TaskContext';
 import { useLocale } from '../contexts/LocaleContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { StorageService } from '../services/storage.service';
@@ -21,6 +22,7 @@ type SettingsTab = 'accounts' | 'calendars' | 'todos' | 'general';
 export const SettingsPage: React.FC = () => {
   const { reloadAccounts, accounts } = useAuth();
   const { calendars, selectedCalendars, toggleCalendar } = useCalendar();
+  const { lists: todoLists, selectedLists: selectedTodoLists, toggleList, listSettings, setListSettings } = useTask();
   const { locale, setLocale, t } = useLocale();
   const { themeName, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState<SettingsTab>('accounts');
@@ -208,12 +210,53 @@ export const SettingsPage: React.FC = () => {
             </div>
 
             <Card>
-              <CardContent className="py-12 text-center">
-                <CheckSquare size={48} className="mx-auto text-muted mb-4" />
-                <p className="text-muted-foreground text-lg font-medium mb-2">{t.todos.comingSoon}</p>
-                <p className="text-sm text-muted-foreground/80">
-                  {t.todos.comingSoonDescription}
-                </p>
+              <CardHeader>
+                <CardTitle>{t.todos.selectLists}</CardTitle>
+                <p className="text-sm text-muted-foreground">{t.todos.selectListsHelp}</p>
+              </CardHeader>
+              <CardContent>
+                {todoLists.length > 0 ? (
+                  <div className="space-y-4">
+                    {todoLists.map((list) => {
+                      const account = accounts.find(acc => acc.homeAccountId === list.accountId);
+                      const settings = listSettings[list.id] || { allowTopLevelEdit: true };
+                      return (
+                        <div key={list.id} className="border rounded-lg p-4 space-y-3">
+                          <label className="flex items-center gap-3 cursor-pointer">
+                            <Checkbox
+                              checked={selectedTodoLists.includes(list.id)}
+                              onCheckedChange={() => toggleList(list.id)}
+                            />
+                            <div className="flex-1">
+                              <div className="font-medium text-foreground">{list.displayName}</div>
+                              {account && (
+                                <div className="text-xs text-muted-foreground">{account.username}</div>
+                              )}
+                            </div>
+                          </label>
+                          {selectedTodoLists.includes(list.id) && (
+                            <label className="flex items-center gap-3 pl-8 cursor-pointer">
+                              <Checkbox
+                                checked={settings.allowTopLevelEdit}
+                                onCheckedChange={(checked) =>
+                                  setListSettings(list.id, { ...settings, allowTopLevelEdit: checked as boolean })
+                                }
+                              />
+                              <div>
+                                <div className="text-sm font-medium text-foreground">{t.todos.allowTopLevelEdit}</div>
+                                <div className="text-xs text-muted-foreground">{t.todos.allowTopLevelEditHelp}</div>
+                              </div>
+                            </label>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground italic py-4 text-center">
+                    {t.todos.noLists}
+                  </p>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

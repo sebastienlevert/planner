@@ -223,14 +223,24 @@ export const frCA: TranslationKeys = {
     noCompletedTasks: 'Aucune tâche terminée',
     deleteConfirm: 'Supprimer cette tâche?',
     failedToCreate: 'Échec de la création de la tâche',
+    checklist: 'Liste de contrôle',
+    checklistItems: 'Éléments de la liste',
+    addChecklistItem: 'Ajouter un élément...',
+    noChecklistItems: 'Aucun élément dans la liste',
+    deleteChecklistItem: 'Supprimer l\'élément',
+    taskDetails: 'Détails de la tâche',
+    due: 'Échéance',
   },
 
   // Todos (settings section)
   todos: {
     title: 'Listes de tâches',
-    description: 'Gérez vos listes et tâches Microsoft To Do.',
-    comingSoon: 'Fonctionnalité à venir',
-    comingSoonDescription: 'La gestion des listes de tâches sera disponible dans une mise à jour future.',
+    description: 'Sélectionnez les listes à afficher et configurez les permissions de modification.',
+    selectLists: 'Sélectionner les listes',
+    selectListsHelp: 'Choisissez les listes qui apparaissent sur la page Tâches.',
+    allowTopLevelEdit: 'Permettre la modification des tâches',
+    allowTopLevelEditHelp: 'Lorsque désactivé, les tâches de cette liste ne peuvent pas être complétées ou supprimées (utile pour les listes de type catégories comme les courses).',
+    noLists: 'Aucune liste de tâches trouvée. Connectez-vous pour synchroniser vos listes.',
   },
 
   // Meals
