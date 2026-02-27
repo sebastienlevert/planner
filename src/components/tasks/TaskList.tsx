@@ -48,8 +48,8 @@ export const TaskList: React.FC<TaskListProps> = ({ showCompleted = false }) => 
 
   if (filteredTasks.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-500">
-        <CheckCircle2 size={48} className="mx-auto mb-3 text-gray-400" />
+      <div className="text-center py-12 text-muted-foreground">
+        <CheckCircle2 size={48} className="mx-auto mb-3 text-muted-foreground" />
         <p>{showCompleted ? t.tasks.noCompletedTasks : t.tasks.noActiveTasks}</p>
       </div>
     );
@@ -63,10 +63,10 @@ export const TaskList: React.FC<TaskListProps> = ({ showCompleted = false }) => 
 
         return (
           <div key={listId} className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            <h3 className="text-lg font-semibold text-foreground mb-4">
               {list?.displayName || t.events.unknown}
               {account && (
-                <span className="text-sm font-normal text-gray-500 ml-2">
+                <span className="text-sm font-normal text-muted-foreground ml-2">
                   ({account.email})
                 </span>
               )}
@@ -76,7 +76,7 @@ export const TaskList: React.FC<TaskListProps> = ({ showCompleted = false }) => 
               {listTasks.map(task => (
                 <div
                   key={task.id}
-                  className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border"
+                  className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors border"
                 >
                   {/* Checkbox */}
                   <button
@@ -87,7 +87,7 @@ export const TaskList: React.FC<TaskListProps> = ({ showCompleted = false }) => 
                     {task.status === 'completed' ? (
                       <CheckCircle2 size={24} className="text-green-600" />
                     ) : (
-                      <Circle size={24} className="text-gray-400 hover:text-primary-600" />
+                      <Circle size={24} className="text-muted-foreground hover:text-primary-600" />
                     )}
                   </button>
 
@@ -97,8 +97,8 @@ export const TaskList: React.FC<TaskListProps> = ({ showCompleted = false }) => 
                       <p
                         className={`font-medium ${
                           task.status === 'completed'
-                            ? 'line-through text-gray-500'
-                            : 'text-gray-900'
+                            ? 'line-through text-muted-foreground'
+                            : 'text-foreground'
                         }`}
                       >
                         {task.title}
@@ -110,13 +110,13 @@ export const TaskList: React.FC<TaskListProps> = ({ showCompleted = false }) => 
                     </div>
 
                     {task.body?.content && (
-                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                         {task.body.content}
                       </p>
                     )}
 
                     {task.dueDateTime && (
-                      <div className="flex items-center gap-1 text-sm text-gray-500 mt-2">
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground mt-2">
                         <CalendarIcon size={14} />
                         <span>
                           Due {dateHelpers.formatDate(task.dueDateTime.dateTime, 'PPP')}
@@ -128,7 +128,7 @@ export const TaskList: React.FC<TaskListProps> = ({ showCompleted = false }) => 
                   {/* Delete Button */}
                   <button
                     onClick={() => handleDelete(task)}
-                    className="btn-icon text-red-600 hover:bg-red-50 flex-shrink-0"
+                    className="btn-icon text-red-600 hover:bg-destructive/10 flex-shrink-0"
                     aria-label="Delete task"
                   >
                     <Trash2 size={18} />

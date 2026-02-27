@@ -40,11 +40,11 @@ export const CalendarPage: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center max-w-md">
-          <CalendarIcon size={64} className="mx-auto text-gray-400 mb-4" />
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+          <CalendarIcon size={64} className="mx-auto text-muted-foreground mb-4" />
+          <h2 className="text-2xl font-semibold text-foreground mb-2">
             {t.auth.welcome}
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-muted-foreground mb-6">
             {t.auth.signInMessage}
           </p>
           <LoginButton />

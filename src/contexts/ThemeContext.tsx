@@ -66,8 +66,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     // Set data attribute and class for theme-specific styling
     root.setAttribute('data-theme', themeName);
 
-    // Add/remove dark class for dark mode
-    if (themeName === 'dark') {
+    // Add/remove dark class for dark mode themes
+    const darkThemes: ThemeName[] = ['dark', 'nord', 'catppuccin', 'dracula', 'midnight'];
+    if (darkThemes.includes(themeName)) {
       root.classList.add('dark');
     } else {
       root.classList.remove('dark');

@@ -11,7 +11,7 @@ const categoryColors: Record<FridgeCategory, string> = {
   seafood: 'bg-cyan-100 text-cyan-800',
   pantry: 'bg-yellow-100 text-yellow-800',
   condiments: 'bg-purple-100 text-purple-800',
-  other: 'bg-gray-100 text-gray-800',
+  other: 'bg-secondary text-secondary-foreground',
 };
 
 export const FridgeInventory: React.FC = () => {
@@ -56,7 +56,7 @@ export const FridgeInventory: React.FC = () => {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <RefrigeratorIcon size={24} className="text-primary-600" />
-          <h3 className="text-lg font-semibold text-gray-900">{t.meals.fridgeInventory}</h3>
+          <h3 className="text-lg font-semibold text-foreground">{t.meals.fridgeInventory}</h3>
         </div>
         <button
           onClick={() => setIsAdding(!isAdding)}
@@ -68,7 +68,7 @@ export const FridgeInventory: React.FC = () => {
       </div>
 
       {isAdding && (
-        <form onSubmit={handleSubmit} className="mb-4 p-4 bg-gray-50 rounded-lg">
+        <form onSubmit={handleSubmit} className="mb-4 p-4 bg-muted rounded-lg">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <input
               type="text"
@@ -118,8 +118,8 @@ export const FridgeInventory: React.FC = () => {
       )}
 
       {fridgeItems.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
-          <RefrigeratorIcon size={48} className="mx-auto mb-3 text-gray-400" />
+        <div className="text-center py-8 text-muted-foreground">
+          <RefrigeratorIcon size={48} className="mx-auto mb-3 text-muted-foreground" />
           <p>{t.meals.emptyFridge}</p>
         </div>
       ) : (
@@ -130,12 +130,12 @@ export const FridgeInventory: React.FC = () => {
 
             return (
               <div key={cat.value}>
-                <h4 className="text-sm font-semibold text-gray-700 mb-2">{cat.label}</h4>
+                <h4 className="text-sm font-semibold text-muted-foreground mb-2">{cat.label}</h4>
                 <div className="space-y-2">
                   {items.map(item => (
                     <div
                       key={item.id}
-                      className="flex items-center justify-between p-3 bg-white border rounded-lg hover:shadow-sm transition-shadow"
+                      className="flex items-center justify-between p-3 bg-card border rounded-lg hover:shadow-sm transition-shadow"
                     >
                       <div className="flex items-center gap-3">
                         <span className={`px-2 py-1 rounded text-xs font-medium ${categoryColors[item.category]}`}>
@@ -143,12 +143,12 @@ export const FridgeInventory: React.FC = () => {
                         </span>
                         <span className="font-medium">{item.name}</span>
                         {item.quantity && (
-                          <span className="text-sm text-gray-500">({item.quantity})</span>
+                          <span className="text-sm text-muted-foreground">({item.quantity})</span>
                         )}
                       </div>
                       <button
                         onClick={() => removeFridgeItem(item.id)}
-                        className="btn-icon text-red-600 hover:bg-red-50"
+                        className="btn-icon text-red-600 hover:bg-destructive/10"
                         aria-label={`Remove ${item.name}`}
                       >
                         <Trash2 size={18} />

@@ -21,7 +21,7 @@ export const AuthCallback: React.FC = () => {
     <div className="flex items-center justify-center min-h-screen">
       <div className="text-center">
         <div className="loading-spinner mx-auto mb-4"></div>
-        <p className="text-gray-600">Completing sign in...</p>
+        <p className="text-muted-foreground">Completing sign in...</p>
       </div>
     </div>
   );

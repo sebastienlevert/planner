@@ -25,8 +25,8 @@ export const RecipeGenerator: React.FC = () => {
       <div className="card">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">{t.meals.aiRecipeSuggestions}</h3>
-            <p className="text-sm text-gray-600">
+            <h3 className="text-lg font-semibold text-foreground mb-1">{t.meals.aiRecipeSuggestions}</h3>
+            <p className="text-sm text-muted-foreground">
               {fridgeItems.length} ingredients available
             </p>
           </div>
@@ -41,13 +41,13 @@ export const RecipeGenerator: React.FC = () => {
         </div>
 
         {error && (
-          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+          <div className="mt-4 p-4 bg-destructive/10 border border-destructive/30 rounded-lg text-destructive text-sm">
             {error}
           </div>
         )}
 
         {fridgeItems.length === 0 && (
-          <p className="mt-4 text-sm text-gray-500">
+          <p className="mt-4 text-sm text-muted-foreground">
             {t.meals.addIngredientsFirst}
           </p>
         )}
@@ -56,7 +56,7 @@ export const RecipeGenerator: React.FC = () => {
       {/* Recipe List */}
       {recipes.length > 0 && (
         <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          <h3 className="text-lg font-semibold text-foreground mb-4">
             {t.meals.yourRecipes} ({recipes.length})
           </h3>
 
@@ -64,11 +64,11 @@ export const RecipeGenerator: React.FC = () => {
             {recipes.map(recipe => (
               <div
                 key={recipe.id}
-                className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer bg-white"
+                className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer bg-card"
                 onClick={() => setSelectedRecipeId(recipe.id)}
               >
                 <div className="flex items-start justify-between mb-2">
-                  <h4 className="font-semibold text-gray-900">{recipe.title}</h4>
+                  <h4 className="font-semibold text-foreground">{recipe.title}</h4>
                   <div className="flex gap-2">
                     <button
                       onClick={e => {
@@ -80,7 +80,7 @@ export const RecipeGenerator: React.FC = () => {
                     >
                       <Heart
                         size={18}
-                        className={recipe.isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400'}
+                        className={recipe.isFavorite ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}
                       />
                     </button>
                     <button
@@ -98,9 +98,9 @@ export const RecipeGenerator: React.FC = () => {
                   </div>
                 </div>
 
-                <p className="text-sm text-gray-600 mb-3 line-clamp-2">{recipe.description}</p>
+                <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{recipe.description}</p>
 
-                <div className="flex items-center gap-4 text-xs text-gray-500">
+                <div className="flex items-center gap-4 text-xs text-muted-foreground">
                   {recipe.prepTime && (
                     <div className="flex items-center gap-1">
                       <Clock size={14} />
@@ -132,9 +132,9 @@ export const RecipeGenerator: React.FC = () => {
       {/* Recipe Detail Modal */}
       {selectedRecipe && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b p-6 flex items-center justify-between">
-              <h2 className="text-2xl font-semibold text-gray-900">{selectedRecipe.title}</h2>
+          <div className="bg-popover rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-popover border-b p-6 flex items-center justify-between">
+              <h2 className="text-2xl font-semibold text-foreground">{selectedRecipe.title}</h2>
               <button
                 onClick={() => setSelectedRecipeId(null)}
                 className="btn-secondary"
@@ -144,9 +144,9 @@ export const RecipeGenerator: React.FC = () => {
             </div>
 
             <div className="p-6 space-y-6">
-              <p className="text-gray-700">{selectedRecipe.description}</p>
+              <p className="text-foreground">{selectedRecipe.description}</p>
 
-              <div className="flex gap-6 text-sm text-gray-600">
+              <div className="flex gap-6 text-sm text-muted-foreground">
                 {selectedRecipe.prepTime && (
                   <div>
                     <strong>{t.meals.prep}</strong> {selectedRecipe.prepTime}
@@ -165,8 +165,8 @@ export const RecipeGenerator: React.FC = () => {
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">{t.meals.ingredients}</h3>
-                <ul className="list-disc list-inside space-y-1 text-gray-700">
+                <h3 className="text-lg font-semibold text-foreground mb-3">{t.meals.ingredients}</h3>
+                <ul className="list-disc list-inside space-y-1 text-foreground">
                   {selectedRecipe.ingredients.map((ing, idx) => (
                     <li key={idx}>{ing}</li>
                   ))}
@@ -174,8 +174,8 @@ export const RecipeGenerator: React.FC = () => {
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">{t.meals.instructions}</h3>
-                <ol className="list-decimal list-inside space-y-2 text-gray-700">
+                <h3 className="text-lg font-semibold text-foreground mb-3">{t.meals.instructions}</h3>
+                <ol className="list-decimal list-inside space-y-2 text-foreground">
                   {selectedRecipe.instructions.map((step, idx) => (
                     <li key={idx} className="pl-2">
                       {step}

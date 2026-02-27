@@ -1,4 +1,4 @@
-export type ThemeName = 'light' | 'dark' | 'blue' | 'purple' | 'green' | 'rose' | 'amber' | 'slate';
+export type ThemeName = 'light' | 'dark' | 'blue' | 'purple' | 'green' | 'rose' | 'amber' | 'slate' | 'nord' | 'catppuccin' | 'dracula' | 'sunset' | 'midnight' | 'sandstone' | 'lavender';
 
 export interface Theme {
   name: ThemeName;
@@ -233,6 +233,188 @@ export const themes: Record<ThemeName, Theme> = {
       border: '214 32% 91%',            // #e2e8f0
       input: '214 32% 91%',
       ring: '215 28% 17%',
+      radius: '1rem',
+    },
+  },
+  nord: {
+    name: 'nord',
+    label: 'Nord',
+    colors: {
+      background: '220 16% 22%',        // #2e3440
+      foreground: '219 28% 88%',        // #d8dee9
+      card: '220 17% 27%',              // #3b4252
+      cardForeground: '219 28% 88%',
+      popover: '220 17% 27%',
+      popoverForeground: '219 28% 88%',
+      primary: '213 32% 52%',           // #5e81ac
+      primaryForeground: '0 0% 100%',
+      secondary: '220 16% 32%',         // #434c5e
+      secondaryForeground: '219 28% 88%',
+      muted: '220 16% 28%',
+      mutedForeground: '219 14% 63%',   // #7b88a1
+      accent: '213 32% 52%',
+      accentForeground: '0 0% 100%',
+      destructive: '354 42% 56%',       // #bf616a
+      destructiveForeground: '0 0% 100%',
+      border: '220 16% 36%',
+      input: '220 16% 32%',
+      ring: '213 32% 52%',
+      radius: '0.75rem',
+    },
+  },
+  catppuccin: {
+    name: 'catppuccin',
+    label: 'Catppuccin',
+    colors: {
+      background: '240 21% 15%',        // #1e1e2e
+      foreground: '226 64% 88%',        // #cdd6f4
+      card: '240 21% 18%',              // #24243e - slightly lighter
+      cardForeground: '226 64% 88%',
+      popover: '240 21% 18%',
+      popoverForeground: '226 64% 88%',
+      primary: '267 84% 81%',           // #cba6f7 - mauve
+      primaryForeground: '240 21% 15%',
+      secondary: '240 21% 22%',         // #313244
+      secondaryForeground: '226 64% 88%',
+      muted: '240 21% 20%',
+      mutedForeground: '228 24% 60%',   // #7f849c
+      accent: '267 84% 81%',
+      accentForeground: '240 21% 15%',
+      destructive: '343 81% 75%',       // #f38ba8
+      destructiveForeground: '240 21% 15%',
+      border: '240 21% 25%',
+      input: '240 21% 22%',
+      ring: '267 84% 81%',
+      radius: '0.75rem',
+    },
+  },
+  dracula: {
+    name: 'dracula',
+    label: 'Dracula',
+    colors: {
+      background: '231 15% 18%',        // #282a36
+      foreground: '60 30% 96%',         // #f8f8f2
+      card: '232 14% 22%',              // #2d2f3f
+      cardForeground: '60 30% 96%',
+      popover: '232 14% 22%',
+      popoverForeground: '60 30% 96%',
+      primary: '265 89% 78%',           // #bd93f9 - purple
+      primaryForeground: '231 15% 18%',
+      secondary: '231 15% 26%',         // #383a4e
+      secondaryForeground: '60 30% 96%',
+      muted: '231 15% 24%',
+      mutedForeground: '228 8% 56%',    // #8490a5
+      accent: '191 97% 77%',            // #8be9fd - cyan
+      accentForeground: '231 15% 18%',
+      destructive: '0 100% 67%',        // #ff5555
+      destructiveForeground: '60 30% 96%',
+      border: '231 15% 30%',
+      input: '231 15% 26%',
+      ring: '265 89% 78%',
+      radius: '0.75rem',
+    },
+  },
+  sunset: {
+    name: 'sunset',
+    label: 'Sunset',
+    colors: {
+      background: '30 50% 97%',         // warm cream
+      foreground: '20 20% 20%',         // dark warm brown
+      card: '30 40% 99%',
+      cardForeground: '20 20% 20%',
+      popover: '30 40% 99%',
+      popoverForeground: '20 20% 20%',
+      primary: '15 80% 55%',            // warm coral-orange
+      primaryForeground: '0 0% 100%',
+      secondary: '30 40% 92%',          // soft warm beige
+      secondaryForeground: '20 20% 30%',
+      muted: '30 30% 93%',
+      mutedForeground: '20 10% 50%',
+      accent: '350 65% 60%',            // soft rose
+      accentForeground: '0 0% 100%',
+      destructive: '0 72% 51%',
+      destructiveForeground: '0 0% 100%',
+      border: '30 25% 88%',
+      input: '30 30% 92%',
+      ring: '15 80% 55%',
+      radius: '1rem',
+    },
+  },
+  midnight: {
+    name: 'midnight',
+    label: 'Midnight',
+    colors: {
+      background: '230 25% 9%',         // deep navy
+      foreground: '220 20% 85%',        // soft silver
+      card: '230 22% 13%',              // elevated navy
+      cardForeground: '220 20% 85%',
+      popover: '230 22% 13%',
+      popoverForeground: '220 20% 85%',
+      primary: '220 70% 55%',           // rich blue
+      primaryForeground: '0 0% 100%',
+      secondary: '230 20% 18%',
+      secondaryForeground: '220 20% 85%',
+      muted: '230 20% 15%',
+      mutedForeground: '220 15% 55%',
+      accent: '200 80% 60%',            // teal accent
+      accentForeground: '0 0% 100%',
+      destructive: '0 65% 55%',
+      destructiveForeground: '0 0% 100%',
+      border: '230 18% 22%',
+      input: '230 20% 18%',
+      ring: '220 70% 55%',
+      radius: '0.75rem',
+    },
+  },
+  sandstone: {
+    name: 'sandstone',
+    label: 'Sandstone',
+    colors: {
+      background: '40 30% 96%',         // warm off-white
+      foreground: '30 15% 22%',         // dark warm gray
+      card: '40 25% 99%',
+      cardForeground: '30 15% 22%',
+      popover: '40 25% 99%',
+      popoverForeground: '30 15% 22%',
+      primary: '25 40% 48%',            // earthy brown
+      primaryForeground: '0 0% 100%',
+      secondary: '40 25% 91%',          // soft sand
+      secondaryForeground: '30 15% 30%',
+      muted: '40 20% 92%',
+      mutedForeground: '30 10% 50%',
+      accent: '40 30% 88%',
+      accentForeground: '30 15% 25%',
+      destructive: '0 72% 51%',
+      destructiveForeground: '0 0% 100%',
+      border: '40 20% 87%',
+      input: '40 20% 91%',
+      ring: '25 40% 48%',
+      radius: '1rem',
+    },
+  },
+  lavender: {
+    name: 'lavender',
+    label: 'Lavender',
+    colors: {
+      background: '260 30% 97%',        // soft lavender white
+      foreground: '260 20% 20%',        // dark purple-gray
+      card: '260 25% 99%',
+      cardForeground: '260 20% 20%',
+      popover: '260 25% 99%',
+      popoverForeground: '260 20% 20%',
+      primary: '260 50% 60%',           // soft purple
+      primaryForeground: '0 0% 100%',
+      secondary: '260 30% 92%',         // light lavender
+      secondaryForeground: '260 20% 30%',
+      muted: '260 20% 93%',
+      mutedForeground: '260 10% 50%',
+      accent: '290 40% 65%',            // orchid accent
+      accentForeground: '0 0% 100%',
+      destructive: '0 72% 51%',
+      destructiveForeground: '0 0% 100%',
+      border: '260 20% 89%',
+      input: '260 20% 92%',
+      ring: '260 50% 60%',
       radius: '1rem',
     },
   },
