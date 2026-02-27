@@ -23,8 +23,6 @@ interface AgendaViewProps {
 export const AgendaView: React.FC<AgendaViewProps> = ({ currentDate, onCreateEvent, onDateChange, onEventClick }) => {
   const { events, getEventsForDateRange, ensureDateRange } = useCalendar();
   const { locale, t } = useLocale();
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [expandedDay, setExpandedDay] = useState<{ date: Date; events: CalendarEvent[] } | null>(null);
 
   const MAX_VISIBLE_EVENTS = 3;
@@ -118,32 +116,6 @@ export const AgendaView: React.FC<AgendaViewProps> = ({ currentDate, onCreateEve
     }
   };
 
-  // Swipe to navigate weeks
-  const minSwipeDistance = 50;
-
-  const onTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const onTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const onTouchEnd = () => {
-    if (!touchStart || !touchEnd || !onDateChange) return;
-
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
-
-    if (isLeftSwipe) {
-      onDateChange(dateHelpers.nextWeek(currentDate));
-    } else if (isRightSwipe) {
-      onDateChange(dateHelpers.previousWeek(currentDate));
-    }
-  };
-
   // Top row: Sun(0)–Wed(3), Bottom row: Thu(4)–Sat(6) + next week preview
   const topRow = weekDays.slice(0, 4);
   const bottomRow = weekDays.slice(4, 7);
@@ -186,7 +158,7 @@ export const AgendaView: React.FC<AgendaViewProps> = ({ currentDate, onCreateEve
         </div>
 
         {/* Events */}
-        <div className="p-4 space-y-3 overflow-hidden">
+        <div className="flex-1 p-4 space-y-3 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {visibleEvents.map(event => {
             const eventEnd = new Date(event.end.dateTime);
             const isPast = eventEnd < new Date();
@@ -215,12 +187,7 @@ export const AgendaView: React.FC<AgendaViewProps> = ({ currentDate, onCreateEve
   };
 
   return (
-    <div
-      className="flex flex-col h-full bg-background p-4 gap-4"
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
-    >
+    <div className="flex flex-col h-full bg-background p-4 gap-4">
       {/* Top row: Sun–Wed (4 cells) */}
       <div className="flex-1 grid grid-cols-4 gap-4 min-h-0">
         {topRow.map(day => renderDayCell(day))}
@@ -251,7 +218,7 @@ export const AgendaView: React.FC<AgendaViewProps> = ({ currentDate, onCreateEve
           </div>
 
           {/* Preview events */}
-          <div className="flex-1 p-4 space-y-3 overflow-hidden">
+          <div className="flex-1 p-4 space-y-3 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {nextWeekPreviewEvents.length > 0 ? (
               nextWeekPreviewEvents.slice(0, MAX_VISIBLE_EVENTS).map(event => (
                 <EventCard

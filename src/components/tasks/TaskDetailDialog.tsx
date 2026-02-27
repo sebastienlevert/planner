@@ -26,7 +26,7 @@ export const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
   isOpen,
   onClose,
   task,
-  allowEdit,
+  allowEdit: _allowEdit,
 }) => {
   const { getChecklistItems, createChecklistItem, deleteChecklistItem, toggleChecklistItem, lists } = useTask();
   const { locale, t } = useLocale();
