@@ -51,6 +51,31 @@ export class GraphService {
     return this.request<T>(endpoint, accessToken, { method: 'GET' });
   }
 
+  // Follow @odata.nextLink to get all pages of results
+  async getAll(endpoint: string, accessToken: string): Promise<{ value: any[] }> {
+    const allValues: any[] = [];
+    const firstPage: any = await this.get(endpoint, accessToken);
+    allValues.push(...(firstPage.value || []));
+
+    let nextLink: string | undefined = firstPage['@odata.nextLink'];
+    while (nextLink) {
+      const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const response = await fetch(nextLink, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+          'Prefer': `outlook.timezone="${userTimeZone}"`,
+        },
+      });
+      if (!response.ok) break;
+      const data = await response.json();
+      allValues.push(...(data.value || []));
+      nextLink = data['@odata.nextLink'];
+    }
+
+    return { value: allValues };
+  }
+
   async post<T>(endpoint: string, accessToken: string, body: any): Promise<T> {
     return this.request<T>(endpoint, accessToken, {
       method: 'POST',
@@ -109,7 +134,7 @@ export class GraphService {
       $top: '100',
     });
 
-    return this.get(`/me/calendarview?${params.toString()}`, accessToken);
+    return this.getAll(`/me/calendarview?${params.toString()}`, accessToken);
   }
 
   async getCalendarViewForCalendar(calendarId: string, accessToken: string, startDateTime: string, endDateTime: string) {
@@ -120,7 +145,7 @@ export class GraphService {
       $top: '100',
     });
 
-    return this.get(`/me/calendars/${calendarId}/calendarview?${params.toString()}`, accessToken);
+    return this.getAll(`/me/calendars/${calendarId}/calendarview?${params.toString()}`, accessToken);
   }
 
   async createEvent(calendarId: string, accessToken: string, event: any) {

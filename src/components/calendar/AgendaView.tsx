@@ -116,9 +116,9 @@ export const AgendaView: React.FC<AgendaViewProps> = ({ currentDate, onCreateEve
     }
   };
 
-  // Top row: Sun(0)–Wed(3), Bottom row: Thu(4)–Sat(6) + next week preview
-  const topRow = weekDays.slice(0, 4);
-  const bottomRow = weekDays.slice(4, 7);
+  // Top row: Mon(1)–Thu(4), Bottom row: Fri(5)–Sun(0) + next week preview
+  const topRow = weekDays.slice(1, 5);
+  const bottomRow = [weekDays[5], weekDays[6], weekDays[0]];
 
   const renderDayCell = (day: Date) => {
     const isToday = dateHelpers.isToday(day);
@@ -188,12 +188,12 @@ export const AgendaView: React.FC<AgendaViewProps> = ({ currentDate, onCreateEve
 
   return (
     <div className="flex flex-col h-full bg-background p-4 gap-4">
-      {/* Top row: Sun–Wed (4 cells) */}
+      {/* Top row: Mon–Thu (4 cells) */}
       <div className="flex-1 grid grid-cols-4 gap-4 min-h-0">
         {topRow.map(day => renderDayCell(day))}
       </div>
 
-      {/* Bottom row: Thu–Sat (3 cells) + Next week preview (1 cell) */}
+      {/* Bottom row: Fri–Sun (3 cells) + Next week preview (1 cell) */}
       <div className="flex-1 grid grid-cols-4 gap-4 min-h-0">
         {bottomRow.map(day => renderDayCell(day))}
 

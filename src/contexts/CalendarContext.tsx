@@ -40,6 +40,8 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
   // Track the date range we've already fetched events for
   const fetchedRangeRef = useRef<{ start: Date; end: Date } | null>(null);
   const isFetchingRef = useRef(false);
+  const pendingRangeRef = useRef<{ start: Date; end: Date } | null>(null);
+  const ensureDateRangeRef = useRef<(start: Date, end: Date) => void>(() => {});
 
   // Save selected calendars to settings whenever they change
   useEffect(() => {
@@ -93,10 +95,17 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
         setSelectedCalendars(allCalendars.map(cal => cal.id));
       }
 
-      // Fetch events for previous month, current month, and next month
+      // Fetch events - at minimum 3 months, but extend if user has navigated further
       const now = new Date();
-      const rangeStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-      const rangeEnd = new Date(now.getFullYear(), now.getMonth() + 2, 0); // last day of next month
+      const defaultStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const defaultEnd = new Date(now.getFullYear(), now.getMonth() + 2, 0); // last day of next month
+      const existingRange = fetchedRangeRef.current;
+      const rangeStart = existingRange
+        ? new Date(Math.min(defaultStart.getTime(), existingRange.start.getTime()))
+        : defaultStart;
+      const rangeEnd = existingRange
+        ? new Date(Math.max(defaultEnd.getTime(), existingRange.end.getTime()))
+        : defaultEnd;
       await fetchEventsForDateRange(rangeStart, rangeEnd, allCalendars, true);
       fetchedRangeRef.current = { start: rangeStart, end: rangeEnd };
 
@@ -156,28 +165,42 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
   // Ensure events are loaded for a given date range, fetching if needed
   const ensureDateRange = useCallback((start: Date, end: Date) => {
     const range = fetchedRangeRef.current;
-    if (!range || isFetchingRef.current || calendars.length === 0 || accounts.length === 0) return;
+    if (!range || calendars.length === 0 || accounts.length === 0) return;
+
+    // Already covered
+    if (start >= range.start && end <= range.end) return;
+
+    // If currently fetching, queue the range for later
+    if (isFetchingRef.current) {
+      const existing = pendingRangeRef.current;
+      pendingRangeRef.current = {
+        start: existing ? (start < existing.start ? start : existing.start) : start,
+        end: existing ? (end > existing.end ? end : existing.end) : end,
+      };
+      return;
+    }
 
     let fetchStart: Date | null = null;
     let fetchEnd: Date | null = null;
 
-    // Need to fetch earlier data
+    // Need to fetch earlier data — extend by an extra month backward
     if (start < range.start) {
-      fetchStart = start;
+      fetchStart = new Date(start.getFullYear(), start.getMonth() - 1, 1);
       fetchEnd = new Date(range.start.getTime() - 1);
     }
 
-    // Need to fetch later data
+    // Need to fetch later data — extend by an extra month forward
     if (end > range.end) {
       fetchStart = fetchStart || new Date(range.end.getTime() + 1);
-      fetchEnd = end;
+      const extendedEnd = new Date(end.getFullYear(), end.getMonth() + 2, 0);
+      fetchEnd = extendedEnd;
     }
 
     if (fetchStart && fetchEnd) {
       // Extend tracked range immediately to prevent duplicate fetches
       fetchedRangeRef.current = {
-        start: start < range.start ? start : range.start,
-        end: end > range.end ? end : range.end,
+        start: fetchStart < range.start ? fetchStart : range.start,
+        end: fetchEnd > range.end ? fetchEnd : range.end,
       };
 
       isFetchingRef.current = true;
@@ -187,10 +210,21 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
         .catch(err => console.error('Failed to load additional events:', err))
         .finally(() => {
           isFetchingRef.current = false;
-          setIsSyncing(false);
+
+          // Process any queued range request
+          const pending = pendingRangeRef.current;
+          if (pending) {
+            pendingRangeRef.current = null;
+            ensureDateRangeRef.current(pending.start, pending.end);
+          } else {
+            setIsSyncing(false);
+          }
         });
     }
   }, [calendars, accounts, getAccessToken]);
+
+  // Keep ref in sync so async callbacks always call the latest version
+  ensureDateRangeRef.current = ensureDateRange;
 
   // Create a new event
   const createEvent = async (input: CreateEventInput): Promise<CalendarEvent> => {
