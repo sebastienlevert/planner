@@ -50,6 +50,8 @@ export const CalendarPage: React.FC = () => {
     setIsDetailsModalOpen(true);
   };
 
+  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
   // Calculate month/year display based on current view and date
   const getMonthYearDisplay = (): string => {
     if (currentView === 'agenda') {
@@ -62,16 +64,16 @@ export const CalendarPage: React.FC = () => {
       const lastYear = weekEnd.getFullYear();
 
       if (firstMonth === lastMonth && firstYear === lastYear) {
-        return dateHelpers.formatDate(weekStart, 'MMMM yyyy', locale);
+        return capitalize(dateHelpers.formatDate(weekStart, 'MMMM yyyy', locale));
       }
 
       if (firstYear === lastYear) {
-        return `${dateHelpers.formatDate(weekStart, 'MMMM', locale)} / ${dateHelpers.formatDate(weekEnd, 'MMMM yyyy', locale)}`;
+        return `${capitalize(dateHelpers.formatDate(weekStart, 'MMMM', locale))} / ${capitalize(dateHelpers.formatDate(weekEnd, 'MMMM yyyy', locale))}`;
       }
 
-      return `${dateHelpers.formatDate(weekStart, 'MMMM yyyy', locale)} / ${dateHelpers.formatDate(weekEnd, 'MMMM yyyy', locale)}`;
+      return `${capitalize(dateHelpers.formatDate(weekStart, 'MMMM yyyy', locale))} / ${capitalize(dateHelpers.formatDate(weekEnd, 'MMMM yyyy', locale))}`;
     } else if (currentView === 'month') {
-      return dateHelpers.formatDate(currentDate, 'MMMM yyyy', locale);
+      return capitalize(dateHelpers.formatDate(currentDate, 'MMMM yyyy', locale));
     }
     return '';
   };
