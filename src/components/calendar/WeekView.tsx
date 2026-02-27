@@ -286,7 +286,7 @@ export const WeekView: React.FC<WeekViewProps> = ({ currentDate, onCreateEvent, 
       {/* Time grid */}
       <div
         ref={scrollContainerRef}
-        className="flex-1 overflow-auto bg-background overlay-scrollbar"
+        className="flex-1 overflow-auto bg-background"
       >
         <div className="flex min-h-full">
           {/* Hour labels */}

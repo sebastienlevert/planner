@@ -73,6 +73,41 @@
     min-height: 100vh;
     overflow-x: hidden;
     transition: background-color 0.3s ease, color 0.3s ease;
+
+    /* Global subtle scrollbars - hidden by default, overlay on hover */
+    scrollbar-width: none;
+  }
+
+  /* Hide scrollbar by default - no layout space reserved */
+  *::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 2px;
+  }
+
+  /* Show thin overlay scrollbar on hover (pointer devices only) */
+  @media (hover: hover) {
+    :hover::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+
+    :hover::-webkit-scrollbar-thumb {
+      background: hsl(var(--muted-foreground) / 0.3);
+    }
+
+    :hover {
+      scrollbar-width: thin;
+      scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+    }
   }
 
   #root {
@@ -173,29 +208,6 @@
   .touch-optimized {
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
-  }
-
-  /* Overlay scrollbar that doesn't affect layout */
-  .overlay-scrollbar {
-    scrollbar-gutter: auto;
-  }
-
-  .overlay-scrollbar::-webkit-scrollbar {
-    width: 8px;
-    position: absolute;
-  }
-
-  .overlay-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .overlay-scrollbar::-webkit-scrollbar-thumb {
-    background: var(--color-border);
-    border-radius: 4px;
-  }
-
-  .overlay-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: var(--color-text-secondary);
   }
 }
 

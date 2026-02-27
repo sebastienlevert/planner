@@ -202,7 +202,7 @@ export const DayView: React.FC<DayViewProps> = ({ currentDate, onCreateEvent, on
       )}
 
       {/* Time grid */}
-      <div ref={scrollContainerRef} className="flex-1 overflow-auto bg-background overlay-scrollbar">
+      <div ref={scrollContainerRef} className="flex-1 overflow-auto bg-background">
         <div className="flex min-h-full">
           {/* Hour labels */}
           <div className="w-24 flex-shrink-0 bg-card border-r border-border">
