@@ -130,6 +130,7 @@ export const frCA: TranslationKeys = {
     aboutDescription: 'Cette application s\'intègre avec les services Microsoft 365, y compris le calendrier Outlook, OneDrive et Azure OpenAI pour la planification des repas.',
     theme: 'Thème',
     themeHelp: 'Choisissez un thème pour personnaliser votre expérience de calendrier',
+    changeColor: 'Changer la couleur',
     applicationSettings: 'Paramètres de l\'application',
   },
 

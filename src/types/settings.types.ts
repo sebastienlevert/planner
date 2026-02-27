@@ -7,6 +7,7 @@ export interface AppSettings {
   locale?: Locale;
   theme?: ThemeName;
   selectedCalendars?: string[];
+  calendarColors?: Record<string, string>;
   selectedTodoLists?: string[];
   todoListSettings?: Record<string, TodoListSettings>;
 }

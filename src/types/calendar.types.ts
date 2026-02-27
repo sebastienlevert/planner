@@ -79,6 +79,7 @@ export interface CalendarContextType extends CalendarState {
   updateEvent: (eventId: string, updates: Partial<CalendarEvent>) => Promise<void>;
   deleteEvent: (eventId: string, accountId: string) => Promise<void>;
   toggleCalendar: (calendarId: string) => void;
+  setCalendarColor: (calendarId: string, color: string) => void;
   getEventsForDateRange: (start: Date, end: Date) => CalendarEvent[];
   ensureDateRange: (start: Date, end: Date) => void;
 }

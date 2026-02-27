@@ -128,6 +128,7 @@ export const en = {
     aboutDescription: 'This app integrates with Microsoft 365 services including Outlook Calendar, OneDrive, and Azure OpenAI for meal planning.',
     theme: 'Theme',
     themeHelp: 'Choose a theme to personalize your calendar experience',
+    changeColor: 'Change color',
     applicationSettings: 'Application Settings',
   },
 

@@ -1385,6 +1385,8 @@ VITE_AZURE_OPENAI_DEPLOYMENT=your_deployment_name_here
 
 1. **NEVER `git push` without explicit user approval.** Always commit locally and inform the user. Only push when the user explicitly says to push.
 2. **ALWAYS run `npm run build` before committing.** This runs `tsc -b && vite build` and catches TypeScript errors that `tsc --noEmit` may miss. Do not commit if the build fails.
+3. **ALWAYS stop the dev server before building, then restart it after.** Stop the running `npm run dev` process, run `npm run build`, then start `npm run dev` again. This ensures a clean build and a fresh dev server.
+4. **ALWAYS clear the Vite cache before starting the dev server.** Run `rm -rf node_modules/.vite` before `npm run dev` to avoid stale HMR cache errors (e.g., missing exports).
 
 ### Workflow for Implementing UI Features
 

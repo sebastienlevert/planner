@@ -28,6 +28,10 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
     const settings = StorageService.getSettings();
     return settings.selectedCalendars || [];
   });
+  const [_calendarColors, setCalendarColors] = useState<Record<string, string>>(() => {
+    const settings = StorageService.getSettings();
+    return settings.calendarColors || {};
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<number | null>(null);
@@ -71,6 +75,14 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
         const accessToken = await getAccessToken(account.homeAccountId);
         const accountCalendars = await calendarService.getCalendars(accessToken, account.homeAccountId);
         allCalendars.push(...accountCalendars);
+      }
+
+      // Apply user color overrides
+      const savedColors = StorageService.getSettings().calendarColors || {};
+      for (const cal of allCalendars) {
+        if (savedColors[cal.id]) {
+          cal.color = savedColors[cal.id];
+        }
       }
 
       setCalendars(allCalendars);
@@ -238,6 +250,19 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
     );
   };
 
+  // Set a custom color for a calendar
+  const setCalendarColorFn = useCallback((calendarId: string, color: string) => {
+    setCalendarColors(prev => {
+      const updated = { ...prev, [calendarId]: color };
+      const settings = StorageService.getSettings();
+      StorageService.setSettings({ ...settings, calendarColors: updated });
+      return updated;
+    });
+    setCalendars(prev => prev.map(cal =>
+      cal.id === calendarId ? { ...cal, color } : cal
+    ));
+  }, []);
+
   // Get events for a specific date range (filtered by selected calendars)
   const getEventsForDateRange = (startDate: Date, endDate: Date): CalendarEvent[] => {
     return events.filter(event => {
@@ -263,6 +288,7 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
     updateEvent,
     deleteEvent,
     toggleCalendar,
+    setCalendarColor: setCalendarColorFn,
     getEventsForDateRange,
     ensureDateRange,
   };

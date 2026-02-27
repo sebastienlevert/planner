@@ -21,7 +21,7 @@ type SettingsTab = 'accounts' | 'calendars' | 'todos' | 'general';
 
 export const SettingsPage: React.FC = () => {
   const { reloadAccounts, accounts } = useAuth();
-  const { calendars, selectedCalendars, toggleCalendar } = useCalendar();
+  const { calendars, selectedCalendars, toggleCalendar, setCalendarColor } = useCalendar();
   const { lists: todoLists, selectedLists: selectedTodoLists, toggleList, listSettings, setListSettings } = useTask();
   const { locale, setLocale, t } = useLocale();
   const { themeName, setTheme } = useTheme();
@@ -31,6 +31,17 @@ export const SettingsPage: React.FC = () => {
   const [selectedTheme, setSelectedTheme] = useState<ThemeName>(themeName);
   const [isSaved, setIsSaved] = useState(false);
   const [selectedAccountFilter, setSelectedAccountFilter] = useState<string>('all');
+  const [colorPickerCalendarId, setColorPickerCalendarId] = useState<string | null>(null);
+
+  const COLOR_PALETTE = [
+    '#3b82f6', '#2563eb', '#1d4ed8', // Blues
+    '#8b5cf6', '#7c3aed', '#a855f7', // Purples
+    '#ec4899', '#f43f5e', '#ef4444', // Pinks/Reds
+    '#f97316', '#f59e0b', '#eab308', // Oranges/Yellows
+    '#22c55e', '#16a34a', '#10b981', // Greens
+    '#14b8a6', '#06b6d4', '#0ea5e9', // Teals/Cyans
+    '#6366f1', '#64748b',            // Indigo/Slate
+  ];
 
   useEffect(() => {
     // Reload accounts when settings page mounts to pick up any new accounts from auth callback
@@ -181,12 +192,40 @@ export const SettingsPage: React.FC = () => {
                               <div className="text-xs text-muted-foreground/80">{calendar.owner.address}</div>
                             )}
                           </div>
-                          {calendar.color && (
-                            <div
-                              className="w-4 h-4 rounded-full border"
+                          <div className="relative">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setColorPickerCalendarId(prev => prev === calendar.id ? null : calendar.id);
+                              }}
+                              className="w-7 h-7 rounded-full border-2 border-muted-foreground/30 hover:border-foreground/50 transition-colors"
                               style={{ backgroundColor: calendar.color }}
+                              title={t.settings.changeColor}
                             />
-                          )}
+                            {colorPickerCalendarId === calendar.id && (
+                              <div
+                                className="absolute right-0 top-9 z-50 bg-popover border rounded-lg shadow-lg p-3 grid grid-cols-5 gap-2 w-56"
+                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                              >
+                                {COLOR_PALETTE.map((color) => (
+                                  <button
+                                    key={color}
+                                    type="button"
+                                    onClick={() => {
+                                      setCalendarColor(calendar.id, color);
+                                      setColorPickerCalendarId(null);
+                                    }}
+                                    className={`w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 ${
+                                      calendar.color === color ? 'border-foreground ring-2 ring-foreground/20' : 'border-transparent'
+                                    }`}
+                                    style={{ backgroundColor: color }}
+                                  />
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </label>
                       );
                     })}
