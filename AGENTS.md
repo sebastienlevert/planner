@@ -1381,6 +1381,11 @@ VITE_AZURE_OPENAI_DEPLOYMENT=your_deployment_name_here
 
 ## AI Agent Development Best Practices
 
+### Critical Git Rules
+
+1. **NEVER `git push` without explicit user approval.** Always commit locally and inform the user. Only push when the user explicitly says to push.
+2. **ALWAYS run `npm run build` before committing.** This runs `tsc -b && vite build` and catches TypeScript errors that `tsc --noEmit` may miss. Do not commit if the build fails.
+
 ### Workflow for Implementing UI Features
 
 When working on this project as an AI agent, follow this standard workflow:
