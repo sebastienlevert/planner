@@ -33,7 +33,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
   event,
 }) => {
   const { calendars, updateEvent, deleteEvent } = useCalendar();
-  const { t } = useLocale();
+  const { locale, t } = useLocale();
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -67,8 +67,8 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
   const startDate = new Date(event.start.dateTime);
   const endDate = new Date(event.end.dateTime);
-  const startTime = dateHelpers.formatTime(event.start.dateTime);
-  const endTime = dateHelpers.formatTime(event.end.dateTime);
+  const startTime = dateHelpers.formatTime(event.start.dateTime, locale);
+  const endTime = dateHelpers.formatTime(event.end.dateTime, locale);
 
   const handleEdit = () => {
     setFormData({
@@ -358,16 +358,16 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                     <div>
                       <div className="font-medium text-foreground">{t.calendar.allDay}</div>
                       <div className="text-sm text-muted-foreground">
-                        {dateHelpers.formatDate(startDate)}
+                        {dateHelpers.formatDate(startDate, 'PPP', locale)}
                         {startDate.toDateString() !== endDate.toDateString() && (
-                          <> - {dateHelpers.formatDate(endDate)}</>
+                          <> - {dateHelpers.formatDate(endDate, 'PPP', locale)}</>
                         )}
                       </div>
                     </div>
                   ) : (
                     <div>
                       <div className="font-medium text-foreground">
-                        {dateHelpers.formatDate(startDate)}
+                        {dateHelpers.formatDate(startDate, 'PPP', locale)}
                       </div>
                       <div className="text-sm text-muted-foreground">
                         {startTime} - {endTime}
@@ -466,7 +466,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={handleConfirmDelete}
         title={t.events.deleteEvent}
-        message={`Are you sure you want to delete "${event.subject}"? This action cannot be undone.`}
+        message={t.events.deleteEventConfirm.replace('{name}', event.subject)}
         confirmText={t.actions.delete}
         cancelText={t.actions.cancel}
         isLoading={isDeleting}
