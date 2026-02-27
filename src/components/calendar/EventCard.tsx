@@ -2,6 +2,7 @@ import React from 'react';
 import { Clock, MapPin, Users, Repeat } from 'lucide-react';
 import type { CalendarEvent } from '../../types/calendar.types';
 import { useCalendar } from '../../contexts/CalendarContext';
+import { useLocale } from '../../contexts/LocaleContext';
 import { dateHelpers } from '../../utils/dateHelpers';
 
 interface EventCardProps {
@@ -13,6 +14,7 @@ interface EventCardProps {
 
 export const EventCard: React.FC<EventCardProps> = ({ event, compact = false, onClick, isPast = false }) => {
   const { calendars } = useCalendar();
+  const { t } = useLocale();
 
   const calendar = calendars.find(cal => cal.id === event.calendarId);
   const eventColor = calendar?.color || '#0ea5e9';
@@ -23,7 +25,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, compact = false, on
   if (compact) {
     return (
       <div
-        className={`rounded-lg p-3 text-sm cursor-pointer transition-opacity hover:opacity-80 relative ${isPast ? 'opacity-50 bg-muted' : ''}`}
+        className={`rounded-lg p-4 text-base cursor-pointer transition-opacity hover:opacity-80 relative ${isPast ? 'opacity-50 bg-muted' : ''}`}
         style={{
           backgroundColor: isPast ? undefined : `${eventColor}40`,
         }}
@@ -36,7 +38,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, compact = false, on
           {event.subject}
         </div>
         {!event.isAllDay && (
-          <div className={`text-xs mt-0.5 ${isPast ? 'text-muted-foreground/70' : 'opacity-70'}`} style={isPast ? {} : { color: eventColor }}>
+          <div className={`text-sm mt-0.5 ${isPast ? 'text-muted-foreground/70' : 'opacity-70'}`} style={isPast ? {} : { color: eventColor }}>
             {startTime} – {endTime}
           </div>
         )}
@@ -88,7 +90,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, compact = false, on
         {event.isAllDay && (
           <div className="flex items-center gap-2">
             <Clock size={18} />
-            <span>All day</span>
+            <span>{t.calendar.allDay}</span>
           </div>
         )}
 
@@ -102,7 +104,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, compact = false, on
         {event.attendees && event.attendees.length > 0 && (
           <div className="flex items-center gap-2">
             <Users size={18} />
-            <span>{event.attendees.length} attendees</span>
+            <span>{event.attendees.length} {t.calendar.attendees}</span>
           </div>
         )}
       </div>

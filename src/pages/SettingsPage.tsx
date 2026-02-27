@@ -68,10 +68,10 @@ export const SettingsPage: React.FC = () => {
     : calendars.filter(cal => cal.accountId === selectedAccountFilter);
 
   const tabs = [
-    { id: 'accounts' as SettingsTab, label: 'Accounts', icon: Users },
-    { id: 'calendars' as SettingsTab, label: 'Calendars', icon: CalendarIcon },
-    { id: 'todos' as SettingsTab, label: 'To Dos', icon: CheckSquare },
-    { id: 'general' as SettingsTab, label: 'General', icon: Sliders },
+    { id: 'accounts' as SettingsTab, label: t.tabs.accounts, icon: Users },
+    { id: 'calendars' as SettingsTab, label: t.tabs.calendars, icon: CalendarIcon },
+    { id: 'todos' as SettingsTab, label: t.tabs.todos, icon: CheckSquare },
+    { id: 'general' as SettingsTab, label: t.tabs.general, icon: Sliders },
   ];
 
   return (
@@ -115,9 +115,9 @@ export const SettingsPage: React.FC = () => {
           {/* Accounts Tab */}
           <TabsContent value="accounts" className="space-y-6 mt-6">
             <div>
-              <h3 className="text-lg font-semibold mb-2 text-foreground">Microsoft Accounts</h3>
+              <h3 className="text-lg font-semibold mb-2 text-foreground">{t.auth.microsoftAccounts}</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Manage your connected Microsoft 365 accounts. Add multiple accounts to sync calendars and tasks from different organizations.
+                {t.auth.microsoftAccountsHelp}
               </p>
             </div>
             <AccountManager />
@@ -126,9 +126,9 @@ export const SettingsPage: React.FC = () => {
           {/* Calendars Tab */}
           <TabsContent value="calendars" className="space-y-6 mt-6">
             <div>
-              <h3 className="text-lg font-semibold mb-2 text-foreground">Calendar Sync</h3>
+              <h3 className="text-lg font-semibold mb-2 text-foreground">{t.settings.calendarSync}</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Select which calendars to sync and display. Only selected calendars will appear in your calendar view.
+                {t.settings.calendarSyncHelp}
               </p>
             </div>
 
@@ -136,14 +136,14 @@ export const SettingsPage: React.FC = () => {
             {accounts.length > 1 && (
               <Card>
                 <CardContent className="pt-6">
-                  <Label htmlFor="account-filter">Filter by Account</Label>
+                  <Label htmlFor="account-filter">{t.auth.filterByAccount}</Label>
                   <select
                     id="account-filter"
                     value={selectedAccountFilter}
                     onChange={(e) => setSelectedAccountFilter(e.target.value)}
                     className="w-full mt-2 flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
-                    <option value="all">All Accounts</option>
+                    <option value="all">{t.auth.allAccounts}</option>
                     {accounts.map((account) => (
                       <option key={account.homeAccountId} value={account.homeAccountId}>
                         {account.username}
@@ -191,7 +191,7 @@ export const SettingsPage: React.FC = () => {
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground italic py-4 text-center">
-                    {selectedAccountFilter === 'all' ? t.settings.noCalendars : 'No calendars found for this account.'}
+                    {selectedAccountFilter === 'all' ? t.settings.noCalendars : t.settings.noCalendarsForAccount}
                   </p>
                 )}
               </CardContent>
@@ -201,18 +201,18 @@ export const SettingsPage: React.FC = () => {
           {/* To Dos Tab */}
           <TabsContent value="todos" className="space-y-6 mt-6">
             <div>
-              <h3 className="text-lg font-semibold mb-2 text-foreground">To Do Lists</h3>
+              <h3 className="text-lg font-semibold mb-2 text-foreground">{t.todos.title}</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Manage your Microsoft To Do lists and tasks.
+                {t.todos.description}
               </p>
             </div>
 
             <Card>
               <CardContent className="py-12 text-center">
                 <CheckSquare size={48} className="mx-auto text-muted mb-4" />
-                <p className="text-muted-foreground text-lg font-medium mb-2">Feature Coming Later</p>
+                <p className="text-muted-foreground text-lg font-medium mb-2">{t.todos.comingSoon}</p>
                 <p className="text-sm text-muted-foreground/80">
-                  To Do list management will be available in a future update.
+                  {t.todos.comingSoonDescription}
                 </p>
               </CardContent>
             </Card>
@@ -223,7 +223,7 @@ export const SettingsPage: React.FC = () => {
             {/* App Settings */}
             <Card>
               <CardHeader>
-                <CardTitle>Application Settings</CardTitle>
+                <CardTitle>{t.settings.applicationSettings}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
@@ -260,7 +260,7 @@ export const SettingsPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Theme</Label>
+                  <Label>{t.settings.theme}</Label>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {Object.entries(themes).map(([key, theme]) => {
                       const isSelected = selectedTheme === key;
@@ -291,7 +291,7 @@ export const SettingsPage: React.FC = () => {
                     })}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Choose a theme to personalize your calendar experience
+                    {t.settings.themeHelp}
                   </p>
                 </div>
               </CardContent>

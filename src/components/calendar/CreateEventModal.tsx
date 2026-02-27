@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useCalendar } from '../../contexts/CalendarContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLocale } from '../../contexts/LocaleContext';
 import type { CreateEventInput } from '../../types/calendar.types';
 import {
   Dialog,
@@ -29,36 +31,52 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
   initialDate,
   initialHour = 9,
 }) => {
-  const { calendars, createEvent } = useCalendar();
+  const { calendars, createEvent, selectedCalendars } = useCalendar();
   const { accounts } = useAuth();
+  const { t } = useLocale();
 
-  // Only set initial values if we have calendars available
-  const [formData, setFormData] = useState({
-    subject: '',
-    body: '',
-    startDate: initialDate ? initialDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-    startTime: `${initialHour.toString().padStart(2, '0')}:00`,
-    endDate: initialDate ? initialDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-    endTime: `${(initialHour + 1).toString().padStart(2, '0')}:00`,
-    location: '',
-    calendarId: calendars.length > 0 ? calendars[0].id : '',
-    accountId: calendars.length > 0 ? calendars[0].accountId : '',
-    isAllDay: false,
-  });
+  const availableCalendars = calendars.filter(cal => selectedCalendars.includes(cal.id));
 
+  const getInitialFormData = () => {
+    const dateStr = initialDate ? initialDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+    return {
+      subject: '',
+      body: '',
+      startDate: dateStr,
+      startTime: `${initialHour.toString().padStart(2, '0')}:00`,
+      endDate: dateStr,
+      endTime: `${(initialHour + 1).toString().padStart(2, '0')}:00`,
+      location: '',
+      calendarId: availableCalendars.length > 0 ? availableCalendars[0].id : '',
+      accountId: availableCalendars.length > 0 ? availableCalendars[0].accountId : '',
+      isAllDay: false,
+    };
+  };
+
+  const [formData, setFormData] = useState(getInitialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showMore, setShowMore] = useState(false);
+
+  // Reset form when dialog opens with new date
+  React.useEffect(() => {
+    if (isOpen) {
+      setFormData(getInitialFormData());
+      setError(null);
+      setShowMore(false);
+    }
+  }, [isOpen, initialDate]);
 
   // Update form data when calendars are loaded
   React.useEffect(() => {
-    if (calendars.length > 0 && !formData.calendarId) {
+    if (availableCalendars.length > 0 && !formData.calendarId) {
       setFormData(prev => ({
         ...prev,
-        calendarId: calendars[0].id,
-        accountId: calendars[0].accountId,
+        calendarId: availableCalendars[0].id,
+        accountId: availableCalendars[0].accountId,
       }));
     }
-  }, [calendars]);
+  }, [availableCalendars]);
 
   const handleCalendarChange = (calendarId: string) => {
     const selectedCalendar = calendars.find(cal => cal.id === calendarId);
@@ -77,19 +95,18 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
     setIsSubmitting(true);
 
     try {
-      // Validate that we have calendars and accounts
       if (calendars.length === 0) {
-        throw new Error('No calendars available. Please add an account in Settings.');
+        throw new Error(t.events.noCalendarsError);
       }
 
       if (!formData.calendarId || !formData.accountId) {
-        throw new Error('Please select a calendar.');
+        throw new Error(t.events.selectCalendarError);
       }
 
       // Verify the account exists
       const accountExists = accounts.some(acc => acc.homeAccountId === formData.accountId);
       if (!accountExists) {
-        throw new Error('Account not found. Please try signing in again in Settings.');
+        throw new Error(t.events.accountNotFoundError);
       }
 
       let startDateTime: Date;
@@ -110,7 +127,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
       }
 
       if (endDateTime <= startDateTime) {
-        throw new Error('End time must be after start time');
+        throw new Error(t.events.endTimeError);
       }
 
       const input: CreateEventInput = {
@@ -126,20 +143,6 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
 
       await createEvent(input);
       onClose();
-
-      // Reset form
-      setFormData({
-        subject: '',
-        body: '',
-        startDate: new Date().toISOString().split('T')[0],
-        startTime: '09:00',
-        endDate: new Date().toISOString().split('T')[0],
-        endTime: '10:00',
-        location: '',
-        calendarId: calendars[0]?.id || '',
-        accountId: calendars[0]?.accountId || '',
-        isAllDay: false,
-      });
     } catch (err: any) {
       setError(err.message || 'Failed to create event');
     } finally {
@@ -151,9 +154,9 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create Event</DialogTitle>
+          <DialogTitle>{t.events.createEvent}</DialogTitle>
           <DialogDescription>
-            Add a new event to your calendar
+            {t.events.addEventDescription}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -163,28 +166,28 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
             </div>
           )}
 
-          {calendars.length === 0 && (
+          {availableCalendars.length === 0 && (
             <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-yellow-700 dark:text-yellow-400 text-sm">
-              No calendars available. Please add an account in Settings to create events.
+              {t.events.noCalendarsWarning}
             </div>
           )}
 
           {/* Title */}
           <div className="space-y-2">
-            <Label htmlFor="title">Title *</Label>
+            <Label htmlFor="title">{t.events.title} *</Label>
             <Input
               id="title"
               type="text"
               value={formData.subject}
               onChange={e => setFormData(prev => ({ ...prev, subject: e.target.value }))}
-              placeholder="Event title"
+              placeholder={t.events.eventTitle}
               required
             />
           </div>
 
           {/* Calendar Selection */}
           <div className="space-y-2">
-            <Label htmlFor="calendar">Calendar *</Label>
+            <Label htmlFor="calendar">{t.events.calendar} *</Label>
             <select
               id="calendar"
               value={formData.calendarId}
@@ -192,11 +195,11 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               required
             >
-              {calendars.map(cal => {
+              {availableCalendars.map(cal => {
                 const account = accounts.find(acc => acc.homeAccountId === cal.accountId);
                 return (
                   <option key={cal.id} value={cal.id}>
-                    {cal.name} ({account?.email || 'Unknown'})
+                    {cal.name} ({account?.email || t.events.unknown})
                   </option>
                 );
               })}
@@ -211,14 +214,14 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
               onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isAllDay: checked as boolean }))}
             />
             <Label htmlFor="allDay" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              All day event
+              {t.events.allDayEvent}
             </Label>
           </div>
 
           {/* Date and Time */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="startDate">Start Date *</Label>
+              <Label htmlFor="startDate">{t.events.startDate} *</Label>
               <Input
                 id="startDate"
                 type="date"
@@ -230,7 +233,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
 
             {!formData.isAllDay && (
               <div className="space-y-2">
-                <Label htmlFor="startTime">Start Time *</Label>
+                <Label htmlFor="startTime">{t.events.startTime} *</Label>
                 <Input
                   id="startTime"
                   type="time"
@@ -244,7 +247,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="endDate">End Date *</Label>
+              <Label htmlFor="endDate">{t.events.endDate} *</Label>
               <Input
                 id="endDate"
                 type="date"
@@ -256,7 +259,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
 
             {!formData.isAllDay && (
               <div className="space-y-2">
-                <Label htmlFor="endTime">End Time *</Label>
+                <Label htmlFor="endTime">{t.events.endTime} *</Label>
                 <Input
                   id="endTime"
                   type="time"
@@ -268,29 +271,43 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
             )}
           </div>
 
-          {/* Location */}
-          <div className="space-y-2">
-            <Label htmlFor="location">Location</Label>
-            <Input
-              id="location"
-              type="text"
-              value={formData.location}
-              onChange={e => setFormData(prev => ({ ...prev, location: e.target.value }))}
-              placeholder="Add location"
-            />
-          </div>
+          {/* Expandable section for less important fields */}
+          <button
+            type="button"
+            className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            onClick={() => setShowMore(!showMore)}
+          >
+            {showMore ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+            {t.events.moreOptions}
+          </button>
 
-          {/* Description */}
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={formData.body}
-              onChange={e => setFormData(prev => ({ ...prev, body: e.target.value }))}
-              rows={3}
-              placeholder="Add description"
-            />
-          </div>
+          {showMore && (
+            <div className="space-y-4 pl-1">
+              {/* Location */}
+              <div className="space-y-2">
+                <Label htmlFor="location">{t.events.location}</Label>
+                <Input
+                  id="location"
+                  type="text"
+                  value={formData.location}
+                  onChange={e => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                  placeholder={t.events.addLocation}
+                />
+              </div>
+
+              {/* Description */}
+              <div className="space-y-2">
+                <Label htmlFor="description">{t.events.description}</Label>
+                <Textarea
+                  id="description"
+                  value={formData.body}
+                  onChange={e => setFormData(prev => ({ ...prev, body: e.target.value }))}
+                  rows={3}
+                  placeholder={t.events.addDescription}
+                />
+              </div>
+            </div>
+          )}
 
           {/* Actions */}
           <DialogFooter>
@@ -300,13 +317,13 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
               onClick={onClose}
               disabled={isSubmitting}
             >
-              Cancel
+              {t.actions.cancel}
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting || calendars.length === 0}
+              disabled={isSubmitting || availableCalendars.length === 0}
             >
-              {isSubmitting ? 'Creating...' : 'Create Event'}
+              {isSubmitting ? t.actions.creating : t.events.createEvent}
             </Button>
           </DialogFooter>
         </form>

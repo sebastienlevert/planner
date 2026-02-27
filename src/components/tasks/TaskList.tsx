@@ -2,6 +2,7 @@ import React from 'react';
 import { CheckCircle2, Circle, Trash2, Calendar as CalendarIcon, AlertCircle } from 'lucide-react';
 import { useTask } from '../../contexts/TaskContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLocale } from '../../contexts/LocaleContext';
 import type { TodoTask } from '../../types/task.types';
 import { dateHelpers } from '../../utils/dateHelpers';
 
@@ -12,6 +13,7 @@ interface TaskListProps {
 export const TaskList: React.FC<TaskListProps> = ({ showCompleted = false }) => {
   const { tasks, lists, toggleTaskComplete, deleteTask } = useTask();
   const { accounts } = useAuth();
+  const { t } = useLocale();
 
   const filteredTasks = tasks.filter(task =>
     showCompleted ? task.status === 'completed' : task.status !== 'completed'
@@ -35,7 +37,7 @@ export const TaskList: React.FC<TaskListProps> = ({ showCompleted = false }) => 
   };
 
   const handleDelete = async (task: TodoTask) => {
-    if (confirm('Delete this task?')) {
+    if (confirm(t.tasks.deleteConfirm)) {
       try {
         await deleteTask(task.id, task.accountId);
       } catch (error) {
@@ -48,7 +50,7 @@ export const TaskList: React.FC<TaskListProps> = ({ showCompleted = false }) => 
     return (
       <div className="text-center py-12 text-gray-500">
         <CheckCircle2 size={48} className="mx-auto mb-3 text-gray-400" />
-        <p>{showCompleted ? 'No completed tasks' : 'No active tasks'}</p>
+        <p>{showCompleted ? t.tasks.noCompletedTasks : t.tasks.noActiveTasks}</p>
       </div>
     );
   }
@@ -62,7 +64,7 @@ export const TaskList: React.FC<TaskListProps> = ({ showCompleted = false }) => 
         return (
           <div key={listId} className="card">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              {list?.displayName || 'Unknown List'}
+              {list?.displayName || t.events.unknown}
               {account && (
                 <span className="text-sm font-normal text-gray-500 ml-2">
                   ({account.email})
@@ -80,7 +82,7 @@ export const TaskList: React.FC<TaskListProps> = ({ showCompleted = false }) => 
                   <button
                     onClick={() => handleToggle(task)}
                     className="touch-target flex-shrink-0 mt-1"
-                    aria-label={task.status === 'completed' ? 'Mark incomplete' : 'Mark complete'}
+                    aria-label={task.status === 'completed' ? t.actions.markIncomplete : t.actions.markComplete}
                   >
                     {task.status === 'completed' ? (
                       <CheckCircle2 size={24} className="text-green-600" />

@@ -1,10 +1,12 @@
 import React from 'react';
 import { Calendar, Users } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLocale } from '../../contexts/LocaleContext';
 import { LoginButton } from '../auth/LoginButton';
 
 export const Header: React.FC = () => {
   const { accounts, isAuthenticated } = useAuth();
+  const { t } = useLocale();
 
   return (
     <header className="bg-background shadow-sm border-b border-border sticky top-0 z-50">
@@ -17,9 +19,9 @@ export const Header: React.FC = () => {
             </div>
             <div>
               <h1 className="text-xl font-display font-semibold text-foreground">
-                Family Planner
+                {t.header.title}
               </h1>
-              <p className="text-xs text-muted-foreground">Your week at a glance</p>
+              <p className="text-xs text-muted-foreground">{t.header.subtitle}</p>
             </div>
           </div>
 
@@ -30,7 +32,7 @@ export const Header: React.FC = () => {
                 <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg">
                   <Users size={18} className="text-muted-foreground" />
                   <span className="text-sm font-medium text-foreground">
-                    {accounts.length} {accounts.length === 1 ? 'Account' : 'Accounts'}
+                    {accounts.length === 1 ? t.auth.accountsCount.replace('{count}', String(accounts.length)) : t.auth.accountsCountPlural.replace('{count}', String(accounts.length))}
                   </span>
                 </div>
               </div>

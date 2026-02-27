@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Folder, ChevronRight, Image as ImageIcon, Loader } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePhoto } from '../../contexts/PhotoContext';
+import { useLocale } from '../../contexts/LocaleContext';
 import { onedriveService } from '../../services/onedrive.service';
 import type { DriveItem } from '../../services/onedrive.service';
 import {
@@ -21,10 +22,11 @@ interface FolderPickerProps {
 export const FolderPicker: React.FC<FolderPickerProps> = ({ isOpen, onClose }) => {
   const { accounts, getAccessToken } = useAuth();
   const { setSelectedFolder } = usePhoto();
+  const { t } = useLocale();
   const [currentFolderId, setCurrentFolderId] = useState<string>('root');
   const [items, setItems] = useState<DriveItem[]>([]);
   const [breadcrumb, setBreadcrumb] = useState<Array<{ id: string; name: string }>>([
-    { id: 'root', name: 'OneDrive' },
+    { id: 'root', name: t.photos.oneDrive },
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +37,7 @@ export const FolderPicker: React.FC<FolderPickerProps> = ({ isOpen, onClose }) =
 
   const loadFolder = async (folderId: string) => {
     if (accounts.length === 0) {
-      setError('Please sign in to access OneDrive');
+      setError(t.photos.signInToAccess);
       return;
     }
 
@@ -56,7 +58,7 @@ export const FolderPicker: React.FC<FolderPickerProps> = ({ isOpen, onClose }) =
       setItems(folderItems);
     } catch (err: any) {
       console.error('Failed to load folder:', err);
-      setError(err.message || 'Failed to load folder');
+      setError(err.message || t.photos.failedToLoadFolder);
     } finally {
       setIsLoading(false);
     }
@@ -87,13 +89,13 @@ export const FolderPicker: React.FC<FolderPickerProps> = ({ isOpen, onClose }) =
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <DialogTitle className="text-xl">Select Photo Folder</DialogTitle>
+              <DialogTitle className="text-xl">{t.photos.selectFolder}</DialogTitle>
               <DialogDescription className="sr-only">
                 Choose a folder from OneDrive to display photos
               </DialogDescription>
             </div>
             <Button variant="secondary" onClick={onClose}>
-              Cancel
+              {t.actions.cancel}
             </Button>
           </div>
 
@@ -132,7 +134,7 @@ export const FolderPicker: React.FC<FolderPickerProps> = ({ isOpen, onClose }) =
           ) : folders.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <Folder size={48} className="mx-auto mb-3 text-muted" />
-              <p>No folders found</p>
+              <p>{t.photos.noFolders}</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -151,7 +153,7 @@ export const FolderPicker: React.FC<FolderPickerProps> = ({ isOpen, onClose }) =
                       <p className="font-medium text-foreground">{folder.name}</p>
                       {folder.folder && (
                         <p className="text-sm text-muted-foreground">
-                          {folder.folder.childCount} items
+                          {folder.folder.childCount} {t.photos.items}
                         </p>
                       )}
                     </div>
@@ -161,7 +163,7 @@ export const FolderPicker: React.FC<FolderPickerProps> = ({ isOpen, onClose }) =
                     onClick={() => selectFolder(folder)}
                     className="ml-3"
                   >
-                    Select
+                    {t.actions.select}
                   </Button>
                 </div>
               ))}
@@ -178,7 +180,7 @@ export const FolderPicker: React.FC<FolderPickerProps> = ({ isOpen, onClose }) =
                     <p className="font-medium text-foreground">
                       {breadcrumb[breadcrumb.length - 1].name}
                     </p>
-                    <p className="text-sm text-muted-foreground">This folder contains photos</p>
+                    <p className="text-sm text-muted-foreground">{t.photos.containsPhotos}</p>
                   </div>
                 </div>
                 <Button
@@ -187,7 +189,7 @@ export const FolderPicker: React.FC<FolderPickerProps> = ({ isOpen, onClose }) =
                     selectFolder({ id: currentFolder.id, name: currentFolder.name } as DriveItem);
                   }}
                 >
-                  Select This Folder
+                  {t.photos.selectThisFolder}
                 </Button>
               </div>
             </div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
+import { useLocale } from '../../contexts/LocaleContext';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,10 +30,12 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   onConfirm,
   title,
   message,
-  confirmText = 'Confirm',
-  cancelText = 'Cancel',
+  confirmText,
+  cancelText,
   isLoading = false,
 }) => {
+  const { t } = useLocale();
+
   const handleConfirm = () => {
     onConfirm();
   };
@@ -51,7 +54,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isLoading}>
-            {cancelText}
+            {cancelText || t.actions.cancel}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
@@ -61,7 +64,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             disabled={isLoading}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isLoading ? 'Processing...' : confirmText}
+            {isLoading ? t.actions.processing : (confirmText || t.actions.confirm)}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

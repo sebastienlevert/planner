@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, MapPin, Users, Trash2, Edit2, Calendar as CalendarIcon, Repeat } from 'lucide-react';
 import { useCalendar } from '../../contexts/CalendarContext';
+import { useLocale } from '../../contexts/LocaleContext';
 import type { CalendarEvent } from '../../types/calendar.types';
 import { dateHelpers } from '../../utils/dateHelpers';
 import { ConfirmDialog } from '../common/ConfirmDialog';
@@ -32,6 +33,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
   event,
 }) => {
   const { calendars, updateEvent, deleteEvent } = useCalendar();
+  const { t } = useLocale();
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -118,7 +120,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
       setIsEditing(false);
       onClose();
     } catch (err: any) {
-      setError(err.message || 'Failed to update event');
+      setError(err.message || t.events.failedToUpdate);
     } finally {
       setIsSubmitting(false);
     }
@@ -137,7 +139,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
       setShowDeleteConfirm(false);
       onClose();
     } catch (err: any) {
-      setError(err.message || 'Failed to delete event');
+      setError(err.message || t.events.failedToDelete);
       setShowDeleteConfirm(false);
     } finally {
       setIsDeleting(false);
@@ -151,7 +153,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
           <DialogHeader>
             <div className="flex items-start justify-between gap-4">
               <DialogTitle className="text-xl flex-1">
-                {isEditing ? 'Edit Event' : 'Event Details'}
+                {isEditing ? t.events.editEvent : t.events.eventDetails}
               </DialogTitle>
               {!isEditing && event && (
                 <DialogDescription className="sr-only">
@@ -197,13 +199,13 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
               {/* Title */}
               <div className="space-y-2">
-                <Label htmlFor="title">Title *</Label>
+                <Label htmlFor="title">{t.events.title} *</Label>
                 <Input
                   id="title"
                   type="text"
                   value={formData.subject}
                   onChange={e => setFormData(prev => ({ ...prev, subject: e.target.value }))}
-                  placeholder="Event title"
+                  placeholder={t.events.eventTitle}
                   required
                 />
               </div>
@@ -216,14 +218,14 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                   onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isAllDay: checked as boolean }))}
                 />
                 <Label htmlFor="allDay" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                  All day event
+                  {t.events.allDayEvent}
                 </Label>
               </div>
 
               {/* Date and Time */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="startDate">Start Date *</Label>
+                  <Label htmlFor="startDate">{t.events.startDate} *</Label>
                   <Input
                     id="startDate"
                     type="date"
@@ -235,7 +237,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
                 {!formData.isAllDay && (
                   <div className="space-y-2">
-                    <Label htmlFor="startTime">Start Time *</Label>
+                    <Label htmlFor="startTime">{t.events.startTime} *</Label>
                     <Input
                       id="startTime"
                       type="time"
@@ -249,7 +251,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="endDate">End Date *</Label>
+                  <Label htmlFor="endDate">{t.events.endDate} *</Label>
                   <Input
                     id="endDate"
                     type="date"
@@ -261,7 +263,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
                 {!formData.isAllDay && (
                   <div className="space-y-2">
-                    <Label htmlFor="endTime">End Time *</Label>
+                    <Label htmlFor="endTime">{t.events.endTime} *</Label>
                     <Input
                       id="endTime"
                       type="time"
@@ -275,25 +277,25 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
 
               {/* Location */}
               <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
+                <Label htmlFor="location">{t.events.location}</Label>
                 <Input
                   id="location"
                   type="text"
                   value={formData.location}
                   onChange={e => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                  placeholder="Add location"
+                  placeholder={t.events.addLocation}
                 />
               </div>
 
               {/* Description */}
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">{t.events.description}</Label>
                 <Textarea
                   id="description"
                   value={formData.body}
                   onChange={e => setFormData(prev => ({ ...prev, body: e.target.value }))}
                   rows={3}
-                  placeholder="Add description"
+                  placeholder={t.events.addDescription}
                 />
               </div>
 
@@ -305,13 +307,13 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                   onClick={handleCancelEdit}
                   disabled={isSubmitting}
                 >
-                  Cancel
+                  {t.actions.cancel}
                 </Button>
                 <Button
                   type="submit"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Saving...' : 'Save Changes'}
+                  {isSubmitting ? t.actions.saving : t.actions.saveChanges}
                 </Button>
               </DialogFooter>
             </form>
@@ -354,7 +356,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                 <div>
                   {event.isAllDay ? (
                     <div>
-                      <div className="font-medium text-foreground">All day</div>
+                      <div className="font-medium text-foreground">{t.calendar.allDay}</div>
                       <div className="text-sm text-muted-foreground">
                         {dateHelpers.formatDate(startDate)}
                         {startDate.toDateString() !== endDate.toDateString() && (
@@ -380,7 +382,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                 <div className="flex items-start gap-3">
                   <MapPin size={20} className="text-muted-foreground mt-0.5" />
                   <div>
-                    <div className="font-medium text-foreground">Location</div>
+                    <div className="font-medium text-foreground">{t.events.location}</div>
                     <div className="text-sm text-muted-foreground">{event.location.displayName}</div>
                   </div>
                 </div>
@@ -391,7 +393,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                 <div className="flex items-start gap-3">
                   <Users size={20} className="text-muted-foreground mt-0.5" />
                   <div>
-                    <div className="font-medium text-foreground">Organizer</div>
+                    <div className="font-medium text-foreground">{t.events.organizer}</div>
                     <div className="text-sm text-muted-foreground">
                       {event.organizer.emailAddress.name} ({event.organizer.emailAddress.address})
                     </div>
@@ -405,7 +407,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                   <Users size={20} className="text-muted-foreground mt-0.5" />
                   <div className="flex-1">
                     <div className="font-medium text-foreground mb-2">
-                      Attendees ({event.attendees.length})
+                      {t.events.attendees} ({event.attendees.length})
                     </div>
                     <div className="space-y-1">
                       {event.attendees.map((attendee, index) => (
@@ -426,7 +428,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                 <>
                   <Separator />
                   <div>
-                    <div className="font-medium text-foreground mb-2">Description</div>
+                    <div className="font-medium text-foreground mb-2">{t.events.description}</div>
                     <div className="text-sm text-muted-foreground whitespace-pre-wrap">
                       {event.bodyPreview}
                     </div>
@@ -439,17 +441,17 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
               <div className="flex gap-2">
                 {event.isCancelled && (
                   <Badge variant="destructive" className="text-xs">
-                    Cancelled
+                    {t.events.cancelled}
                   </Badge>
                 )}
                 {event.isOrganizer && (
                   <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
-                    You're the organizer
+                    {t.events.youAreOrganizer}
                   </Badge>
                 )}
                 {!canEdit && (
                   <Badge variant="secondary" className="text-xs">
-                    Read-only
+                    {t.events.readOnly}
                   </Badge>
                 )}
               </div>
@@ -463,10 +465,10 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
         isOpen={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={handleConfirmDelete}
-        title="Delete Event"
+        title={t.events.deleteEvent}
         message={`Are you sure you want to delete "${event.subject}"? This action cannot be undone.`}
-        confirmText="Delete"
-        cancelText="Cancel"
+        confirmText={t.actions.delete}
+        cancelText={t.actions.cancel}
         isLoading={isDeleting}
       />
     </>

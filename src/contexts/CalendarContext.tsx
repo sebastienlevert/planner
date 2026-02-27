@@ -4,7 +4,6 @@ import { calendarService } from '../services/calendar.service';
 import type { Calendar, CalendarEvent, CreateEventInput, CalendarContextType } from '../types/calendar.types';
 import { StorageService } from '../services/storage.service';
 import { appConfig } from '../config/app.config';
-import { dateHelpers } from '../utils/dateHelpers';
 
 const CalendarContext = createContext<CalendarContextType | undefined>(undefined);
 
@@ -82,13 +81,12 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
         setSelectedCalendars(allCalendars.map(cal => cal.id));
       }
 
-      // Fetch events for the current week plus 2 weeks ahead (to support agenda view)
-      const weekStart = dateHelpers.getWeekStart();
-      const weekEnd = dateHelpers.getWeekEnd();
-      const extendedEnd = new Date(weekEnd);
-      extendedEnd.setDate(extendedEnd.getDate() + 14); // Add 2 more weeks
-      await fetchEventsForDateRange(weekStart, extendedEnd, allCalendars, true);
-      fetchedRangeRef.current = { start: weekStart, end: extendedEnd };
+      // Fetch events for previous month, current month, and next month
+      const now = new Date();
+      const rangeStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const rangeEnd = new Date(now.getFullYear(), now.getMonth() + 2, 0); // last day of next month
+      await fetchEventsForDateRange(rangeStart, rangeEnd, allCalendars, true);
+      fetchedRangeRef.current = { start: rangeStart, end: rangeEnd };
 
       setLastSyncTime(Date.now());
       StorageService.setCalendarCache({ calendars: allCalendars, events, timestamp: Date.now() });

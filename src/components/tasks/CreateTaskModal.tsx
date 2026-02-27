@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTask } from '../../contexts/TaskContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLocale } from '../../contexts/LocaleContext';
 import type { CreateTaskInput } from '../../types/task.types';
 import {
   Dialog,
@@ -23,6 +24,7 @@ interface CreateTaskModalProps {
 export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose }) => {
   const { lists, createTask } = useTask();
   const { accounts } = useAuth();
+  const { t } = useLocale();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -75,7 +77,7 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClos
         accountId: lists[0]?.accountId || '',
       });
     } catch (err: any) {
-      setError(err.message || 'Failed to create task');
+      setError(err.message || t.tasks.failedToCreate);
     } finally {
       setIsSubmitting(false);
     }
@@ -85,9 +87,9 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClos
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create Task</DialogTitle>
+          <DialogTitle>{t.tasks.createTask}</DialogTitle>
           <DialogDescription>
-            Add a new task to your to-do list
+            {t.tasks.addTaskDescription}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -99,13 +101,13 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClos
 
           {/* Title */}
           <div className="space-y-2">
-            <Label htmlFor="taskTitle">Task Title *</Label>
+            <Label htmlFor="taskTitle">{t.tasks.taskTitle} *</Label>
             <Input
               id="taskTitle"
               type="text"
               value={formData.title}
               onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))}
-              placeholder="What needs to be done?"
+              placeholder={t.tasks.taskTitlePlaceholder}
               required
               autoFocus
             />
@@ -113,7 +115,7 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClos
 
           {/* List Selection */}
           <div className="space-y-2">
-            <Label htmlFor="list">List *</Label>
+            <Label htmlFor="list">{t.tasks.list} *</Label>
             <select
               id="list"
               value={formData.listId}
@@ -125,7 +127,7 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClos
                 const account = accounts.find(acc => acc.homeAccountId === list.accountId);
                 return (
                   <option key={list.id} value={list.id}>
-                    {list.displayName} ({account?.email || 'Unknown'})
+                    {list.displayName} ({account?.email || t.events.unknown})
                   </option>
                 );
               })}
@@ -134,22 +136,22 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClos
 
           {/* Importance */}
           <div className="space-y-2">
-            <Label htmlFor="importance">Importance</Label>
+            <Label htmlFor="importance">{t.tasks.importance}</Label>
             <select
               id="importance"
               value={formData.importance}
               onChange={e => setFormData(prev => ({ ...prev, importance: e.target.value as any }))}
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <option value="low">Low</option>
-              <option value="normal">Normal</option>
-              <option value="high">High</option>
+              <option value="low">{t.tasks.importanceLow}</option>
+              <option value="normal">{t.tasks.importanceNormal}</option>
+              <option value="high">{t.tasks.importanceHigh}</option>
             </select>
           </div>
 
           {/* Due Date */}
           <div className="space-y-2">
-            <Label htmlFor="dueDate">Due Date</Label>
+            <Label htmlFor="dueDate">{t.tasks.dueDate}</Label>
             <Input
               id="dueDate"
               type="date"
@@ -160,13 +162,13 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClos
 
           {/* Notes */}
           <div className="space-y-2">
-            <Label htmlFor="notes">Notes</Label>
+            <Label htmlFor="notes">{t.tasks.notes}</Label>
             <Textarea
               id="notes"
               value={formData.body}
               onChange={e => setFormData(prev => ({ ...prev, body: e.target.value }))}
               rows={3}
-              placeholder="Add notes or details"
+              placeholder={t.tasks.notesPlaceholder}
             />
           </div>
 
@@ -178,13 +180,13 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClos
               onClick={onClose}
               disabled={isSubmitting}
             >
-              Cancel
+              {t.actions.cancel}
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Creating...' : 'Create Task'}
+              {isSubmitting ? t.actions.creating : t.tasks.createTask}
             </Button>
           </DialogFooter>
         </form>

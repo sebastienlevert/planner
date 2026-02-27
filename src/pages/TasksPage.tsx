@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CheckSquare, RefreshCw, Plus } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useLocale } from '../contexts/LocaleContext';
 import { useTask } from '../contexts/TaskContext';
 import { LoginButton } from '../components/auth/LoginButton';
 import { TaskList } from '../components/tasks/TaskList';
@@ -9,6 +10,7 @@ import { Button } from '@/components/ui/button';
 
 export const TasksPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
+  const { t } = useLocale();
   const { isSyncing, syncTasks, lastSyncTime } = useTask();
   const [showCompleted, setShowCompleted] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -19,10 +21,10 @@ export const TasksPage: React.FC = () => {
         <div className="text-center max-w-md">
           <CheckSquare size={64} className="mx-auto text-muted-foreground mb-4" />
           <h2 className="text-2xl font-semibold text-foreground mb-2">
-            Task Management
+            {t.tasks.taskManagement}
           </h2>
           <p className="text-muted-foreground mb-6">
-            Sign in to manage your Microsoft To Do tasks.
+            {t.tasks.signInMessage}
           </p>
           <LoginButton />
         </div>
@@ -36,14 +38,14 @@ export const TasksPage: React.FC = () => {
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-semibold text-foreground">Tasks</h2>
-            <p className="text-muted-foreground">Manage your to-do lists</p>
+            <h2 className="text-2xl font-semibold text-foreground">{t.tasks.title}</h2>
+            <p className="text-muted-foreground">{t.tasks.subtitle}</p>
           </div>
 
           <div className="flex items-center gap-3">
             {lastSyncTime && (
               <span className="text-xs text-muted-foreground">
-                Last synced: {new Date(lastSyncTime).toLocaleTimeString()}
+                {t.tasks.lastSynced} {new Date(lastSyncTime).toLocaleTimeString()}
               </span>
             )}
             <Button
@@ -60,7 +62,7 @@ export const TasksPage: React.FC = () => {
               className="flex items-center gap-2"
             >
               <Plus size={20} />
-              New Task
+              {t.actions.newTask}
             </Button>
           </div>
         </div>
@@ -72,14 +74,14 @@ export const TasksPage: React.FC = () => {
             variant={!showCompleted ? 'default' : 'secondary'}
             className="touch-optimized"
           >
-            Active
+            {t.tasks.active}
           </Button>
           <Button
             onClick={() => setShowCompleted(true)}
             variant={showCompleted ? 'default' : 'secondary'}
             className="touch-optimized"
           >
-            Completed
+            {t.tasks.completed}
           </Button>
         </div>
       </div>

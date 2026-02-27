@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Image } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useLocale } from '../contexts/LocaleContext';
 import { LoginButton } from '../components/auth/LoginButton';
 import { PhotoSlideshow } from '../components/photos/PhotoSlideshow';
 import { FolderPicker } from '../components/photos/FolderPicker';
 
 export const PhotosPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
+  const { t } = useLocale();
   const [isFolderPickerOpen, setIsFolderPickerOpen] = useState(false);
 
   if (!isAuthenticated) {
@@ -15,10 +17,10 @@ export const PhotosPage: React.FC = () => {
         <div className="text-center max-w-md">
           <Image size={64} className="mx-auto text-gray-400 mb-4" />
           <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-            Photo Slideshow
+            {t.photos.title}
           </h2>
           <p className="text-gray-600 mb-6">
-            Sign in to view photos from your OneDrive folder.
+            {t.photos.signInMessage}
           </p>
           <LoginButton />
         </div>

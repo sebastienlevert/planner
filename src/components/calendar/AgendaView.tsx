@@ -44,13 +44,20 @@ export const AgendaView: React.FC<AgendaViewProps> = ({ currentDate, onCreateEve
     return Array.from({ length: 7 }, (_, i) => addDays(nextWeekStart, i));
   }, [nextWeekStart]);
 
-  // Format next week title: "Mar 1–8" if same month, "Feb 25 – Mar 3" if different
-  const nextWeekTitle = useMemo(() => {
+  // Format next week header parts: day range (bold) + month(s) (lighter)
+  const nextWeekHeader = useMemo(() => {
+    const startDay = dateHelpers.formatDate(nextWeekStart, 'd');
+    const endDay = dateHelpers.formatDate(nextWeekEnd, 'd');
+    const startMonth = dateHelpers.formatDate(nextWeekStart, 'MMM', locale);
+    const endMonth = dateHelpers.formatDate(nextWeekEnd, 'MMM', locale);
     const sameMonth = nextWeekStart.getMonth() === nextWeekEnd.getMonth();
+
+    const capitalize = (s: string) => locale === 'en' ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+
     if (sameMonth) {
-      return `${dateHelpers.formatDate(nextWeekStart, 'MMM d', locale)}–${dateHelpers.formatDate(nextWeekEnd, 'd', locale)}`;
+      return { days: `${startDay}–${endDay}`, month: capitalize(startMonth) };
     }
-    return `${dateHelpers.formatDate(nextWeekStart, 'MMM d', locale)} – ${dateHelpers.formatDate(nextWeekEnd, 'MMM d', locale)}`;
+    return { days: `${startDay}–${endDay}`, month: `${capitalize(startMonth)} – ${capitalize(endMonth)}` };
   }, [nextWeekStart, nextWeekEnd, locale]);
 
   // Fetch events for current week + next week (for preview)
@@ -161,25 +168,25 @@ export const AgendaView: React.FC<AgendaViewProps> = ({ currentDate, onCreateEve
           }`}
         >
           <div className="flex items-baseline gap-2">
-            <span className={`text-2xl font-bold ${isToday ? 'text-primary' : 'text-foreground'}`}>
+            <span className={`text-xl font-bold ${isToday ? 'text-primary' : 'text-foreground'}`}>
               {dateHelpers.formatDate(day, 'd')}
             </span>
             <span className={`text-base font-medium ${isToday ? 'text-primary' : 'text-muted-foreground'}`}>
-              {dateHelpers.formatDate(day, 'EEE', locale)}
+              {locale === 'en'
+                ? dateHelpers.formatDate(day, 'EEE', locale).charAt(0).toUpperCase() + dateHelpers.formatDate(day, 'EEE', locale).slice(1)
+                : dateHelpers.formatDate(day, 'EEE', locale)}
             </span>
           </div>
-          {dayEvents.length === 0 && (
-            <button
-              onClick={() => handleDayClick(day)}
-              className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
-            >
-              <Plus size={20} />
-            </button>
-          )}
+          <button
+            onClick={() => handleDayClick(day)}
+            className="w-11 h-11 rounded-full flex items-center justify-center hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+          >
+            <Plus size={24} />
+          </button>
         </div>
 
         {/* Events */}
-        <div className="p-3 space-y-2 overflow-hidden">
+        <div className="p-4 space-y-3 overflow-hidden">
           {visibleEvents.map(event => {
             const eventEnd = new Date(event.end.dateTime);
             const isPast = eventEnd < new Date();
@@ -197,7 +204,7 @@ export const AgendaView: React.FC<AgendaViewProps> = ({ currentDate, onCreateEve
           {remainingCount > 0 && (
             <button
               onClick={() => setExpandedDay({ date: day, events: dayEvents })}
-              className="w-full rounded-lg p-3 text-sm font-medium text-muted-foreground bg-muted/50 hover:bg-muted hover:text-foreground transition-colors cursor-pointer text-center"
+              className="w-full rounded-lg p-4 text-base font-medium text-muted-foreground bg-muted/50 hover:bg-muted hover:text-foreground transition-colors cursor-pointer text-center"
             >
               +{remainingCount} {t.calendar.more}
             </button>
@@ -230,14 +237,21 @@ export const AgendaView: React.FC<AgendaViewProps> = ({ currentDate, onCreateEve
         >
           {/* Header */}
           <div className="px-4 py-3 border-b border-border bg-muted/30 flex items-center justify-between">
-            <span className="text-base font-medium text-muted-foreground">
-              {nextWeekTitle}
-            </span>
-            <ChevronRight size={20} className="text-muted-foreground" />
+            <div className="flex items-baseline gap-2">
+              <span className="text-xl font-bold text-foreground">
+                {nextWeekHeader.days}
+              </span>
+              <span className="text-base font-medium text-muted-foreground">
+                {nextWeekHeader.month}
+              </span>
+            </div>
+            <div className="w-11 h-11 rounded-full flex items-center justify-center text-muted-foreground">
+              <ChevronRight size={24} />
+            </div>
           </div>
 
           {/* Preview events */}
-          <div className="p-3 space-y-2 overflow-hidden">
+          <div className="flex-1 p-4 space-y-3 overflow-hidden">
             {nextWeekPreviewEvents.length > 0 ? (
               nextWeekPreviewEvents.slice(0, MAX_VISIBLE_EVENTS).map(event => (
                 <EventCard
@@ -248,12 +262,12 @@ export const AgendaView: React.FC<AgendaViewProps> = ({ currentDate, onCreateEve
                 />
               ))
             ) : (
-              <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
+              <div className="flex items-center justify-center h-full text-muted-foreground text-base">
                 {t.common.noResults}
               </div>
             )}
             {nextWeekPreviewEvents.length > MAX_VISIBLE_EVENTS && (
-              <div className="w-full rounded-lg p-3 text-sm font-medium text-muted-foreground bg-muted/50 text-center">
+              <div className="w-full rounded-lg p-4 text-base font-medium text-muted-foreground bg-muted/50 text-center">
                 +{nextWeekPreviewEvents.length - MAX_VISIBLE_EVENTS} {t.calendar.more}
               </div>
             )}
@@ -267,13 +281,10 @@ export const AgendaView: React.FC<AgendaViewProps> = ({ currentDate, onCreateEve
           {expandedDay && (
             <>
               <DialogHeader className="px-5 pt-5 pb-0">
-                <DialogTitle className="flex items-baseline gap-3">
-                  <span className="text-3xl font-bold">
-                    {dateHelpers.formatDate(expandedDay.date, 'd')}
-                  </span>
-                  <span className="text-lg font-medium text-muted-foreground">
-                    {dateHelpers.formatDate(expandedDay.date, 'EEEE', locale)}
-                  </span>
+                <DialogTitle className="text-2xl font-bold">
+                  {locale === 'fr-CA'
+                    ? dateHelpers.formatDate(expandedDay.date, 'd MMMM', locale)
+                    : dateHelpers.formatDate(expandedDay.date, 'MMMM d', locale)}
                 </DialogTitle>
               </DialogHeader>
               <div className="p-5 space-y-2 max-h-[60vh] overflow-y-auto">

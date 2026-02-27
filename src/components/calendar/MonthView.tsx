@@ -3,6 +3,7 @@ import { useCalendar } from '../../contexts/CalendarContext';
 import { useLocale } from '../../contexts/LocaleContext';
 import { dateHelpers } from '../../utils/dateHelpers';
 import type { CalendarEvent } from '../../types/calendar.types';
+import { EventCard } from './EventCard';
 
 interface MonthViewProps {
   currentDate: Date;
@@ -106,49 +107,20 @@ export const MonthView: React.FC<MonthViewProps> = ({ currentDate, onDateClick, 
                       <div className="flex-1 overflow-hidden">
                         {dayEvents.length > 0 && (
                           <div className="space-y-1">
-                            {/* All-day events first */}
-                            {dayEvents
-                              .filter(event => event.isAllDay)
-                              .map((event) => (
-                                <div
+                            {dayEvents.map((event) => {
+                              const eventEnd = new Date(event.end.dateTime);
+                              const isPast = eventEnd < new Date();
+
+                              return (
+                                <EventCard
                                   key={event.id}
-                                  className="text-sm px-2 py-1 rounded cursor-pointer hover:opacity-80 transition-opacity break-words font-semibold"
-                                  style={{
-                                    backgroundColor: `${event.color || '#0ea5e9'}50`,
-                                  }}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    onEventClick?.(event);
-                                  }}
-                                >
-                                  {event.subject}
-                                </div>
-                              ))}
-
-                            {/* Timed events with time */}
-                            {dayEvents
-                              .filter(event => !event.isAllDay)
-                              .map((event) => {
-                                const eventStart = new Date(event.start.dateTime);
-                                const eventEnd = new Date(event.end.dateTime);
-                                const eventTime = `${eventStart.getHours().toString().padStart(2, '0')}:${eventStart.getMinutes().toString().padStart(2, '0')}-${eventEnd.getHours().toString().padStart(2, '0')}:${eventEnd.getMinutes().toString().padStart(2, '0')} `;
-
-                                return (
-                                  <div
-                                    key={event.id}
-                                    className="text-sm px-2 py-1 rounded cursor-pointer hover:opacity-80 transition-opacity break-words"
-                                    style={{
-                                      backgroundColor: `${event.color || '#0ea5e9'}40`,
-                                    }}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      onEventClick?.(event);
-                                    }}
-                                  >
-                                    {eventTime}{event.subject}
-                                  </div>
-                                );
-                              })}
+                                  event={event}
+                                  compact
+                                  isPast={isPast}
+                                  onClick={() => onEventClick?.(event)}
+                                />
+                              );
+                            })}
                           </div>
                         )}
                       </div>

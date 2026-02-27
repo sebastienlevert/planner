@@ -4,6 +4,7 @@ import { usePhoto } from '../../contexts/PhotoContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { onedriveService } from '../../services/onedrive.service';
 import { appConfig } from '../../config/app.config';
+import { useLocale } from '../../contexts/LocaleContext';
 
 interface PhotoSlideshowProps {
   onSelectFolder: () => void;
@@ -11,6 +12,7 @@ interface PhotoSlideshowProps {
 
 export const PhotoSlideshow: React.FC<PhotoSlideshowProps> = ({ onSelectFolder }) => {
   const { getAccessToken, accounts } = useAuth();
+  const { t } = useLocale();
   const {
     photos,
     currentPhotoIndex,
@@ -100,9 +102,9 @@ export const PhotoSlideshow: React.FC<PhotoSlideshowProps> = ({ onSelectFolder }
       <div className="h-full flex items-center justify-center bg-gray-900">
         <div className="text-center text-white">
           <FolderIcon size={64} className="mx-auto mb-4 opacity-50" />
-          <p className="text-xl mb-6">No folder selected</p>
+          <p className="text-xl mb-6">{t.photos.noFolderSelected}</p>
           <button onClick={onSelectFolder} className="btn-primary">
-            Select Photo Folder
+            {t.photos.selectFolder}
           </button>
         </div>
       </div>
@@ -124,7 +126,7 @@ export const PhotoSlideshow: React.FC<PhotoSlideshowProps> = ({ onSelectFolder }
             onClick={onSelectFolder}
             className="btn-secondary bg-white/20 text-white hover:bg-white/30 border-white/30"
           >
-            Change Folder
+            {t.actions.changFolder}
           </button>
         </div>
       </div>
@@ -141,7 +143,7 @@ export const PhotoSlideshow: React.FC<PhotoSlideshowProps> = ({ onSelectFolder }
             onClick={togglePlayback}
           />
         ) : (
-          <p className="text-white">Failed to load image</p>
+          <p className="text-white">{t.photos.failedToLoadImage}</p>
         )}
       </div>
 

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Sparkles, Heart, Trash2, Clock, Users } from 'lucide-react';
 import { useMeal } from '../../contexts/MealContext';
+import { useLocale } from '../../contexts/LocaleContext';
 
 export const RecipeGenerator: React.FC = () => {
   const { fridgeItems, recipes, isGenerating, error, generateRecipes, toggleFavorite, deleteRecipe } = useMeal();
+  const { t } = useLocale();
   const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null);
 
   const handleGenerate = async () => {
@@ -23,7 +25,7 @@ export const RecipeGenerator: React.FC = () => {
       <div className="card">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">AI Recipe Suggestions</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">{t.meals.aiRecipeSuggestions}</h3>
             <p className="text-sm text-gray-600">
               {fridgeItems.length} ingredients available
             </p>
@@ -34,7 +36,7 @@ export const RecipeGenerator: React.FC = () => {
             className="btn-primary flex items-center gap-2"
           >
             <Sparkles size={20} />
-            {isGenerating ? 'Generating...' : 'Suggest Recipes'}
+            {isGenerating ? t.actions.generating : t.meals.suggestRecipes}
           </button>
         </div>
 
@@ -46,7 +48,7 @@ export const RecipeGenerator: React.FC = () => {
 
         {fridgeItems.length === 0 && (
           <p className="mt-4 text-sm text-gray-500">
-            Add some ingredients to your fridge to get recipe suggestions.
+            {t.meals.addIngredientsFirst}
           </p>
         )}
       </div>
@@ -55,7 +57,7 @@ export const RecipeGenerator: React.FC = () => {
       {recipes.length > 0 && (
         <div className="card">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Your Recipes ({recipes.length})
+            {t.meals.yourRecipes} ({recipes.length})
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -74,7 +76,7 @@ export const RecipeGenerator: React.FC = () => {
                         toggleFavorite(recipe.id);
                       }}
                       className="btn-icon p-1"
-                      aria-label={recipe.isFavorite ? 'Unfavorite' : 'Favorite'}
+                      aria-label={recipe.isFavorite ? t.actions.unfavorite : t.actions.favorite}
                     >
                       <Heart
                         size={18}
@@ -84,7 +86,7 @@ export const RecipeGenerator: React.FC = () => {
                     <button
                       onClick={e => {
                         e.stopPropagation();
-                        if (confirm('Delete this recipe?')) {
+                        if (confirm(t.meals.deleteRecipeConfirm)) {
                           deleteRecipe(recipe.id);
                         }
                       }}
@@ -117,7 +119,7 @@ export const RecipeGenerator: React.FC = () => {
                   <div className="mt-2">
                     <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-medium">
                       <Sparkles size={12} />
-                      AI Generated
+                      {t.meals.aiGenerated}
                     </span>
                   </div>
                 )}
@@ -137,7 +139,7 @@ export const RecipeGenerator: React.FC = () => {
                 onClick={() => setSelectedRecipeId(null)}
                 className="btn-secondary"
               >
-                Close
+                {t.actions.close}
               </button>
             </div>
 
@@ -147,23 +149,23 @@ export const RecipeGenerator: React.FC = () => {
               <div className="flex gap-6 text-sm text-gray-600">
                 {selectedRecipe.prepTime && (
                   <div>
-                    <strong>Prep:</strong> {selectedRecipe.prepTime}
+                    <strong>{t.meals.prep}</strong> {selectedRecipe.prepTime}
                   </div>
                 )}
                 {selectedRecipe.cookTime && (
                   <div>
-                    <strong>Cook:</strong> {selectedRecipe.cookTime}
+                    <strong>{t.meals.cook}</strong> {selectedRecipe.cookTime}
                   </div>
                 )}
                 {selectedRecipe.servings && (
                   <div>
-                    <strong>Servings:</strong> {selectedRecipe.servings}
+                    <strong>{t.meals.servings}</strong> {selectedRecipe.servings}
                   </div>
                 )}
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Ingredients</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">{t.meals.ingredients}</h3>
                 <ul className="list-disc list-inside space-y-1 text-gray-700">
                   {selectedRecipe.ingredients.map((ing, idx) => (
                     <li key={idx}>{ing}</li>
@@ -172,7 +174,7 @@ export const RecipeGenerator: React.FC = () => {
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Instructions</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">{t.meals.instructions}</h3>
                 <ol className="list-decimal list-inside space-y-2 text-gray-700">
                   {selectedRecipe.instructions.map((step, idx) => (
                     <li key={idx} className="pl-2">

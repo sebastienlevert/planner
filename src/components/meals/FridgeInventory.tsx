@@ -1,17 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Plus, Trash2, RefrigeratorIcon } from 'lucide-react';
 import { useMeal } from '../../contexts/MealContext';
+import { useLocale } from '../../contexts/LocaleContext';
 import type { FridgeCategory } from '../../types/meal.types';
-
-const categories: { value: FridgeCategory; label: string }[] = [
-  { value: 'produce', label: 'Produce' },
-  { value: 'dairy', label: 'Dairy' },
-  { value: 'meat', label: 'Meat' },
-  { value: 'seafood', label: 'Seafood' },
-  { value: 'pantry', label: 'Pantry' },
-  { value: 'condiments', label: 'Condiments' },
-  { value: 'other', label: 'Other' },
-];
 
 const categoryColors: Record<FridgeCategory, string> = {
   produce: 'bg-green-100 text-green-800',
@@ -25,7 +16,18 @@ const categoryColors: Record<FridgeCategory, string> = {
 
 export const FridgeInventory: React.FC = () => {
   const { fridgeItems, addFridgeItem, removeFridgeItem } = useMeal();
+  const { t } = useLocale();
   const [isAdding, setIsAdding] = useState(false);
+
+  const categories: { value: FridgeCategory; label: string }[] = useMemo(() => [
+    { value: 'produce', label: t.meals.categories.produce },
+    { value: 'dairy', label: t.meals.categories.dairy },
+    { value: 'meat', label: t.meals.categories.meat },
+    { value: 'seafood', label: t.meals.categories.seafood },
+    { value: 'pantry', label: t.meals.categories.pantry },
+    { value: 'condiments', label: t.meals.categories.condiments },
+    { value: 'other', label: t.meals.categories.other },
+  ], [t]);
   const [newItem, setNewItem] = useState({
     name: '',
     category: 'produce' as FridgeCategory,
@@ -54,14 +56,14 @@ export const FridgeInventory: React.FC = () => {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <RefrigeratorIcon size={24} className="text-primary-600" />
-          <h3 className="text-lg font-semibold text-gray-900">Fridge Inventory</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{t.meals.fridgeInventory}</h3>
         </div>
         <button
           onClick={() => setIsAdding(!isAdding)}
           className="btn-primary flex items-center gap-2"
         >
           <Plus size={20} />
-          Add Item
+          {t.meals.addItem}
         </button>
       </div>
 
@@ -73,7 +75,7 @@ export const FridgeInventory: React.FC = () => {
               value={newItem.name}
               onChange={e => setNewItem(prev => ({ ...prev, name: e.target.value }))}
               className="input"
-              placeholder="Item name"
+              placeholder={t.meals.itemName}
               autoFocus
             />
             <select
@@ -94,12 +96,12 @@ export const FridgeInventory: React.FC = () => {
               value={newItem.quantity}
               onChange={e => setNewItem(prev => ({ ...prev, quantity: e.target.value }))}
               className="input"
-              placeholder="Quantity (optional)"
+              placeholder={t.meals.quantity}
             />
           </div>
           <div className="flex gap-2 mt-3">
             <button type="submit" className="btn-primary flex-1">
-              Add
+              {t.actions.add}
             </button>
             <button
               type="button"
@@ -109,7 +111,7 @@ export const FridgeInventory: React.FC = () => {
               }}
               className="btn-secondary flex-1"
             >
-              Cancel
+              {t.actions.cancel}
             </button>
           </div>
         </form>
@@ -118,7 +120,7 @@ export const FridgeInventory: React.FC = () => {
       {fridgeItems.length === 0 ? (
         <div className="text-center py-8 text-gray-500">
           <RefrigeratorIcon size={48} className="mx-auto mb-3 text-gray-400" />
-          <p>Your fridge is empty. Add some ingredients to get started!</p>
+          <p>{t.meals.emptyFridge}</p>
         </div>
       ) : (
         <div className="space-y-4">

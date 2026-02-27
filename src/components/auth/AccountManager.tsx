@@ -1,6 +1,7 @@
 import React from 'react';
 import { User, LogOut } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLocale } from '../../contexts/LocaleContext';
 import { LoginButton } from './LoginButton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 
 export const AccountManager: React.FC = () => {
   const { accounts, removeAccount, isLoading } = useAuth();
+  const { t } = useLocale();
 
   const handleRemoveAccount = async (accountId: string, accountName: string) => {
     if (window.confirm(`Are you sure you want to sign out ${accountName}?`)) {
@@ -18,13 +20,13 @@ export const AccountManager: React.FC = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Connected Accounts</CardTitle>
+        <CardTitle>{t.auth.connectedAccounts}</CardTitle>
       </CardHeader>
       <CardContent>
         {accounts.length === 0 ? (
           <div className="text-center py-8">
             <User size={48} className="mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground mb-4">No accounts connected</p>
+            <p className="text-muted-foreground mb-4">{t.auth.noAccountsConnected}</p>
             <LoginButton />
           </div>
         ) : (
