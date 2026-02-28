@@ -27,10 +27,10 @@ export const AgendaView: React.FC<AgendaViewProps> = ({ currentDate, onCreateEve
 
   const MAX_VISIBLE_EVENTS = 3;
 
-  // Always snap to the week start (Sunday)
+  // Always snap to the week start (Monday)
   const weekStart = useMemo(() => dateHelpers.getWeekStart(currentDate), [currentDate]);
 
-  // 7 days of the current week (Sun–Sat)
+  // 7 days of the current week (Mon–Sun)
   const weekDays = useMemo(() => {
     return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   }, [weekStart]);
@@ -116,9 +116,9 @@ export const AgendaView: React.FC<AgendaViewProps> = ({ currentDate, onCreateEve
     }
   };
 
-  // Top row: Mon(1)–Thu(4), Bottom row: Fri(5)–Sun(0) + next week preview
-  const topRow = weekDays.slice(1, 5);
-  const bottomRow = [weekDays[5], weekDays[6], weekDays[0]];
+  // Top row: Mon–Thu, Bottom row: Fri–Sun + next week preview
+  const topRow = weekDays.slice(0, 4);
+  const bottomRow = weekDays.slice(4, 7);
 
   const renderDayCell = (day: Date) => {
     const isToday = dateHelpers.isToday(day);
