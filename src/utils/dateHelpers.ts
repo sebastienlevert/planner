@@ -47,11 +47,11 @@ export const dateHelpers = {
 
   // Week operations
   getWeekStart(date: Date = new Date()): Date {
-    return startOfWeek(date, { weekStartsOn: 0 }); // Sunday
+    return startOfWeek(date, { weekStartsOn: 1 }); // Monday
   },
 
   getWeekEnd(date: Date = new Date()): Date {
-    return endOfWeek(date, { weekStartsOn: 0 });
+    return endOfWeek(date, { weekStartsOn: 1 });
   },
 
   getWeekDays(date: Date = new Date()): Date[] {
