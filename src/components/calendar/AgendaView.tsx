@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useEffect, useCallback } from 'react';
 import { Plus, ChevronRight } from 'lucide-react';
 import { useCalendar } from '../../contexts/CalendarContext';
 import { useLocale } from '../../contexts/LocaleContext';
@@ -6,12 +6,6 @@ import { dateHelpers } from '../../utils/dateHelpers';
 import type { CalendarEvent } from '../../types/calendar.types';
 import { EventCard } from './EventCard';
 import { addDays } from 'date-fns';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 
 interface AgendaViewProps {
   currentDate: Date;
@@ -23,9 +17,7 @@ interface AgendaViewProps {
 export const AgendaView: React.FC<AgendaViewProps> = ({ currentDate, onCreateEvent, onDateChange, onEventClick }) => {
   const { events, getEventsForDateRange, ensureDateRange } = useCalendar();
   const { locale, t } = useLocale();
-  const [expandedDay, setExpandedDay] = useState<{ date: Date; events: CalendarEvent[] } | null>(null);
-
-  const MAX_VISIBLE_EVENTS = 3;
+  const gridRef = useRef<HTMLDivElement>(null);
 
   // Always snap to the week start (Monday)
   const weekStart = useMemo(() => dateHelpers.getWeekStart(currentDate), [currentDate]);
@@ -109,6 +101,29 @@ export const AgendaView: React.FC<AgendaViewProps> = ({ currentDate, onCreateEve
     }
   };
 
+  // Auto-scroll each day cell to show the next upcoming event
+  const scrollToNextEvents = useCallback(() => {
+    if (!gridRef.current) return;
+    const containers = gridRef.current.querySelectorAll<HTMLElement>('[data-day-events]');
+    containers.forEach(container => {
+      const nextEvent = container.querySelector<HTMLElement>('[data-next-event]');
+      if (nextEvent) {
+        const containerRect = container.getBoundingClientRect();
+        const eventRect = nextEvent.getBoundingClientRect();
+        container.scrollTop = Math.max(0, eventRect.top - containerRect.top + container.scrollTop);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(scrollToNextEvents, 100);
+    const interval = setInterval(scrollToNextEvents, 60000);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
+  }, [rangeEvents, currentDate, scrollToNextEvents]);
+
   // Top row: Mon–Thu, Bottom row: Fri–Sun + next week preview
   const topRow = weekDays.slice(0, 4);
   const bottomRow = weekDays.slice(4, 7);
@@ -116,8 +131,12 @@ export const AgendaView: React.FC<AgendaViewProps> = ({ currentDate, onCreateEve
   const renderDayCell = (day: Date) => {
     const isToday = dateHelpers.isToday(day);
     const dayEvents = getEventsForDay(day);
-    const visibleEvents = dayEvents.slice(0, MAX_VISIBLE_EVENTS);
-    const remainingCount = dayEvents.length - MAX_VISIBLE_EVENTS;
+    const now = new Date();
+
+    // Find the first event that hasn't ended yet (auto-scroll target)
+    const firstUpcomingIdx = dayEvents.findIndex(event =>
+      new Date(event.end.dateTime) >= now
+    );
 
     return (
       <div
@@ -150,37 +169,36 @@ export const AgendaView: React.FC<AgendaViewProps> = ({ currentDate, onCreateEve
           </button>
         </div>
 
-        {/* Events */}
-        <div className="flex-1 p-4 space-y-3 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {visibleEvents.map(event => {
+        {/* Events — scrollable, auto-scrolls to next upcoming */}
+        <div
+          data-day-events
+          className="flex-1 p-4 space-y-3 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {dayEvents.map((event, index) => {
             const eventEnd = new Date(event.end.dateTime);
-            const isPast = eventEnd < new Date();
+            const isPast = eventEnd < now;
 
             return (
-              <EventCard
+              <div
                 key={event.id}
-                event={event}
-                compact
-                isPast={isPast}
-                onClick={() => onEventClick?.(event)}
-              />
+                {...(index === firstUpcomingIdx ? { 'data-next-event': 'true' } : {})}
+              >
+                <EventCard
+                  event={event}
+                  compact
+                  isPast={isPast}
+                  onClick={() => onEventClick?.(event)}
+                />
+              </div>
             );
           })}
-          {remainingCount > 0 && (
-            <button
-              onClick={() => setExpandedDay({ date: day, events: dayEvents })}
-              className="w-full rounded-lg p-4 text-base font-medium text-muted-foreground bg-muted/50 hover:bg-muted hover:text-foreground transition-colors cursor-pointer text-center"
-            >
-              +{remainingCount} {t.calendar.more}
-            </button>
-          )}
         </div>
       </div>
     );
   };
 
   return (
-    <div className="flex flex-col h-full bg-background p-4 gap-4">
+    <div ref={gridRef} className="flex flex-col h-full bg-background p-4 gap-4">
       {/* Top row: Mon–Thu (4 cells) */}
       <div className="flex-1 grid grid-cols-4 gap-4 min-h-0">
         {topRow.map(day => renderDayCell(day))}
@@ -246,41 +264,6 @@ export const AgendaView: React.FC<AgendaViewProps> = ({ currentDate, onCreateEve
         </div>
       </div>
 
-      {/* Expanded day dialog */}
-      <Dialog open={!!expandedDay} onOpenChange={(open) => !open && setExpandedDay(null)}>
-        <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden">
-          {expandedDay && (
-            <>
-              <DialogHeader className="px-5 pt-5 pb-0">
-                <DialogTitle className="text-2xl font-bold">
-                  {locale === 'fr-CA'
-                    ? dateHelpers.formatDate(expandedDay.date, 'd MMMM', locale)
-                    : dateHelpers.formatDate(expandedDay.date, 'MMMM d', locale)}
-                </DialogTitle>
-              </DialogHeader>
-              <div className="p-5 space-y-2 max-h-[60vh] overflow-y-auto">
-                {expandedDay.events.map(event => {
-                  const eventEnd = new Date(event.end.dateTime);
-                  const isPast = eventEnd < new Date();
-
-                  return (
-                    <EventCard
-                      key={event.id}
-                      event={event}
-                      compact
-                      isPast={isPast}
-                      onClick={() => {
-                        setExpandedDay(null);
-                        onEventClick?.(event);
-                      }}
-                    />
-                  );
-                })}
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

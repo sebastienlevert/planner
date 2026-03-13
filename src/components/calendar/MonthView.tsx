@@ -104,7 +104,7 @@ export const MonthView: React.FC<MonthViewProps> = ({ currentDate, onDateClick, 
                       </div>
 
                       {/* Event indicators */}
-                      <div className="flex-1 overflow-hidden">
+                      <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                         {dayEvents.length > 0 && (
                           <div className="space-y-1">
                             {dayEvents.map((event) => {
