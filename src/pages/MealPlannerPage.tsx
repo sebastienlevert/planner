@@ -219,11 +219,11 @@ export const MealPlannerPage: React.FC = () => {
   }
 
   const renderMealLine = (type: typeof MEAL_TYPES[number], meals: CalendarEvent[], day: Date) => (
-    <div key={type.key} className="flex items-start gap-2 min-h-[28px]">
-      <span className="text-sm shrink-0 mt-0.5" title={t.mealPlanner?.[type.key] || type.key}>{type.emoji}</span>
+    <div key={type.key} className="flex items-start gap-2 lg:gap-3 min-h-[28px] lg:min-h-[36px]">
+      <span className="text-sm lg:text-base shrink-0 mt-0.5 lg:mt-1" title={t.mealPlanner?.[type.key] || type.key}>{type.emoji}</span>
       <div className="flex-1 min-w-0">
         {meals.length > 0 ? (
-          <div className="space-y-0.5">
+          <div className="space-y-0.5 lg:space-y-1">
             {meals.map(meal => {
               const isEditing = editingMeal?.id === meal.id;
               if (isEditing) return renderEditForm(meal, day);
@@ -233,7 +233,7 @@ export const MealPlannerPage: React.FC = () => {
               return (
                 <div
                   key={meal.id}
-                  className="group text-sm font-medium rounded px-1.5 py-0.5 flex items-center gap-1 min-w-0 cursor-pointer hover:ring-1 hover:ring-primary/30 transition-all"
+                  className="group text-sm lg:text-base font-medium rounded lg:rounded-lg px-1.5 py-0.5 lg:px-3 lg:py-1.5 flex items-center gap-1 lg:gap-2 min-w-0 cursor-pointer hover:ring-1 hover:ring-primary/30 transition-all"
                   style={{ backgroundColor: `${mealCalendar.color}20`, color: mealCalendar.color }}
                   onClick={() => startEditing(meal)}
                 >
@@ -247,16 +247,16 @@ export const MealPlannerPage: React.FC = () => {
                       className="shrink-0 opacity-60 hover:opacity-100 transition-opacity"
                       title={recipeUrl}
                     >
-                      <LinkIcon size={12} />
+                      <LinkIcon size={14} className="w-3 h-3 lg:w-4 lg:h-4" />
                     </a>
                   )}
-                  <Pencil size={12} className="shrink-0 opacity-0 group-hover:opacity-40 transition-opacity" />
+                  <Pencil size={14} className="shrink-0 opacity-0 group-hover:opacity-40 transition-opacity w-3 h-3 lg:w-4 lg:h-4" />
                 </div>
               );
             })}
           </div>
         ) : (
-          <span className="text-xs text-muted-foreground/40 italic">—</span>
+          <span className="text-xs lg:text-sm text-muted-foreground/40 italic lg:mt-1">—</span>
         )}
       </div>
     </div>
@@ -459,7 +459,7 @@ export const MealPlannerPage: React.FC = () => {
         </div>
 
         {/* Meals content */}
-        <div className={`p-3 space-y-1.5 ${isMobile ? '' : 'flex-1'}`}>
+        <div className={`p-3 lg:p-4 space-y-1.5 lg:space-y-2.5 ${isMobile ? '' : 'flex-1'}`}>
           {MEAL_TYPES.map(type => renderMealLine(type, meals[type.key], day))}
           {adding && renderAddForm()}
         </div>
