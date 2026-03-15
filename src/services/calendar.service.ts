@@ -138,8 +138,10 @@ export class CalendarService {
         },
         location: input.location ? {
           displayName: input.location,
+          locationUri: input.location.startsWith('http://') || input.location.startsWith('https://') ? input.location : undefined,
         } : undefined,
         isAllDay: input.isAllDay || false,
+        isReminderOn: input.isReminderOn !== undefined ? input.isReminderOn : true,
         attendees: input.attendees?.map(email => ({
           emailAddress: {
             address: email,
@@ -192,7 +194,11 @@ export class CalendarService {
       if (updates.location) {
         updateData.location = {
           displayName: updates.location.displayName,
+          locationUri: updates.location.locationUri || undefined,
         };
+      } else if ('location' in updates) {
+        // Explicitly clear location
+        updateData.location = { displayName: '' };
       }
 
       await graphService.updateEvent(eventId, accessToken, updateData);
@@ -234,6 +240,7 @@ export class CalendarService {
       },
       location: event.location ? {
         displayName: event.location.displayName,
+        locationUri: event.location.locationUri || undefined,
       } : undefined,
       isAllDay: event.isAllDay || false,
       isCancelled: event.isCancelled || false,

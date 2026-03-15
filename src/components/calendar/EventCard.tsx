@@ -4,6 +4,7 @@ import type { CalendarEvent } from '../../types/calendar.types';
 import { useCalendar } from '../../contexts/CalendarContext';
 import { useLocale } from '../../contexts/LocaleContext';
 import { dateHelpers } from '../../utils/dateHelpers';
+import { StorageService } from '../../services/storage.service';
 
 interface EventCardProps {
   event: CalendarEvent;
@@ -12,12 +13,29 @@ interface EventCardProps {
   isPast?: boolean;
 }
 
+function getMealEmoji(event: CalendarEvent): string | null {
+  const start = new Date(event.start.dateTime);
+  const hour = start.getHours();
+  const time = hour + start.getMinutes() / 60;
+
+  if (time >= 6 && time < 10) return '🥐';
+  if (time >= 11 && time < 13.5) return '🥗';
+  if (time >= 17 && time < 21) return '🍽️';
+  return null;
+}
+
 export const EventCard: React.FC<EventCardProps> = ({ event, compact = false, onClick, isPast = false }) => {
   const { calendars } = useCalendar();
   const { t } = useLocale();
 
   const calendar = calendars.find(cal => cal.id === event.calendarId);
   const eventColor = calendar?.color || '#0ea5e9';
+  const calendarEmoji = calendar?.emoji;
+
+  const mealCalendarId = StorageService.getSettings().mealCalendarId;
+  const isMeal = mealCalendarId && event.calendarId === mealCalendarId;
+  const mealEmoji = isMeal ? getMealEmoji(event) : null;
+  const displayEmoji = isMeal ? (mealEmoji || calendarEmoji) : calendarEmoji;
 
   const startTime = dateHelpers.formatTime(event.start.dateTime);
   const endTime = dateHelpers.formatTime(event.end.dateTime);
@@ -35,9 +53,9 @@ export const EventCard: React.FC<EventCardProps> = ({ event, compact = false, on
         }}
       >
         <div className={`font-semibold line-clamp-2 ${isPast ? 'text-muted-foreground' : ''}`} style={isPast ? {} : { color: eventColor }}>
-          {event.subject}
+          {displayEmoji && <span className="mr-1">{displayEmoji}</span>}{event.subject}
         </div>
-        {!event.isAllDay && (
+        {!event.isAllDay && !isMeal && (
           <div className={`text-sm mt-0.5 ${isPast ? 'text-muted-foreground/70' : 'opacity-70'}`} style={isPast ? {} : { color: eventColor }}>
             {startTime} – {endTime}
           </div>
@@ -62,7 +80,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, compact = false, on
     >
       <div className="flex justify-between items-start mb-2">
         <h3 className={`font-semibold text-base ${isPast ? 'text-muted-foreground' : 'text-foreground'}`}>
-          {event.subject}
+          {displayEmoji && <span className="mr-1">{displayEmoji}</span>}{event.subject}
         </h3>
         {calendar && (
           <span
@@ -78,7 +96,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, compact = false, on
       </div>
 
       <div className="space-y-1.5 text-sm text-muted-foreground">
-        {!event.isAllDay && (
+        {!event.isAllDay && !isMeal && (
           <div className="flex items-center gap-2">
             <Clock size={18} />
             <span>

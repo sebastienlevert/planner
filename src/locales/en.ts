@@ -3,6 +3,7 @@ export const en = {
   nav: {
     calendar: 'Calendar',
     todos: 'To Dos',
+    mealPlanner: 'Meals',
     settings: 'Settings',
   },
 
@@ -129,6 +130,8 @@ export const en = {
     theme: 'Theme',
     themeHelp: 'Choose a theme to personalize your calendar experience',
     changeColor: 'Change color',
+    changeEmoji: 'Set emoji',
+    removeEmoji: 'Remove emoji',
     applicationSettings: 'Application Settings',
   },
 
@@ -302,6 +305,27 @@ export const en = {
     error: 'Error',
     success: 'Success',
     noResults: 'No results found',
+    cancel: 'Cancel',
+  },
+
+  // Meal Planner
+  mealPlanner: {
+    title: 'Meal Planner',
+    today: 'Today',
+    breakfast: 'Breakfast',
+    lunch: 'Lunch',
+    dinner: 'Dinner',
+    placeholder: "What's cooking?",
+    recipeLinkPlaceholder: 'Recipe link (optional)',
+    add: 'Add',
+    save: 'Save',
+    delete: 'Delete',
+    noCalendar: 'No Meal Calendar Selected',
+    noCalendarDesc: 'Go to Settings → Calendars and select a calendar for meal planning.',
+    mealCalendar: 'Meal Calendar',
+    mealCalendarHelp: 'Select which calendar to use for meal planning events.',
+    selectCalendar: 'Select a calendar...',
+    none: 'None',
   },
 };
 

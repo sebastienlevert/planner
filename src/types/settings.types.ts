@@ -8,6 +8,8 @@ export interface AppSettings {
   theme?: ThemeName;
   selectedCalendars?: string[];
   calendarColors?: Record<string, string>;
+  calendarEmojis?: Record<string, string>;
   selectedTodoLists?: string[];
   todoListSettings?: Record<string, TodoListSettings>;
+  mealCalendarId?: string;
 }

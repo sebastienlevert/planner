@@ -32,6 +32,10 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
     const settings = StorageService.getSettings();
     return settings.calendarColors || {};
   });
+  const [_calendarEmojis, setCalendarEmojis] = useState<Record<string, string>>(() => {
+    const settings = StorageService.getSettings();
+    return settings.calendarEmojis || {};
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<number | null>(null);
@@ -81,9 +85,13 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
 
       // Apply user color overrides
       const savedColors = StorageService.getSettings().calendarColors || {};
+      const savedEmojis = StorageService.getSettings().calendarEmojis || {};
       for (const cal of allCalendars) {
         if (savedColors[cal.id]) {
           cal.color = savedColors[cal.id];
+        }
+        if (savedEmojis[cal.id]) {
+          cal.emoji = savedEmojis[cal.id];
         }
       }
 
@@ -297,6 +305,24 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
     ));
   }, []);
 
+  // Set a custom emoji for a calendar
+  const setCalendarEmojiFn = useCallback((calendarId: string, emoji: string) => {
+    setCalendarEmojis(prev => {
+      const updated = { ...prev };
+      if (emoji) {
+        updated[calendarId] = emoji;
+      } else {
+        delete updated[calendarId];
+      }
+      const settings = StorageService.getSettings();
+      StorageService.setSettings({ ...settings, calendarEmojis: updated });
+      return updated;
+    });
+    setCalendars(prev => prev.map(cal =>
+      cal.id === calendarId ? { ...cal, emoji: emoji || undefined } : cal
+    ));
+  }, []);
+
   // Get events for a specific date range (filtered by selected calendars)
   const getEventsForDateRange = (startDate: Date, endDate: Date): CalendarEvent[] => {
     return events.filter(event => {
@@ -323,6 +349,7 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
     deleteEvent,
     toggleCalendar,
     setCalendarColor: setCalendarColorFn,
+    setCalendarEmoji: setCalendarEmojiFn,
     getEventsForDateRange,
     ensureDateRange,
   };

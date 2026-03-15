@@ -13,6 +13,7 @@ import { PhotosPage } from './pages/PhotosPage';
 import { MealsPage } from './pages/MealsPage';
 import { TasksPage } from './pages/TasksPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { MealPlannerPage } from './pages/MealPlannerPage';
 import { useAutoReload } from './hooks/useAutoReload';
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
                         <Route path="photos" element={<PhotosPage />} />
                         <Route path="meals" element={<MealsPage />} />
                         <Route path="tasks" element={<TasksPage />} />
+                        <Route path="meal-planner" element={<MealPlannerPage />} />
                         <Route path="settings" element={<SettingsPage />} />
                       </Route>
                     </Routes>

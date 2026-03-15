@@ -2,6 +2,7 @@ export interface Calendar {
   id: string;
   name: string;
   color: string;
+  emoji?: string;
   owner: {
     name: string;
     address: string;
@@ -27,6 +28,7 @@ export interface CalendarEvent {
   };
   location?: {
     displayName: string;
+    locationUri?: string;
   };
   isAllDay: boolean;
   isCancelled: boolean;
@@ -61,6 +63,7 @@ export interface CreateEventInput {
   calendarId: string;
   accountId: string;
   attendees?: string[];
+  isReminderOn?: boolean;
 }
 
 export interface CalendarState {
@@ -80,6 +83,7 @@ export interface CalendarContextType extends CalendarState {
   deleteEvent: (eventId: string, accountId: string) => Promise<void>;
   toggleCalendar: (calendarId: string) => void;
   setCalendarColor: (calendarId: string, color: string) => void;
+  setCalendarEmoji: (calendarId: string, emoji: string) => void;
   getEventsForDateRange: (start: Date, end: Date) => CalendarEvent[];
   ensureDateRange: (start: Date, end: Date) => void;
 }

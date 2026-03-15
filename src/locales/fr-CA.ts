@@ -5,6 +5,7 @@ export const frCA: TranslationKeys = {
   nav: {
     calendar: 'Calendrier',
     todos: 'Tâches',
+    mealPlanner: 'Repas',
     settings: 'Paramètres',
   },
 
@@ -131,6 +132,8 @@ export const frCA: TranslationKeys = {
     theme: 'Thème',
     themeHelp: 'Choisissez un thème pour personnaliser votre expérience de calendrier',
     changeColor: 'Changer la couleur',
+    changeEmoji: 'Définir un emoji',
+    removeEmoji: 'Retirer l\'emoji',
     applicationSettings: 'Paramètres de l\'application',
   },
 
@@ -304,5 +307,26 @@ export const frCA: TranslationKeys = {
     error: 'Erreur',
     success: 'Succès',
     noResults: 'Aucun résultat trouvé',
+    cancel: 'Annuler',
+  },
+
+  // Meal Planner
+  mealPlanner: {
+    title: 'Planificateur de repas',
+    today: "Aujourd'hui",
+    breakfast: 'Déjeuner',
+    lunch: 'Dîner',
+    dinner: 'Souper',
+    placeholder: 'Qu\'est-ce qu\'on cuisine?',
+    recipeLinkPlaceholder: 'Lien de recette (optionnel)',
+    add: 'Ajouter',
+    save: 'Enregistrer',
+    delete: 'Supprimer',
+    noCalendar: 'Aucun calendrier de repas sélectionné',
+    noCalendarDesc: 'Allez dans Paramètres → Calendriers et sélectionnez un calendrier pour la planification des repas.',
+    mealCalendar: 'Calendrier de repas',
+    mealCalendarHelp: 'Sélectionnez le calendrier à utiliser pour les événements de repas.',
+    selectCalendar: 'Sélectionner un calendrier...',
+    none: 'Aucun',
   },
 };

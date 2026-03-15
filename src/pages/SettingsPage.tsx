@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Settings as SettingsIcon, Save, Users, Calendar as CalendarIcon, CheckSquare, Sliders } from 'lucide-react';
 import { AccountManager } from '../components/auth/AccountManager';
 import { useAuth } from '../contexts/AuthContext';
@@ -21,7 +21,7 @@ type SettingsTab = 'accounts' | 'calendars' | 'todos' | 'general';
 
 export const SettingsPage: React.FC = () => {
   const { reloadAccounts, accounts } = useAuth();
-  const { calendars, selectedCalendars, toggleCalendar, setCalendarColor } = useCalendar();
+  const { calendars, selectedCalendars, toggleCalendar, setCalendarColor, setCalendarEmoji } = useCalendar();
   const { lists: todoLists, selectedLists: selectedTodoLists, toggleList, listSettings, setListSettings } = useTask();
   const { locale, setLocale, t } = useLocale();
   const { themeName, setTheme } = useTheme();
@@ -32,6 +32,44 @@ export const SettingsPage: React.FC = () => {
   const [isSaved, setIsSaved] = useState(false);
   const [selectedAccountFilter, setSelectedAccountFilter] = useState<string>('all');
   const [colorPickerCalendarId, setColorPickerCalendarId] = useState<string | null>(null);
+  const [emojiPickerCalendarId, setEmojiPickerCalendarId] = useState<string | null>(null);
+  const [popupDirection, setPopupDirection] = useState<'down' | 'up'>('down');
+  const [mealCalendarId, setMealCalendarId] = useState<string>('');
+  const emojiPickerRef = useRef<HTMLDivElement>(null);
+  const colorPickerRef = useRef<HTMLDivElement>(null);
+
+  // Close pickers on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (emojiPickerCalendarId && emojiPickerRef.current && !emojiPickerRef.current.contains(e.target as Node)) {
+        setEmojiPickerCalendarId(null);
+      }
+      if (colorPickerCalendarId && colorPickerRef.current && !colorPickerRef.current.contains(e.target as Node)) {
+        setColorPickerCalendarId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [emojiPickerCalendarId, colorPickerCalendarId]);
+
+  // Measure available space and flip popup if needed
+  const popupRef = useCallback((node: HTMLDivElement | null) => {
+    if (!node) return;
+    const rect = node.getBoundingClientRect();
+    if (rect.bottom > window.innerHeight) {
+      setPopupDirection('up');
+    } else {
+      setPopupDirection('down');
+    }
+  }, []);
+
+  const EMOJI_PALETTE = [
+    '📅', '💼', '👨‍👩‍👧‍👦', '🏠', '🎉', '🏋️', '📚', '🎮',
+    '✈️', '🎂', '❤️', '⚽', '🎵', '🍽️', '💊', '🐾',
+    '👶', '🏫', '⛪', '🧑‍💻', '🎯', '🌟', '🔔', '📧',
+    '🍳', '🥗', '🍕', '🧁', '☕', '🛒', '🎨', '🏖️',
+    '🧘', '🎓', '🩺',
+  ];
 
   const COLOR_PALETTE = [
     '#3b82f6', '#2563eb', '#1d4ed8', // Blues
@@ -52,11 +90,12 @@ export const SettingsPage: React.FC = () => {
     setCalendarName(settings.calendarName || t.settings.appName);
     setSelectedLocale(settings.locale || 'en');
     setSelectedTheme(settings.theme || themeName);
+    setMealCalendarId(settings.mealCalendarId || '');
   }, [t]);
 
   const handleSaveSettings = () => {
     const settings = StorageService.getSettings();
-    StorageService.setSettings({ ...settings, calendarName, locale: selectedLocale, theme: selectedTheme });
+    StorageService.setSettings({ ...settings, calendarName, locale: selectedLocale, theme: selectedTheme, mealCalendarId: mealCalendarId || undefined });
     setLocale(selectedLocale);
     setTheme(selectedTheme);
     setIsSaved(true);
@@ -192,39 +231,96 @@ export const SettingsPage: React.FC = () => {
                               <div className="text-xs text-muted-foreground/80">{calendar.owner.address}</div>
                             )}
                           </div>
-                          <div className="relative">
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setColorPickerCalendarId(prev => prev === calendar.id ? null : calendar.id);
-                              }}
-                              className="w-7 h-7 rounded-full border-2 border-muted-foreground/30 hover:border-foreground/50 transition-colors"
-                              style={{ backgroundColor: calendar.color }}
-                              title={t.settings.changeColor}
-                            />
-                            {colorPickerCalendarId === calendar.id && (
-                              <div
-                                className="absolute right-0 top-9 z-50 bg-popover border rounded-lg shadow-lg p-3 grid grid-cols-5 gap-2 w-56"
-                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                          <div className="flex items-center gap-2">
+                            <div className="relative" ref={emojiPickerCalendarId === calendar.id ? emojiPickerRef : undefined}>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setEmojiPickerCalendarId(prev => prev === calendar.id ? null : calendar.id);
+                                  setColorPickerCalendarId(null);
+                                }}
+                                className="w-7 h-7 rounded border border-muted-foreground/30 hover:border-foreground/50 transition-colors flex items-center justify-center text-sm bg-muted/50"
+                                title={t.settings.changeEmoji || 'Set emoji'}
                               >
-                                {COLOR_PALETTE.map((color) => (
-                                  <button
-                                    key={color}
-                                    type="button"
-                                    onClick={() => {
-                                      setCalendarColor(calendar.id, color);
-                                      setColorPickerCalendarId(null);
-                                    }}
-                                    className={`w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 ${
-                                      calendar.color === color ? 'border-foreground ring-2 ring-foreground/20' : 'border-transparent'
-                                    }`}
-                                    style={{ backgroundColor: color }}
-                                  />
-                                ))}
-                              </div>
-                            )}
+                                {calendar.emoji || <span className="text-muted-foreground/50">—</span>}
+                              </button>
+                              {emojiPickerCalendarId === calendar.id && (
+                                <div
+                                  ref={popupRef}
+                                  className={`absolute right-0 z-50 bg-popover border rounded-lg shadow-lg p-3 w-64 ${popupDirection === 'up' ? 'bottom-9' : 'top-9'}`}
+                                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                >
+                                  <div className="grid grid-cols-6 gap-2">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setCalendarEmoji(calendar.id, '');
+                                        setEmojiPickerCalendarId(null);
+                                      }}
+                                      className={`w-9 h-9 rounded-lg border transition-transform hover:scale-110 flex items-center justify-center text-xs ${
+                                        !calendar.emoji ? 'border-foreground bg-muted ring-2 ring-foreground/20' : 'border-transparent hover:bg-muted/50'
+                                      }`}
+                                      title={t.settings.removeEmoji}
+                                    >
+                                      <span className="text-muted-foreground">✕</span>
+                                    </button>
+                                    {EMOJI_PALETTE.map((emoji) => (
+                                      <button
+                                        key={emoji}
+                                        type="button"
+                                        onClick={() => {
+                                          setCalendarEmoji(calendar.id, emoji);
+                                          setEmojiPickerCalendarId(null);
+                                        }}
+                                        className={`w-9 h-9 rounded-lg border transition-transform hover:scale-110 flex items-center justify-center text-lg ${
+                                          calendar.emoji === emoji ? 'border-foreground bg-muted ring-2 ring-foreground/20' : 'border-transparent hover:bg-muted/50'
+                                        }`}
+                                      >
+                                        {emoji}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                            <div className="relative" ref={colorPickerCalendarId === calendar.id ? colorPickerRef : undefined}>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setColorPickerCalendarId(prev => prev === calendar.id ? null : calendar.id);
+                                  setEmojiPickerCalendarId(null);
+                                }}
+                                className="w-7 h-7 rounded-full border-2 border-muted-foreground/30 hover:border-foreground/50 transition-colors"
+                                style={{ backgroundColor: calendar.color }}
+                                title={t.settings.changeColor}
+                              />
+                              {colorPickerCalendarId === calendar.id && (
+                                <div
+                                  ref={popupRef}
+                                  className={`absolute right-0 z-50 bg-popover border rounded-lg shadow-lg p-3 grid grid-cols-5 gap-2 w-56 ${popupDirection === 'up' ? 'bottom-9' : 'top-9'}`}
+                                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                >
+                                  {COLOR_PALETTE.map((color) => (
+                                    <button
+                                      key={color}
+                                      type="button"
+                                      onClick={() => {
+                                        setCalendarColor(calendar.id, color);
+                                        setColorPickerCalendarId(null);
+                                      }}
+                                      className={`w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 ${
+                                        calendar.color === color ? 'border-foreground ring-2 ring-foreground/20' : 'border-transparent'
+                                      }`}
+                                      style={{ backgroundColor: color }}
+                                    />
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </label>
                       );
@@ -237,9 +333,31 @@ export const SettingsPage: React.FC = () => {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
 
-          {/* To Dos Tab */}
+            {/* Meal Calendar Selector */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">{t.mealPlanner?.mealCalendar || 'Meal Calendar'}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-3">
+                  {t.mealPlanner?.mealCalendarHelp || 'Select which calendar to use for meal planning events.'}
+                </p>
+                <select
+                  value={mealCalendarId}
+                  onChange={(e) => setMealCalendarId(e.target.value)}
+                  className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <option value="">{t.mealPlanner?.none || 'None'}</option>
+                  {calendars.map((cal) => (
+                    <option key={cal.id} value={cal.id}>
+                      {cal.emoji ? `${cal.emoji} ` : ''}{cal.name}
+                    </option>
+                  ))}
+                </select>
+              </CardContent>
+            </Card>
+          </TabsContent>
           <TabsContent value="todos" className="space-y-6 mt-6">
             <div>
               <h3 className="text-lg font-semibold mb-2 text-foreground">{t.todos.title}</h3>
