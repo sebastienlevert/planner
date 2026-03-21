@@ -3,6 +3,8 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { Calendar, CheckSquare, UtensilsCrossed, Settings, BookOpen, X } from 'lucide-react';
 import { useLocale } from '../../contexts/LocaleContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useProfilePhotos } from '../../hooks/useProfilePhotos';
+import { UserAvatar } from '../common/UserAvatar';
 
 interface NavItem {
   to: string;
@@ -19,6 +21,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose }) => {
   const { t } = useLocale();
   const { accounts, isAuthenticated } = useAuth();
+  const photos = useProfilePhotos();
   const location = useLocation();
 
   // Close sidebar on route change (mobile)
@@ -86,11 +89,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose })
       </NavLink>
     ));
 
-  const getInitials = (name: string): string => {
-    const parts = name.trim().split(/\s+/);
-    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-    return name.substring(0, 2).toUpperCase();
-  };
 
   return (
     <>
@@ -100,13 +98,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose })
         {isAuthenticated && accounts.length > 0 && (
           <div className="flex flex-col items-center gap-2 mb-4 pb-4 border-b border-border w-full px-2">
             {accounts.map((account) => (
-              <div
+              <UserAvatar
                 key={account.homeAccountId}
-                className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-sm"
-                title={account.name || account.username}
-              >
-                {getInitials(account.name || account.username)}
-              </div>
+                name={account.name || account.username}
+                photoUrl={photos[account.homeAccountId]}
+              />
             ))}
           </div>
         )}
@@ -146,13 +142,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose })
             {isAuthenticated && accounts.length > 0 && (
               <div className="flex items-center gap-1">
                 {accounts.map((account) => (
-                  <div
+                  <UserAvatar
                     key={account.homeAccountId}
-                    className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-xs"
-                    title={account.name || account.username}
-                  >
-                    {getInitials(account.name || account.username)}
-                  </div>
+                    name={account.name || account.username}
+                    photoUrl={photos[account.homeAccountId]}
+                    size="sm"
+                  />
                 ))}
               </div>
             )}

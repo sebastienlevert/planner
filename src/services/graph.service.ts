@@ -99,6 +99,20 @@ export class GraphService {
     return this.get('/me', accessToken);
   }
 
+  async getProfilePhoto(accessToken: string): Promise<string | null> {
+    try {
+      const url = `${this.baseUrl}/me/photo/$value`;
+      const response = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+      });
+      if (!response.ok) return null;
+      const blob = await response.blob();
+      return URL.createObjectURL(blob);
+    } catch {
+      return null;
+    }
+  }
+
   // Calendar operations
   async getCalendars(accessToken: string) {
     return this.get('/me/calendars', accessToken);

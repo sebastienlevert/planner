@@ -3,6 +3,8 @@ import { useLocation } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import { useLocale } from '../../contexts/LocaleContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useProfilePhotos } from '../../hooks/useProfilePhotos';
+import { UserAvatar } from '../common/UserAvatar';
 
 interface MobileHeaderProps {
   onMenuToggle: () => void;
@@ -18,15 +20,10 @@ const routeTitles: Record<string, string> = {
   '/settings': 'settings',
 };
 
-function getInitials(name: string): string {
-  const parts = name.trim().split(/\s+/);
-  if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-  return name.substring(0, 2).toUpperCase();
-}
-
 export const MobileHeader: React.FC<MobileHeaderProps> = ({ onMenuToggle }) => {
   const { t } = useLocale();
   const { accounts, isAuthenticated } = useAuth();
+  const photos = useProfilePhotos();
   const location = useLocation();
 
   const currentKey = routeTitles[location.pathname] || 'calendar';
@@ -58,13 +55,12 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({ onMenuToggle }) => {
         {isAuthenticated && accounts.length > 0 && (
           <div className="flex items-center gap-1.5 shrink-0 ml-2">
             {accounts.map((account) => (
-              <div
+              <UserAvatar
                 key={account.homeAccountId}
-                className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-xs"
-                title={account.name || account.username}
-              >
-                {getInitials(account.name || account.username)}
-              </div>
+                name={account.name || account.username}
+                photoUrl={photos[account.homeAccountId]}
+                size="sm"
+              />
             ))}
           </div>
         )}
