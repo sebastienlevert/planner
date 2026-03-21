@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { CheckCircle2, Circle, Trash2, Calendar as CalendarIcon, AlertCircle, ChevronRight } from 'lucide-react';
 import { useTask } from '../../contexts/TaskContext';
-import { useAuth } from '../../contexts/AuthContext';
 import { useLocale } from '../../contexts/LocaleContext';
 import type { TodoTask } from '../../types/task.types';
 import { dateHelpers } from '../../utils/dateHelpers';
@@ -9,7 +8,6 @@ import { TaskDetailDialog } from './TaskDetailDialog';
 
 export const TaskList: React.FC = () => {
   const { tasks, lists, toggleTaskComplete, deleteTask, listSettings } = useTask();
-  const { accounts } = useAuth();
   const { locale, t } = useLocale();
   const [selectedTask, setSelectedTask] = useState<TodoTask | null>(null);
 
@@ -58,7 +56,6 @@ export const TaskList: React.FC = () => {
       <div className="space-y-6">
         {Object.entries(groupedTasks).map(([listId, listTasks]) => {
           const list = lists.find(l => l.id === listId);
-          const account = accounts.find(a => a.homeAccountId === list?.accountId);
           const settings = listSettings[listId] || { allowTopLevelEdit: true };
           const allowEdit = settings.allowTopLevelEdit;
 
@@ -66,11 +63,6 @@ export const TaskList: React.FC = () => {
             <div key={listId} className="border border-border rounded-xl overflow-hidden bg-card">
               <h3 className="text-base font-semibold text-foreground px-4 py-3 bg-muted/30 border-b border-border">
                 {list?.displayName || t.events.unknown}
-                {account && (
-                  <span className="text-sm font-normal text-muted-foreground ml-2">
-                    ({account.email})
-                  </span>
-                )}
               </h3>
 
               <div className="divide-y divide-border">
