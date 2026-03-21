@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 import { todoService } from '../services/todo.service';
 import { StorageService } from '../services/storage.service';
@@ -36,11 +36,13 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
   const [lastSyncTime, setLastSyncTime] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Auto-sync on mount and when accounts change
+  // Lazy sync — only load from cache on mount, don't hit the API until user opens Tasks
+  const hasSyncedRef = useRef(false);
+
   useEffect(() => {
     if (accounts.length === 0) return;
 
-    // 1. Load from IndexedDB cache first for instant UI
+    // Load from IndexedDB cache for instant UI if user navigates to Tasks later
     const accountKey = accounts.map(a => a.homeAccountId).sort().join(',');
     (async () => {
       const cachedLists = await cacheService.get<TodoList[]>(`todo-lists:${accountKey}`);
@@ -55,14 +57,12 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
       if (cachedTasks) setTasks(cachedTasks.data);
       if (cachedLists || cachedTasks) setIsLoading(false);
     })();
-
-    // 2. Then sync from API
-    syncTasks();
   }, [accounts]);
 
-  // Sync To Do lists and tasks from all accounts
+  // Sync To Do lists and tasks from all accounts (called lazily on first access)
   const syncTasks = useCallback(async () => {
     if (accounts.length === 0) return;
+    hasSyncedRef.current = true;
 
     try {
       setIsSyncing(true);

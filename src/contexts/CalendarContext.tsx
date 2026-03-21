@@ -124,17 +124,20 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
         setSelectedCalendars(allCalendars.map(cal => cal.id));
       }
 
-      // Fetch events - at minimum 3 months, but extend if user has navigated further
+      // Fetch events - just this week + next week for fast initial load
       const now = new Date();
-      const defaultStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-      const defaultEnd = new Date(now.getFullYear(), now.getMonth() + 2, 0); // last day of next month
+      const dayOfWeek = now.getDay();
+      const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+      const thisMonday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + mondayOffset);
+      const nextSundayPlus7 = new Date(thisMonday.getTime() + 14 * 24 * 60 * 60 * 1000);
+
       const existingRange = fetchedRangeRef.current;
       const rangeStart = existingRange
-        ? new Date(Math.min(defaultStart.getTime(), existingRange.start.getTime()))
-        : defaultStart;
+        ? new Date(Math.min(thisMonday.getTime(), existingRange.start.getTime()))
+        : thisMonday;
       const rangeEnd = existingRange
-        ? new Date(Math.max(defaultEnd.getTime(), existingRange.end.getTime()))
-        : defaultEnd;
+        ? new Date(Math.max(nextSundayPlus7.getTime(), existingRange.end.getTime()))
+        : nextSundayPlus7;
       await fetchEventsForDateRange(rangeStart, rangeEnd, allCalendars, true);
       fetchedRangeRef.current = { start: rangeStart, end: rangeEnd };
 

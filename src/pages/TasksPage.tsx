@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CheckSquare, RefreshCw, Plus } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocale } from '../contexts/LocaleContext';
@@ -14,6 +14,13 @@ export const TasksPage: React.FC = () => {
   const { isSyncing, syncTasks, lastSyncTime } = useTask();
   const [showCompleted, setShowCompleted] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  // Trigger first sync when page is opened
+  useEffect(() => {
+    if (isAuthenticated && !lastSyncTime) {
+      syncTasks();
+    }
+  }, [isAuthenticated, lastSyncTime, syncTasks]);
 
   if (!isAuthenticated) {
     return (
