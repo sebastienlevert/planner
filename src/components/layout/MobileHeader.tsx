@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import { Menu, Calendar } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { useLocale } from '../../contexts/LocaleContext';
 
 interface MobileHeaderProps {
@@ -36,12 +36,13 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({ onMenuToggle }) => {
         </button>
 
         <div className="flex items-center gap-2.5 ml-3">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-            <Calendar size={18} className="text-primary-foreground" />
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-sm">
+            N
           </div>
-          <span className="font-display font-semibold text-foreground text-base truncate">
-            {pageTitle}
-          </span>
+          <div className="flex items-baseline gap-2 min-w-0">
+            <span className="font-display font-bold text-foreground text-base">Nestly</span>
+            <span className="text-sm text-muted-foreground truncate">{pageTitle}</span>
+          </div>
         </div>
       </div>
     </header>
