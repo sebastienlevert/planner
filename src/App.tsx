@@ -22,18 +22,22 @@ function AppRoutes() {
 
   return (
     <Routes>
-      {!isAuthenticated && (
-        <Route path="/" element={<LandingPage />} />
+      {!isAuthenticated ? (
+        <>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </>
+      ) : (
+        <Route path="/" element={<MainLayout />}>
+          <Route index element={<Navigate to="/calendar" replace />} />
+          <Route path="calendar" element={<CalendarPage />} />
+          <Route path="photos" element={<PhotosPage />} />
+          <Route path="tasks" element={<TasksPage />} />
+          <Route path="meals" element={<MealPlannerPage />} />
+          <Route path="docs" element={<DocsPage />} />
+          <Route path="settings" element={<SettingsPage />} />
+        </Route>
       )}
-      <Route path="/" element={<MainLayout />}>
-        <Route index element={<Navigate to="/calendar" replace />} />
-        <Route path="calendar" element={<CalendarPage />} />
-        <Route path="photos" element={<PhotosPage />} />
-        <Route path="tasks" element={<TasksPage />} />
-        <Route path="meals" element={<MealPlannerPage />} />
-        <Route path="docs" element={<DocsPage />} />
-        <Route path="settings" element={<SettingsPage />} />
-      </Route>
     </Routes>
   );
 }
