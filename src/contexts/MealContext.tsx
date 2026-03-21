@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, type ReactNode }
 import { openaiService } from '../services/openai.service';
 import type { FridgeItem, Recipe, MealContextType } from '../types/meal.types';
 import { StorageService } from '../services/storage.service';
+import { cacheService } from '../services/idb-cache.service';
 
 const MealContext = createContext<MealContextType | undefined>(undefined);
 
@@ -23,21 +24,33 @@ export const MealProvider: React.FC<MealProviderProps> = ({ children }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Load data from storage on mount
+  // Load data from storage on mount (IndexedDB first, fallback to localStorage)
   useEffect(() => {
-    const storedItems = StorageService.getFridgeInventory();
-    const storedRecipes = StorageService.getSavedRecipes();
-    setFridgeItems(storedItems);
-    setRecipes(storedRecipes);
+    (async () => {
+      const cachedItems = await cacheService.get<FridgeItem[]>('meal:fridge');
+      const cachedRecipes = await cacheService.get<Recipe[]>('meal:recipes');
+      if (cachedItems) {
+        setFridgeItems(cachedItems.data);
+      } else {
+        setFridgeItems(StorageService.getFridgeInventory());
+      }
+      if (cachedRecipes) {
+        setRecipes(cachedRecipes.data);
+      } else {
+        setRecipes(StorageService.getSavedRecipes());
+      }
+    })();
   }, []);
 
   // Save to storage whenever data changes
   useEffect(() => {
     StorageService.setFridgeInventory(fridgeItems);
+    cacheService.set('meal:fridge', fridgeItems);
   }, [fridgeItems]);
 
   useEffect(() => {
     StorageService.setSavedRecipes(recipes);
+    cacheService.set('meal:recipes', recipes);
   }, [recipes]);
 
   const addFridgeItem = (item: Omit<FridgeItem, 'id' | 'addedDate'>) => {

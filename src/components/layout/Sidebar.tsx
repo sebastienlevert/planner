@@ -2,9 +2,6 @@ import React, { useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Calendar, CheckSquare, UtensilsCrossed, Settings, BookOpen, X } from 'lucide-react';
 import { useLocale } from '../../contexts/LocaleContext';
-import { useAuth } from '../../contexts/AuthContext';
-import { useProfilePhotos } from '../../hooks/useProfilePhotos';
-import { UserAvatar } from '../common/UserAvatar';
 
 interface NavItem {
   to: string;
@@ -20,8 +17,6 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose }) => {
   const { t } = useLocale();
-  const { accounts, isAuthenticated } = useAuth();
-  const photos = useProfilePhotos();
   const location = useLocation();
 
   // Close sidebar on route change (mobile)
@@ -94,18 +89,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose })
     <>
       {/* Desktop sidebar — always visible on lg+ */}
       <aside className="hidden lg:flex w-22 bg-card border-r border-border flex-col items-center py-6 shrink-0">
-        {/* User avatars at top */}
-        {isAuthenticated && accounts.length > 0 && (
-          <div className="flex flex-col items-center gap-2 mb-4 pb-4 border-b border-border w-full px-2">
-            {accounts.map((account) => (
-              <UserAvatar
-                key={account.homeAccountId}
-                name={account.name || account.username}
-                photoUrl={photos[account.homeAccountId]}
-              />
-            ))}
-          </div>
-        )}
         <div className="flex flex-col gap-4">
           {renderNavItems(topItems, false)}
         </div>
@@ -139,18 +122,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose })
             <span className="font-display font-semibold text-foreground">{t.header.title}</span>
           </div>
           <div className="flex items-center gap-2">
-            {isAuthenticated && accounts.length > 0 && (
-              <div className="flex items-center gap-1">
-                {accounts.map((account) => (
-                  <UserAvatar
-                    key={account.homeAccountId}
-                    name={account.name || account.username}
-                    photoUrl={photos[account.homeAccountId]}
-                    size="sm"
-                  />
-                ))}
-              </div>
-            )}
             <button
               onClick={onClose}
               className="w-10 h-10 flex items-center justify-center rounded-lg text-muted-foreground hover:bg-muted transition-colors touch-target"

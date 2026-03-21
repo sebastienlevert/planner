@@ -4,6 +4,7 @@ import { calendarService } from '../services/calendar.service';
 import type { Calendar, CalendarEvent, CreateEventInput, CalendarContextType } from '../types/calendar.types';
 import { StorageService } from '../services/storage.service';
 import { appConfig } from '../config/app.config';
+import { cacheService } from '../services/idb-cache.service';
 
 const CalendarContext = createContext<CalendarContextType | undefined>(undefined);
 
@@ -55,16 +56,34 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
 
   // Auto-sync on mount and when accounts change
   useEffect(() => {
-    if (accounts.length > 0) {
+    if (accounts.length === 0) return;
+
+    // 1. Load from IndexedDB cache first for instant UI
+    const accountKey = accounts.map(a => a.homeAccountId).sort().join(',');
+    (async () => {
+      const cachedCals = await cacheService.get<Calendar[]>(`calendars:${accountKey}`);
+      const cachedEvts = await cacheService.get<CalendarEvent[]>(`events:${accountKey}`);
+      if (cachedCals) {
+        setCalendars(cachedCals.data);
+        if (selectedCalendars.length === 0 && calendars.length === 0) {
+          setSelectedCalendars(cachedCals.data.map(c => c.id));
+        }
+      }
+      if (cachedEvts) {
+        setEvents(cachedEvts.data);
+      }
+      if (cachedCals || cachedEvts) setIsLoading(false);
+    })();
+
+    // 2. Then sync from API in the background
+    syncCalendars();
+
+    // Set up periodic sync
+    const syncInterval = setInterval(() => {
       syncCalendars();
+    }, appConfig.calendar.syncInterval);
 
-      // Set up periodic sync
-      const syncInterval = setInterval(() => {
-        syncCalendars();
-      }, appConfig.calendar.syncInterval);
-
-      return () => clearInterval(syncInterval);
-    }
+    return () => clearInterval(syncInterval);
   }, [accounts]);
 
   // Sync calendars and events from all accounts
@@ -97,7 +116,9 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
 
       setCalendars(allCalendars);
 
-      // If first sync and no calendars previously selected, select all calendars by default
+      // Cache calendars
+      const accountKey = accounts.map(a => a.homeAccountId).sort().join(',');
+      cacheService.set(`calendars:${accountKey}`, allCalendars);
       // After initial setup, respect user's selections and don't auto-add calendars
       if (selectedCalendars.length === 0 && calendars.length === 0) {
         setSelectedCalendars(allCalendars.map(cal => cal.id));
@@ -118,6 +139,8 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
       fetchedRangeRef.current = { start: rangeStart, end: rangeEnd };
 
       setLastSyncTime(Date.now());
+      // Cache events
+      cacheService.set(`events:${accountKey}`, events);
       StorageService.setCalendarCache({ calendars: allCalendars, events, timestamp: Date.now() });
     } catch (err) {
       console.error('Calendar sync failed:', err);

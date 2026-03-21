@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, typ
 import { useAuth } from './AuthContext';
 import { todoService } from '../services/todo.service';
 import { StorageService } from '../services/storage.service';
+import { cacheService } from '../services/idb-cache.service';
 import type { TodoList, TodoTask, CreateTaskInput, ChecklistItem, TodoListSettings, TaskContextType } from '../types/task.types';
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -37,9 +38,26 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
 
   // Auto-sync on mount and when accounts change
   useEffect(() => {
-    if (accounts.length > 0) {
-      syncTasks();
-    }
+    if (accounts.length === 0) return;
+
+    // 1. Load from IndexedDB cache first for instant UI
+    const accountKey = accounts.map(a => a.homeAccountId).sort().join(',');
+    (async () => {
+      const cachedLists = await cacheService.get<TodoList[]>(`todo-lists:${accountKey}`);
+      const cachedTasks = await cacheService.get<TodoTask[]>(`todo-tasks:${accountKey}`);
+      if (cachedLists) {
+        setLists(cachedLists.data);
+        const settings = StorageService.getSettings();
+        if (!settings.selectedTodoLists || settings.selectedTodoLists.length === 0) {
+          setSelectedLists(cachedLists.data.map(l => l.id));
+        }
+      }
+      if (cachedTasks) setTasks(cachedTasks.data);
+      if (cachedLists || cachedTasks) setIsLoading(false);
+    })();
+
+    // 2. Then sync from API
+    syncTasks();
   }, [accounts]);
 
   // Sync To Do lists and tasks from all accounts
@@ -87,6 +105,11 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
 
       setTasks(allTasks);
       setLastSyncTime(Date.now());
+
+      // Cache to IndexedDB
+      const accountKey = accounts.map(a => a.homeAccountId).sort().join(',');
+      cacheService.set(`todo-lists:${accountKey}`, allLists);
+      cacheService.set(`todo-tasks:${accountKey}`, allTasks);
     } catch (err) {
       console.error('Task sync failed:', err);
       setError('Failed to sync tasks. Please try again.');
