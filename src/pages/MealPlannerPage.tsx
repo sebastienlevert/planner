@@ -305,8 +305,6 @@ export const MealPlannerPage: React.FC = () => {
       {/* Header */}
       <div className="bg-card border-b border-border">
         <div className="flex flex-wrap items-center gap-2 sm:gap-4 px-3 sm:px-5 py-3">
-          <h1 className="text-xl sm:text-2xl font-bold text-foreground">{t.mealPlanner?.title || 'Meal Planner'}</h1>
-
           <div className="flex items-center gap-1 sm:gap-2">
             <button onClick={goToPrevWeek} className="h-10 w-10 sm:h-11 sm:w-11 rounded-lg flex items-center justify-center hover:bg-muted touch-target">
               <ChevronLeft size={22} />
