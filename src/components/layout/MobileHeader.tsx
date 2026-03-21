@@ -13,9 +13,8 @@ interface MobileHeaderProps {
 const routeTitles: Record<string, string> = {
   '/calendar': 'calendar',
   '/tasks': 'todos',
-  '/meal-planner': 'mealPlanner',
+  '/meals': 'mealPlanner',
   '/photos': 'photos',
-  '/meals': 'meals',
   '/docs': 'docs',
   '/settings': 'settings',
 };

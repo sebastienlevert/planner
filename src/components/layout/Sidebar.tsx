@@ -41,7 +41,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose })
       section: 'top',
     },
     {
-      to: '/meal-planner',
+      to: '/meals',
       icon: <UtensilsCrossed size={26} />,
       labelKey: 'mealPlanner',
       section: 'top',

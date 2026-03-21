@@ -9,7 +9,6 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { MainLayout } from './components/layout/MainLayout';
 import { CalendarPage } from './pages/CalendarPage';
 import { PhotosPage } from './pages/PhotosPage';
-import { MealsPage } from './pages/MealsPage';
 import { TasksPage } from './pages/TasksPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { MealPlannerPage } from './pages/MealPlannerPage';
@@ -30,9 +29,8 @@ function AppRoutes() {
         <Route index element={<Navigate to="/calendar" replace />} />
         <Route path="calendar" element={<CalendarPage />} />
         <Route path="photos" element={<PhotosPage />} />
-        <Route path="meals" element={<MealsPage />} />
         <Route path="tasks" element={<TasksPage />} />
-        <Route path="meal-planner" element={<MealPlannerPage />} />
+        <Route path="meals" element={<MealPlannerPage />} />
         <Route path="docs" element={<DocsPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
