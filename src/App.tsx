@@ -1,4 +1,3 @@
-import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { CalendarProvider } from './contexts/CalendarContext';
@@ -14,17 +13,33 @@ import { MealsPage } from './pages/MealsPage';
 import { TasksPage } from './pages/TasksPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { MealPlannerPage } from './pages/MealPlannerPage';
+import { LandingPage } from './pages/LandingPage';
 import { useAutoReload } from './hooks/useAutoReload';
+import { useAuth } from './contexts/AuthContext';
+
+function AppRoutes() {
+  const { isAuthenticated } = useAuth();
+
+  return (
+    <Routes>
+      {!isAuthenticated && (
+        <Route path="/" element={<LandingPage />} />
+      )}
+      <Route path="/" element={<MainLayout />}>
+        <Route index element={<Navigate to="/calendar" replace />} />
+        <Route path="calendar" element={<CalendarPage />} />
+        <Route path="photos" element={<PhotosPage />} />
+        <Route path="meals" element={<MealsPage />} />
+        <Route path="tasks" element={<TasksPage />} />
+        <Route path="meal-planner" element={<MealPlannerPage />} />
+        <Route path="settings" element={<SettingsPage />} />
+      </Route>
+    </Routes>
+  );
+}
 
 function App() {
   useAutoReload();
-
-  // Debug: Log all navigation
-  React.useEffect(() => {
-    console.log('App: Current location:', window.location.href);
-    console.log('App: Hash:', window.location.hash);
-    console.log('App: Search:', window.location.search);
-  }, []);
 
   return (
     <HashRouter>
@@ -35,17 +50,7 @@ function App() {
               <MealProvider>
                 <PhotoProvider>
                   <TaskProvider>
-                    <Routes>
-                      <Route path="/" element={<MainLayout />}>
-                        <Route index element={<Navigate to="/calendar" replace />} />
-                        <Route path="calendar" element={<CalendarPage />} />
-                        <Route path="photos" element={<PhotosPage />} />
-                        <Route path="meals" element={<MealsPage />} />
-                        <Route path="tasks" element={<TasksPage />} />
-                        <Route path="meal-planner" element={<MealPlannerPage />} />
-                        <Route path="settings" element={<SettingsPage />} />
-                      </Route>
-                    </Routes>
+                    <AppRoutes />
                   </TaskProvider>
                 </PhotoProvider>
               </MealProvider>
