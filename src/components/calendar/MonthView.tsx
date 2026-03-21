@@ -88,7 +88,7 @@ export const MonthView: React.FC<MonthViewProps> = ({ currentDate, onDateClick, 
                     key={dayIndex}
                     className={`border-r border-border last:border-r-0 p-3 cursor-pointer hover:bg-secondary/20 transition-colors touch-optimized ${
                       !inCurrentMonth ? 'bg-muted' : 'bg-card'
-                    } ${isToday ? 'bg-secondary border-2 border-muted-foreground/30' : ''}`}
+                    } ${isToday ? 'ring-2 ring-inset ring-primary' : ''}`}
                     onClick={() => handleDateClick(date)}
                   >
                     <div className="flex flex-col h-full">

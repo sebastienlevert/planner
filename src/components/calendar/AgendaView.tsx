@@ -155,14 +155,12 @@ export const AgendaView: React.FC<AgendaViewProps> = ({ currentDate, onCreateEve
         key={day.toISOString()}
         ref={isToday ? todayRef : undefined}
         className={`flex flex-col border border-border rounded-xl overflow-hidden ${
-          isToday ? 'ring-2 ring-primary bg-secondary/50' : 'bg-card'
-        }`}
+          isToday ? 'ring-2 ring-primary' : ''
+        } bg-card`}
       >
         {/* Day header */}
         <div
-          className={`px-4 py-3 border-b border-border flex items-center justify-between ${
-            isToday ? 'bg-primary/10' : 'bg-muted/30'
-          }`}
+          className="px-4 py-3 border-b border-border flex items-center justify-between bg-muted/30"
         >
           <div className="flex items-baseline gap-2">
             <span className={`text-2xl font-bold ${isToday ? 'text-primary' : 'text-foreground'}`}>

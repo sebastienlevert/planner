@@ -153,8 +153,6 @@ export const DayView: React.FC<DayViewProps> = ({ currentDate, onCreateEvent, on
     }
   };
 
-  const isToday = dateHelpers.isToday(currentDate);
-
   return (
     <div className="flex flex-col h-full">
       {/* All-day events section */}
@@ -224,9 +222,7 @@ export const DayView: React.FC<DayViewProps> = ({ currentDate, onCreateEvent, on
             {hours.map(hour => (
               <div
                 key={hour}
-                className={`border-b border-border cursor-pointer transition-colors hover:bg-secondary/20 touch-optimized ${
-                  isToday ? 'bg-secondary/80' : 'bg-card'
-                }`}
+                className={`border-b border-border cursor-pointer transition-colors hover:bg-secondary/20 touch-optimized bg-card`}
                 style={{ minHeight: '70px' }}
                 onClick={() => handleSlotClick(hour)}
               >

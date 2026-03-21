@@ -204,7 +204,7 @@ export const WeekView: React.FC<WeekViewProps> = ({ currentDate, onCreateEvent, 
             <div
               key={day.toISOString()}
               className={`p-3 text-center ${
-                isToday ? 'flex-[2] bg-secondary' : 'flex-1'
+                isToday ? 'flex-[2]' : 'flex-1'
               } ${index > 0 ? 'border-l border-border' : ''}`}
             >
               <div className="text-base font-medium text-muted-foreground">
@@ -239,7 +239,7 @@ export const WeekView: React.FC<WeekViewProps> = ({ currentDate, onCreateEvent, 
                 <div
                   key={day.toISOString()}
                   className={`${dayIndex > 0 ? 'border-l border-border' : ''} ${
-                    isToday ? 'flex-[2] bg-secondary/80' : 'flex-1'
+                    isToday ? 'flex-[2]' : 'flex-1'
                   } py-0.5 px-2 space-y-0.5`}
                 >
                   {visibleEvents.map(event => {
@@ -318,9 +318,7 @@ export const WeekView: React.FC<WeekViewProps> = ({ currentDate, onCreateEvent, 
                 {hours.map(hour => (
                   <div
                     key={hour}
-                    className={`border-b border-border cursor-pointer transition-colors hover:bg-secondary/20 touch-optimized ${
-                      isToday ? 'bg-secondary/80' : 'bg-card'
-                    }`}
+                    className={`border-b border-border cursor-pointer transition-colors hover:bg-secondary/20 touch-optimized bg-card`}
                     style={{ minHeight: '70px' }}
                     onClick={() => handleSlotClick(day, hour)}
                   >
