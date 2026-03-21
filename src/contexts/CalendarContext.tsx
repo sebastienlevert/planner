@@ -48,46 +48,47 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
   const pendingRangeRef = useRef<{ start: Date; end: Date } | null>(null);
   const ensureDateRangeRef = useRef<(start: Date, end: Date) => void>(() => {});
 
-  // Save selected calendars to settings whenever they change
-  useEffect(() => {
-    const settings = StorageService.getSettings();
-    StorageService.setSettings({ ...settings, selectedCalendars });
-  }, [selectedCalendars]);
+  // Fetch events for a specific date range
+  const fetchEventsForDateRange = async (
+    startDate: Date,
+    endDate: Date,
+    cals?: Calendar[],
+    replace?: boolean
+  ): Promise<void> => {
+    const calendarsToFetch = cals || calendars;
+    if (calendarsToFetch.length === 0 || accounts.length === 0) return;
 
-  // Auto-sync on mount and when accounts change
-  useEffect(() => {
-    if (accounts.length === 0) return;
+    try {
+      // Fetch events from all calendars in parallel
+      const results = await Promise.all(
+        calendarsToFetch.map(async (calendar) => {
+          const accessToken = await getAccessToken(calendar.accountId);
+          return calendarService.getEvents(
+            calendar.id,
+            accessToken,
+            calendar.accountId,
+            startDate,
+            endDate
+          );
+        })
+      );
+      const allEvents = results.flat();
 
-    let cancelled = false;
-    const accountKey = accounts.map(a => a.homeAccountId).sort().join(',');
-
-    // 1. Load from IndexedDB cache first → immediate render
-    (async () => {
-      const [cachedCals, cachedEvts] = await Promise.all([
-        cacheService.get<Calendar[]>(`calendars:${accountKey}`),
-        cacheService.get<CalendarEvent[]>(`events:${accountKey}`),
-      ]);
-      if (cancelled) return;
-      if (cachedCals) {
-        setCalendars(cachedCals.data);
-        if (selectedCalendars.length === 0 && calendars.length === 0) {
-          setSelectedCalendars(cachedCals.data.map(c => c.id));
-        }
+      if (replace) {
+        setEvents(allEvents);
+      } else {
+        // Merge: add new events, avoid duplicates by id
+        setEvents(prev => {
+          const existingIds = new Set(prev.map(e => e.id));
+          const newEvents = allEvents.filter(e => !existingIds.has(e.id));
+          return [...prev, ...newEvents];
+        });
       }
-      if (cachedEvts) setEvents(cachedEvts.data);
-      if (cachedCals || cachedEvts) setIsLoading(false);
-
-      // 2. Background API sync only AFTER cache has rendered
-      syncCalendars();
-    })();
-
-    // Set up periodic sync
-    const syncInterval = setInterval(() => {
-      syncCalendars();
-    }, appConfig.calendar.syncInterval);
-
-    return () => { cancelled = true; clearInterval(syncInterval); };
-  }, [accounts]);
+    } catch (err) {
+      console.error('Failed to fetch events:', err);
+      throw err;
+    }
+  };
 
   // Sync calendars and events from all accounts
   const syncCalendars = useCallback(async () => {
@@ -164,47 +165,47 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
     }
   }, [accounts, getAccessToken]);
 
-  // Fetch events for a specific date range
-  const fetchEventsForDateRange = async (
-    startDate: Date,
-    endDate: Date,
-    cals?: Calendar[],
-    replace?: boolean
-  ): Promise<void> => {
-    const calendarsToFetch = cals || calendars;
-    if (calendarsToFetch.length === 0 || accounts.length === 0) return;
+  // Save selected calendars to settings whenever they change
+  useEffect(() => {
+    const settings = StorageService.getSettings();
+    StorageService.setSettings({ ...settings, selectedCalendars });
+  }, [selectedCalendars]);
 
-    try {
-      // Fetch events from all calendars in parallel
-      const results = await Promise.all(
-        calendarsToFetch.map(async (calendar) => {
-          const accessToken = await getAccessToken(calendar.accountId);
-          return calendarService.getEvents(
-            calendar.id,
-            accessToken,
-            calendar.accountId,
-            startDate,
-            endDate
-          );
-        })
-      );
-      const allEvents = results.flat();
+  // Load from IndexedDB cache on mount for instant UI
+  useEffect(() => {
+    if (accounts.length === 0) return;
+    let cancelled = false;
+    const accountKey = accounts.map(a => a.homeAccountId).sort().join(',');
 
-      if (replace) {
-        setEvents(allEvents);
-      } else {
-        // Merge: add new events, avoid duplicates by id
-        setEvents(prev => {
-          const existingIds = new Set(prev.map(e => e.id));
-          const newEvents = allEvents.filter(e => !existingIds.has(e.id));
-          return [...prev, ...newEvents];
-        });
+    (async () => {
+      const [cachedCals, cachedEvts] = await Promise.all([
+        cacheService.get<Calendar[]>(`calendars:${accountKey}`),
+        cacheService.get<CalendarEvent[]>(`events:${accountKey}`),
+      ]);
+      if (cancelled) return;
+      if (cachedCals) {
+        setCalendars(cachedCals.data);
+        setSelectedCalendars(prev => prev.length === 0 ? cachedCals.data.map(c => c.id) : prev);
       }
-    } catch (err) {
-      console.error('Failed to fetch events:', err);
-      throw err;
-    }
-  };
+      if (cachedEvts) setEvents(cachedEvts.data);
+      if (cachedCals || cachedEvts) setIsLoading(false);
+    })();
+
+    return () => { cancelled = true; };
+  }, [accounts]);
+
+  // Sync from API — runs independently after mount and on interval
+  useEffect(() => {
+    if (accounts.length === 0) return;
+
+    syncCalendars();
+
+    const syncInterval = setInterval(() => {
+      syncCalendars();
+    }, appConfig.calendar.syncInterval);
+
+    return () => clearInterval(syncInterval);
+  }, [accounts, syncCalendars]);
 
   // Ensure events are loaded for a given date range, fetching if needed
   const ensureDateRange = useCallback((start: Date, end: Date) => {
