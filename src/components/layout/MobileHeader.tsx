@@ -29,18 +29,19 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({ onMenuToggle }) => {
   const pageTitle = t.nav[currentKey as keyof typeof t.nav] || t.header.title;
 
   return (
-    <header className="lg:hidden bg-card border-b border-border sticky top-0 z-30">
+    <header className="bg-card border-b border-border sticky top-0 z-30">
       <div className="flex items-center justify-between h-14 px-4">
         <div className="flex items-center min-w-0">
+          {/* Hamburger: mobile only */}
           <button
             onClick={onMenuToggle}
-            className="w-11 h-11 flex items-center justify-center rounded-lg text-foreground hover:bg-muted transition-colors touch-target -ml-1"
+            className="lg:hidden w-11 h-11 flex items-center justify-center rounded-lg text-foreground hover:bg-muted transition-colors touch-target -ml-1"
             aria-label="Open menu"
           >
             <Menu size={24} />
           </button>
 
-          <div className="flex items-center gap-2.5 ml-3 min-w-0">
+          <div className="flex items-center gap-2.5 ml-3 lg:ml-0 min-w-0">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-sm shrink-0">
               N
             </div>
