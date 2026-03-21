@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Check, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { useCalendar } from '../../contexts/CalendarContext';
 import { useLocale } from '../../contexts/LocaleContext';
-import { StorageService } from '../../services/storage.service';
 import { ViewSwitcher } from './ViewSwitcher';
 import type { CalendarView } from '../../types/calendar.types';
 import { dateHelpers } from '../../utils/dateHelpers';
@@ -25,27 +24,8 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 }) => {
   const { isSyncing, isLoading, lastSyncTime } = useCalendar();
   const { t } = useLocale();
-  const [calendarName, setCalendarName] = useState('');
 
-  useEffect(() => {
-    // Load calendar name from settings
-    const loadCalendarName = () => {
-      const settings = StorageService.getSettings();
-      setCalendarName(settings.calendarName || t.calendar.title);
-    };
-
-    loadCalendarName();
-
-    // Listen for settings updates and locale changes
-    window.addEventListener('settings-updated', loadCalendarName);
-    window.addEventListener('locale-changed', loadCalendarName);
-    return () => {
-      window.removeEventListener('settings-updated', loadCalendarName);
-      window.removeEventListener('locale-changed', loadCalendarName);
-    };
-  }, [t]);
-
-  const handlePrevious = () => {
+  const handlePrevious= () => {
     if (currentView === 'day') {
       onDateChange(dateHelpers.previousDay(currentDate));
     } else if (currentView === 'agenda' || currentView === 'week') {
@@ -73,8 +53,8 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     <div className="bg-card border-b border-border">
       {/* Single Row: All Header Components */}
       <div className="flex flex-wrap items-center gap-2 sm:gap-4 px-3 sm:px-5 py-3">
-        {/* Calendar Name */}
-        <h1 className="text-xl sm:text-2xl font-bold text-foreground">{calendarName}</h1>
+        {/* View Switcher */}
+        <ViewSwitcher currentView={currentView} onViewChange={onViewChange} />
 
         {/* Navigation Controls */}
         <div className="flex items-center gap-1 sm:gap-2">
@@ -94,11 +74,8 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
           {monthYearDisplay}
         </h2>
 
-        {/* Spacer to push right items to the end */}
+        {/* Spacer */}
         <div className="flex-1 min-w-0" />
-
-        {/* View Switcher */}
-        <ViewSwitcher currentView={currentView} onViewChange={onViewChange} />
 
         {/* Sync status */}
         <div className="flex items-center">
