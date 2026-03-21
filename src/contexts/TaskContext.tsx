@@ -3,7 +3,10 @@ import { useAuth } from './AuthContext';
 import { todoService } from '../services/todo.service';
 import { StorageService } from '../services/storage.service';
 import { cacheService } from '../services/idb-cache.service';
+import { parallelLimit } from '../utils/parallelLimit';
 import type { TodoList, TodoTask, CreateTaskInput, ChecklistItem, TodoListSettings, TaskContextType } from '../types/task.types';
+
+const MAX_CONCURRENT = 4;
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
@@ -68,13 +71,15 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
       setIsSyncing(true);
       setError(null);
 
-      // Fetch lists from all accounts
-      const allLists: TodoList[] = [];
-      for (const account of accounts) {
-        const accessToken = await getAccessToken(account.homeAccountId);
-        const accountLists = await todoService.getTodoLists(accessToken, account.homeAccountId);
-        allLists.push(...accountLists);
-      }
+      // Fetch lists from all accounts (max 4 concurrent)
+      const listResults = await parallelLimit(
+        accounts.map((account) => async () => {
+          const accessToken = await getAccessToken(account.homeAccountId);
+          return todoService.getTodoLists(accessToken, account.homeAccountId);
+        }),
+        MAX_CONCURRENT
+      );
+      const allLists: TodoList[] = listResults.flat();
 
       setLists(allLists);
 
@@ -87,21 +92,18 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
         StorageService.setSettings({ ...currentSettings, selectedTodoLists: activeSelectedLists });
       }
 
-      // Fetch tasks from all lists (not just selected — we need them for settings)
-      const allTasks: TodoTask[] = [];
-      for (const account of accounts) {
-        const accessToken = await getAccessToken(account.homeAccountId);
-        const accountListIds = allLists
-          .filter(list => list.accountId === account.homeAccountId)
-          .map(list => list.id);
-
-        const accountTasks = await todoService.getAllTasks(
-          accessToken,
-          account.homeAccountId,
-          accountListIds
-        );
-        allTasks.push(...accountTasks);
-      }
+      // Fetch tasks from all accounts (max 4 concurrent)
+      const taskResults = await parallelLimit(
+        accounts.map((account) => async () => {
+          const accessToken = await getAccessToken(account.homeAccountId);
+          const accountListIds = allLists
+            .filter(list => list.accountId === account.homeAccountId)
+            .map(list => list.id);
+          return todoService.getAllTasks(accessToken, account.homeAccountId, accountListIds);
+        }),
+        MAX_CONCURRENT
+      );
+      const allTasks: TodoTask[] = taskResults.flat();
 
       setTasks(allTasks);
       setLastSyncTime(Date.now());

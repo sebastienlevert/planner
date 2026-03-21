@@ -5,6 +5,9 @@ import type { Calendar, CalendarEvent, CreateEventInput, CalendarContextType } f
 import { StorageService } from '../services/storage.service';
 import { appConfig } from '../config/app.config';
 import { cacheService } from '../services/idb-cache.service';
+import { parallelLimit } from '../utils/parallelLimit';
+
+const MAX_CONCURRENT = 4;
 
 const CalendarContext = createContext<CalendarContextType | undefined>(undefined);
 
@@ -59,9 +62,9 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
     if (calendarsToFetch.length === 0 || accounts.length === 0) return;
 
     try {
-      // Fetch events from all calendars in parallel
-      const results = await Promise.all(
-        calendarsToFetch.map(async (calendar) => {
+      // Fetch events from all calendars (max 4 concurrent)
+      const results = await parallelLimit(
+        calendarsToFetch.map((calendar) => async () => {
           const accessToken = await getAccessToken(calendar.accountId);
           return calendarService.getEvents(
             calendar.id,
@@ -70,7 +73,8 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
             startDate,
             endDate
           );
-        })
+        }),
+        MAX_CONCURRENT
       );
       const allEvents = results.flat();
 
@@ -98,13 +102,14 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
       setIsSyncing(true);
       setError(null);
 
-      // Fetch calendars from all accounts in parallel
+      // Fetch calendars from all accounts (max 4 concurrent)
       const allCalendars: Calendar[] = [];
-      const calResults = await Promise.all(
-        accounts.map(async (account) => {
+      const calResults = await parallelLimit(
+        accounts.map((account) => async () => {
           const accessToken = await getAccessToken(account.homeAccountId);
           return calendarService.getCalendars(accessToken, account.homeAccountId);
-        })
+        }),
+        MAX_CONCURRENT
       );
       for (const cals of calResults) allCalendars.push(...cals);
 
