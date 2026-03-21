@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 const GITHUB_API_URL =
-  'https://api.github.com/repos/sebastienlevert/planner/commits?sha=main&per_page=1';
+  'https://api.github.com/repos/sebastienlevert/nestly/commits?sha=main&per_page=1';
 const CHECK_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 const COMMIT_AGE_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes
 
