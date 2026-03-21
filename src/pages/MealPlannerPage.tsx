@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useRef, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Plus, UtensilsCrossed, Link as LinkIcon, Pencil } from 'lucide-react';
+import { ChevronRight, Plus, UtensilsCrossed, Link as LinkIcon, Pencil } from 'lucide-react';
 import { useCalendar } from '../contexts/CalendarContext';
 import { useLocale } from '../contexts/LocaleContext';
 import { StorageService } from '../services/storage.service';
@@ -7,7 +7,8 @@ import { dateHelpers } from '../utils/dateHelpers';
 import type { CalendarEvent } from '../types/calendar.types';
 import { addDays } from 'date-fns';
 import { MealModal } from '../components/meals/MealModal';
-import { Button } from '@/components/ui/button';
+import { DatePicker } from '../components/calendar/DatePicker';
+import { useHeaderControls } from '../contexts/HeaderControlsContext';
 
 const MEAL_TYPES = [
   { key: 'breakfast', emoji: '🥐', defaultStartHour: 7, defaultStartMin: 30, defaultEndHour: 8, defaultEndMin: 0 },
@@ -35,6 +36,11 @@ export const MealPlannerPage: React.FC = () => {
   const todayRef = useRef<HTMLDivElement>(null);
 
   const [currentDate, setCurrentDate] = useState(new Date());
+
+  // Inject date picker into global header
+  useHeaderControls(
+    <DatePicker currentDate={currentDate} onDateChange={setCurrentDate} />
+  );
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
@@ -125,9 +131,6 @@ export const MealPlannerPage: React.FC = () => {
     setModalDate(null);
   }, []);
 
-  const goToPrevWeek = () => setCurrentDate(prev => addDays(dateHelpers.getWeekStart(prev), -7));
-  const goToNextWeek = () => setCurrentDate(prev => addDays(dateHelpers.getWeekStart(prev), 7));
-  const goToToday = () => setCurrentDate(new Date());
   const goToNextWeekNav = () => setCurrentDate(nextWeekStart);
 
   // No meal calendar selected
@@ -309,29 +312,6 @@ export const MealPlannerPage: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="bg-card border-b border-border">
-        <div className="flex flex-wrap items-center gap-2 sm:gap-4 px-3 sm:px-5 py-3">
-          <div className="flex items-center gap-1 sm:gap-2">
-            <Button variant="ghost" size="icon" className="h-10 w-10 sm:h-11 sm:w-11" onClick={goToPrevWeek} aria-label="Previous week">
-              <ChevronLeft size={22} />
-            </Button>
-            <Button variant="secondary" className="h-10 px-3 sm:h-11 sm:px-5 text-sm sm:text-base" onClick={goToToday}>
-              {t.mealPlanner?.today || 'Today'}
-            </Button>
-            <Button variant="ghost" size="icon" className="h-10 w-10 sm:h-11 sm:w-11" onClick={goToNextWeek} aria-label="Next week">
-              <ChevronRight size={22} />
-            </Button>
-          </div>
-
-          <h2 className="text-base sm:text-lg font-semibold text-foreground">
-            {locale === 'en'
-              ? dateHelpers.formatDate(weekStart, 'MMMM yyyy', locale).charAt(0).toUpperCase() + dateHelpers.formatDate(weekStart, 'MMMM yyyy', locale).slice(1)
-              : dateHelpers.formatDate(weekStart, 'MMMM yyyy', locale)}
-          </h2>
-        </div>
-      </div>
-
       {/* Mobile: single column scrollable list */}
       <div className="lg:hidden flex-1 overflow-y-auto p-3 space-y-3">
         {weekDays.map(day => renderDayCell(day, true))}
