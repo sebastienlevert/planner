@@ -66,15 +66,15 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({ onMenuToggle, onSide
             <Menu size={20} />
           </button>
 
-          {!sidebarCollapsed && (
-            <div className="hidden lg:flex items-center gap-2.5 lg:ml-0 min-w-0">
-              <NestlyLogo size={32} className="rounded-lg shrink-0" />
-              <div className="flex items-baseline gap-2 min-w-0">
+          <div className="hidden lg:flex items-center gap-2.5 lg:ml-0 min-w-0">
+            {!sidebarCollapsed && (
+              <>
+                <NestlyLogo size={32} className="rounded-lg shrink-0" />
                 <span className="font-display font-bold text-foreground text-base">Nestly</span>
-                <span className="text-sm text-muted-foreground truncate">{pageTitle}</span>
-              </div>
-            </div>
-          )}
+              </>
+            )}
+            <span className="text-sm text-muted-foreground truncate">{pageTitle}</span>
+          </div>
         </div>
 
         {/* Spacer */}
