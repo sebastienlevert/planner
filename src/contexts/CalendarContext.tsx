@@ -58,32 +58,35 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
   useEffect(() => {
     if (accounts.length === 0) return;
 
-    // 1. Load from IndexedDB cache first for instant UI
+    let cancelled = false;
     const accountKey = accounts.map(a => a.homeAccountId).sort().join(',');
+
+    // 1. Load from IndexedDB cache first → immediate render
     (async () => {
-      const cachedCals = await cacheService.get<Calendar[]>(`calendars:${accountKey}`);
-      const cachedEvts = await cacheService.get<CalendarEvent[]>(`events:${accountKey}`);
+      const [cachedCals, cachedEvts] = await Promise.all([
+        cacheService.get<Calendar[]>(`calendars:${accountKey}`),
+        cacheService.get<CalendarEvent[]>(`events:${accountKey}`),
+      ]);
+      if (cancelled) return;
       if (cachedCals) {
         setCalendars(cachedCals.data);
         if (selectedCalendars.length === 0 && calendars.length === 0) {
           setSelectedCalendars(cachedCals.data.map(c => c.id));
         }
       }
-      if (cachedEvts) {
-        setEvents(cachedEvts.data);
-      }
+      if (cachedEvts) setEvents(cachedEvts.data);
       if (cachedCals || cachedEvts) setIsLoading(false);
-    })();
 
-    // 2. Then sync from API in the background
-    syncCalendars();
+      // 2. Background API sync only AFTER cache has rendered
+      syncCalendars();
+    })();
 
     // Set up periodic sync
     const syncInterval = setInterval(() => {
       syncCalendars();
     }, appConfig.calendar.syncInterval);
 
-    return () => clearInterval(syncInterval);
+    return () => { cancelled = true; clearInterval(syncInterval); };
   }, [accounts]);
 
   // Sync calendars and events from all accounts
@@ -94,13 +97,15 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
       setIsSyncing(true);
       setError(null);
 
-      // Fetch calendars from all accounts
+      // Fetch calendars from all accounts in parallel
       const allCalendars: Calendar[] = [];
-      for (const account of accounts) {
-        const accessToken = await getAccessToken(account.homeAccountId);
-        const accountCalendars = await calendarService.getCalendars(accessToken, account.homeAccountId);
-        allCalendars.push(...accountCalendars);
-      }
+      const calResults = await Promise.all(
+        accounts.map(async (account) => {
+          const accessToken = await getAccessToken(account.homeAccountId);
+          return calendarService.getCalendars(accessToken, account.homeAccountId);
+        })
+      );
+      for (const cals of calResults) allCalendars.push(...cals);
 
       // Apply user color overrides
       const savedColors = StorageService.getSettings().calendarColors || {};
@@ -165,20 +170,20 @@ export const CalendarProvider: React.FC<CalendarProviderProps> = ({ children }) 
     if (calendarsToFetch.length === 0 || accounts.length === 0) return;
 
     try {
-      const allEvents: CalendarEvent[] = [];
-
-      // Fetch events from each calendar individually
-      for (const calendar of calendarsToFetch) {
-        const accessToken = await getAccessToken(calendar.accountId);
-        const calendarEvents = await calendarService.getEvents(
-          calendar.id,
-          accessToken,
-          calendar.accountId,
-          startDate,
-          endDate
-        );
-        allEvents.push(...calendarEvents);
-      }
+      // Fetch events from all calendars in parallel
+      const results = await Promise.all(
+        calendarsToFetch.map(async (calendar) => {
+          const accessToken = await getAccessToken(calendar.accountId);
+          return calendarService.getEvents(
+            calendar.id,
+            accessToken,
+            calendar.accountId,
+            startDate,
+            endDate
+          );
+        })
+      );
+      const allEvents = results.flat();
 
       if (replace) {
         setEvents(allEvents);
