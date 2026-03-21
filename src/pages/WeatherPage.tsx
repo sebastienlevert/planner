@@ -193,9 +193,11 @@ export const WeatherPage: React.FC = () => {
                   <span className="text-sm text-muted-foreground">/ {forecast.temperatureMin}°</span>
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground -mt-1 ml-[23px]">
-                Feels {forecast.apparentTemperatureMax}° / {forecast.apparentTemperatureMin}°
-              </p>
+              {forecast.apparentTemperatureMax != null && (
+                <p className="text-xs text-muted-foreground -mt-1 ml-[23px]">
+                  Feels {forecast.apparentTemperatureMax}° / {forecast.apparentTemperatureMin}°
+                </p>
+              )}
 
               {/* Temp bar */}
               <div className="ml-[23px]">
@@ -211,56 +213,68 @@ export const WeatherPage: React.FC = () => {
               </div>
 
               {/* Hourly temperature graph */}
-              {forecast.hourly.length > 0 && (
+              {forecast.hourly && forecast.hourly.length > 0 && (
                 <div className="mt-1 -mx-1">
                   <HourlyChart points={forecast.hourly} />
                 </div>
               )}
 
               {/* Precipitation */}
-              <div className="flex items-center gap-2">
-                <Droplets size={15} className="text-blue-400 shrink-0" />
-                <span className="text-sm text-foreground">
-                  {forecast.precipitationProbabilityMax}%
-                  {forecast.precipitationSum > 0 && (
-                    <span className="text-muted-foreground"> · {forecast.precipitationSum.toFixed(1)} mm</span>
-                  )}
-                </span>
-              </div>
+              {forecast.precipitationProbabilityMax != null && (
+                <div className="flex items-center gap-2">
+                  <Droplets size={15} className="text-blue-400 shrink-0" />
+                  <span className="text-sm text-foreground">
+                    {forecast.precipitationProbabilityMax}%
+                    {(forecast.precipitationSum ?? 0) > 0 && (
+                      <span className="text-muted-foreground"> · {forecast.precipitationSum.toFixed(1)} mm</span>
+                    )}
+                  </span>
+                </div>
+              )}
 
               {/* Wind */}
-              <div className="flex items-center gap-2">
-                <Wind size={15} className="text-muted-foreground shrink-0" />
-                <span className="text-sm text-foreground">
-                  {forecast.windSpeedMax} km/h {windCompass(forecast.windDirection)}
-                  {forecast.windGustsMax > forecast.windSpeedMax && (
-                    <span className="text-muted-foreground"> · gusts {forecast.windGustsMax}</span>
-                  )}
-                </span>
-              </div>
+              {forecast.windSpeedMax != null && (
+                <div className="flex items-center gap-2">
+                  <Wind size={15} className="text-muted-foreground shrink-0" />
+                  <span className="text-sm text-foreground">
+                    {forecast.windSpeedMax} km/h {windCompass(forecast.windDirection ?? 0)}
+                    {(forecast.windGustsMax ?? 0) > (forecast.windSpeedMax ?? 0) && (
+                      <span className="text-muted-foreground"> · gusts {forecast.windGustsMax}</span>
+                    )}
+                  </span>
+                </div>
+              )}
 
               {/* UV Index */}
-              <div className="flex items-center gap-2">
-                <Sun size={15} className={`shrink-0 ${uvLevel(forecast.uvIndexMax).color}`} />
-                <span className="text-sm text-foreground">
-                  UV {Math.round(forecast.uvIndexMax)}
-                  <span className={`ml-1 text-xs font-medium ${uvLevel(forecast.uvIndexMax).color}`}>
-                    {uvLevel(forecast.uvIndexMax).label}
+              {forecast.uvIndexMax != null && (
+                <div className="flex items-center gap-2">
+                  <Sun size={15} className={`shrink-0 ${uvLevel(forecast.uvIndexMax).color}`} />
+                  <span className="text-sm text-foreground">
+                    UV {Math.round(forecast.uvIndexMax)}
+                    <span className={`ml-1 text-xs font-medium ${uvLevel(forecast.uvIndexMax).color}`}>
+                      {uvLevel(forecast.uvIndexMax).label}
+                    </span>
                   </span>
-                </span>
-              </div>
+                </div>
+              )}
 
               {/* Sunrise / Sunset */}
-              <div className="flex items-center gap-3 mt-auto pt-1 border-t border-border/50">
-                <div className="flex items-center gap-1.5">
-                  <Sunrise size={14} className="text-orange-400" />
-                  <span className="text-xs text-muted-foreground">{formatTime(forecast.sunrise)}</span>
+              {(forecast.sunrise || forecast.sunset) && (
+                <div className="flex items-center gap-3 mt-auto pt-1 border-t border-border/50">
+                  {forecast.sunrise && (
+                    <div className="flex items-center gap-1.5">
+                      <Sunrise size={14} className="text-orange-400" />
+                      <span className="text-xs text-muted-foreground">{formatTime(forecast.sunrise)}</span>
+                    </div>
+                  )}
+                  {forecast.sunset && (
+                    <div className="flex items-center gap-1.5">
+                      <Sunset size={14} className="text-indigo-400" />
+                      <span className="text-xs text-muted-foreground">{formatTime(forecast.sunset)}</span>
+                    </div>
+                  )}
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <Sunset size={14} className="text-indigo-400" />
-                  <span className="text-xs text-muted-foreground">{formatTime(forecast.sunset)}</span>
-                </div>
-              </div>
+              )}
             </>
           ) : loading ? (
             <div className="flex items-center justify-center flex-1">
