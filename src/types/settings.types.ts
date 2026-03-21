@@ -12,4 +12,5 @@ export interface AppSettings {
   selectedTodoLists?: string[];
   todoListSettings?: Record<string, TodoListSettings>;
   mealCalendarId?: string;
+  weatherLocation?: string;
 }

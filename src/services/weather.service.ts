@@ -12,10 +12,12 @@ interface WeatherCache {
   timestamp: number;
   latitude: number;
   longitude: number;
+  locationKey: string; // tracks which location was cached
 }
 
 const CACHE_KEY = 'nestly_weather_cache';
 const CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
+const DEFAULT_COORDS = { latitude: 45.50, longitude: -73.57 }; // Montreal
 
 // WMO Weather interpretation codes → emoji + label
 const weatherCodeMap: Record<number, { icon: string; label: string }> = {
@@ -53,9 +55,10 @@ export function getWeatherInfo(code: number): { icon: string; label: string } {
   return weatherCodeMap[code] ?? { icon: '❓', label: 'Unknown' };
 }
 
-function getCache(): WeatherCache | null {
+function getCache(locationKey: string): WeatherCache | null {
   const cached = StorageService.get<WeatherCache | null>(CACHE_KEY, null);
   if (!cached) return null;
+  if (cached.locationKey !== locationKey) return null; // location changed
   if (Date.now() - cached.timestamp > CACHE_TTL) return null;
   return cached;
 }
@@ -64,36 +67,58 @@ function setCache(data: WeatherCache): void {
   StorageService.set(CACHE_KEY, data);
 }
 
-async function getUserLocation(): Promise<{ latitude: number; longitude: number }> {
-  return new Promise((resolve, reject) => {
+/** Geocode a city name to coordinates using Open-Meteo's free geocoding API */
+export async function geocodeCity(name: string): Promise<{ latitude: number; longitude: number; displayName: string } | null> {
+  const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=1&language=en&format=json`);
+  if (!res.ok) return null;
+  const data = await res.json();
+  if (!data.results || data.results.length === 0) return null;
+  const r = data.results[0];
+  return { latitude: r.latitude, longitude: r.longitude, displayName: `${r.name}, ${r.country}` };
+}
+
+function getBrowserLocation(): Promise<{ latitude: number; longitude: number }> {
+  return new Promise((resolve) => {
     if (!navigator.geolocation) {
-      reject(new Error('Geolocation not supported'));
+      resolve(DEFAULT_COORDS);
       return;
     }
+    const timeout = setTimeout(() => resolve(DEFAULT_COORDS), 3000);
     navigator.geolocation.getCurrentPosition(
-      (pos) => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
-      (err) => reject(err),
-      { timeout: 10000, maximumAge: CACHE_TTL }
+      (pos) => { clearTimeout(timeout); resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }); },
+      () => { clearTimeout(timeout); resolve(DEFAULT_COORDS); },
+      { timeout: 3000, maximumAge: CACHE_TTL }
     );
   });
 }
 
 export async function fetchWeatherForecast(): Promise<DayForecast[]> {
-  // Return cache if fresh
-  const cached = getCache();
+  // Check if user configured a location in settings
+  const settings = StorageService.getSettings();
+  const locationKey = settings.weatherLocation || '__browser__';
+
+  // Return cache if fresh and for the same location
+  const cached = getCache(locationKey);
   if (cached) return cached.forecasts;
 
   let latitude: number;
   let longitude: number;
 
-  try {
-    const loc = await getUserLocation();
+  if (settings.weatherLocation) {
+    const geo = await geocodeCity(settings.weatherLocation);
+    if (geo) {
+      latitude = geo.latitude;
+      longitude = geo.longitude;
+    } else {
+      // Geocoding failed, fall back to browser / default
+      const loc = await getBrowserLocation();
+      latitude = loc.latitude;
+      longitude = loc.longitude;
+    }
+  } else {
+    const loc = await getBrowserLocation();
     latitude = loc.latitude;
     longitude = loc.longitude;
-  } catch {
-    // Fallback to a default location (New York) if geolocation fails
-    latitude = 40.71;
-    longitude = -74.01;
   }
 
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=weather_code,temperature_2m_max,temperature_2m_min&forecast_days=16&timezone=auto`;
@@ -109,6 +134,11 @@ export async function fetchWeatherForecast(): Promise<DayForecast[]> {
     temperatureMin: Math.round(data.daily.temperature_2m_min[i]),
   }));
 
-  setCache({ forecasts, timestamp: Date.now(), latitude, longitude });
+  setCache({ forecasts, timestamp: Date.now(), latitude, longitude, locationKey });
   return forecasts;
+}
+
+/** Clear the weather cache so the next fetch re-queries the API */
+export function clearWeatherCache(): void {
+  StorageService.remove(CACHE_KEY);
 }

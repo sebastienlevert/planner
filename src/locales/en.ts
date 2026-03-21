@@ -123,7 +123,7 @@ export const en = {
     languageHelp: 'Change the language used throughout the app',
     accountManagement: 'Account Management',
     about: 'About',
-    appName: 'Family Planner',
+    appName: 'Nestly',
     appDescription: 'Your all-in-one family organization tool',
     version: 'Version',
     aboutDescription: 'This app integrates with Microsoft 365 services including Outlook Calendar, OneDrive, and Azure OpenAI for meal planning.',
@@ -133,11 +133,15 @@ export const en = {
     changeEmoji: 'Set emoji',
     removeEmoji: 'Remove emoji',
     applicationSettings: 'Application Settings',
+    weatherLocation: 'Weather Location',
+    weatherLocationHelp: 'City name for weather forecasts shown in the calendar (e.g., Montreal, New York, London)',
+    weatherLocationPlaceholder: 'e.g., Montreal',
+    weatherLocationDetect: 'Use my location',
   },
 
   // Auth
   auth: {
-    welcome: 'Welcome to Family Planner',
+    welcome: 'Welcome to Nestly',
     signInMessage: 'Sign in with your Microsoft account to view and manage your family\'s calendars.',
     signIn: 'Sign In',
     signOut: 'Sign Out',
@@ -295,7 +299,7 @@ export const en = {
 
   // Header
   header: {
-    title: 'Family Planner',
+    title: 'Nestly',
     subtitle: 'Your week at a glance',
   },
 

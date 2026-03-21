@@ -125,7 +125,7 @@ export const frCA: TranslationKeys = {
     languageHelp: 'Modifier la langue utilisée dans l\'application',
     accountManagement: 'Gestion des comptes',
     about: 'À propos',
-    appName: 'Planificateur familial',
+    appName: 'Nestly',
     appDescription: 'Votre outil d\'organisation familiale tout-en-un',
     version: 'Version',
     aboutDescription: 'Cette application s\'intègre avec les services Microsoft 365, y compris le calendrier Outlook, OneDrive et Azure OpenAI pour la planification des repas.',
@@ -135,11 +135,15 @@ export const frCA: TranslationKeys = {
     changeEmoji: 'Définir un emoji',
     removeEmoji: 'Retirer l\'emoji',
     applicationSettings: 'Paramètres de l\'application',
+    weatherLocation: 'Emplacement météo',
+    weatherLocationHelp: 'Nom de la ville pour les prévisions météo du calendrier (ex: Montréal, Paris, Lyon)',
+    weatherLocationPlaceholder: 'ex: Montréal',
+    weatherLocationDetect: 'Utiliser ma position',
   },
 
   // Auth
   auth: {
-    welcome: 'Bienvenue au Planificateur familial',
+    welcome: 'Bienvenue sur Nestly',
     signInMessage: 'Connectez-vous avec votre compte Microsoft pour voir et gérer les calendriers de votre famille.',
     signIn: 'Se connecter',
     signOut: 'Se déconnecter',
@@ -297,7 +301,7 @@ export const frCA: TranslationKeys = {
 
   // Header
   header: {
-    title: 'Planificateur familial',
+    title: 'Nestly',
     subtitle: 'Votre semaine en un coup d\'œil',
   },
 

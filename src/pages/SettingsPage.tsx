@@ -35,6 +35,7 @@ export const SettingsPage: React.FC = () => {
   const [emojiPickerCalendarId, setEmojiPickerCalendarId] = useState<string | null>(null);
   const [popupDirection, setPopupDirection] = useState<'down' | 'up'>('down');
   const [mealCalendarId, setMealCalendarId] = useState<string>('');
+  const [weatherLocation, setWeatherLocation] = useState<string>('');
   const emojiPickerRef = useRef<HTMLDivElement>(null);
   const colorPickerRef = useRef<HTMLDivElement>(null);
 
@@ -91,11 +92,12 @@ export const SettingsPage: React.FC = () => {
     setSelectedLocale(settings.locale || 'en');
     setSelectedTheme(settings.theme || themeName);
     setMealCalendarId(settings.mealCalendarId || '');
+    setWeatherLocation(settings.weatherLocation || '');
   }, [t]);
 
   const handleSaveSettings = () => {
     const settings = StorageService.getSettings();
-    StorageService.setSettings({ ...settings, calendarName, locale: selectedLocale, theme: selectedTheme, mealCalendarId: mealCalendarId || undefined });
+    StorageService.setSettings({ ...settings, calendarName, locale: selectedLocale, theme: selectedTheme, mealCalendarId: mealCalendarId || undefined, weatherLocation: weatherLocation || undefined });
     setLocale(selectedLocale);
     setTheme(selectedTheme);
     setIsSaved(true);
@@ -355,6 +357,26 @@ export const SettingsPage: React.FC = () => {
                     </option>
                   ))}
                 </select>
+              </CardContent>
+            </Card>
+
+            {/* Weather Location */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">{t.settings.weatherLocation}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-3">
+                  {t.settings.weatherLocationHelp}
+                </p>
+                <Input
+                  value={weatherLocation}
+                  onChange={(e) => setWeatherLocation(e.target.value)}
+                  placeholder={t.settings.weatherLocationPlaceholder}
+                />
+                <p className="text-xs text-muted-foreground mt-2">
+                  {!weatherLocation && (t.settings.weatherLocationDetect)}
+                </p>
               </CardContent>
             </Card>
           </TabsContent>
