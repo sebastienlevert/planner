@@ -78,7 +78,7 @@ export const CalendarPage: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-hidden relative" {...swipeHandlers}>
+      <div className="flex-1 overflow-hidden relative" style={{ touchAction: 'pan-y' }} {...swipeHandlers}>
         {currentView === 'agenda' && (
           <AgendaView
             currentDate={currentDate}
