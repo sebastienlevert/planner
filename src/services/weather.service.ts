@@ -1,5 +1,10 @@
 import { StorageService } from './storage.service';
 
+export interface HourlyPoint {
+  hour: number;       // 0-23
+  temperature: number;
+}
+
 export interface DayForecast {
   date: string; // YYYY-MM-DD
   weatherCode: number;
@@ -15,6 +20,7 @@ export interface DayForecast {
   sunset: string;                 // ISO time
   apparentTemperatureMax: number;
   apparentTemperatureMin: number;
+  hourly: HourlyPoint[];          // 24 hourly temperature points
 }
 
 interface WeatherCache {
@@ -131,12 +137,25 @@ export async function fetchWeatherForecast(): Promise<DayForecast[]> {
     longitude = loc.longitude;
   }
 
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,uv_index_max,sunrise,sunset&forecast_days=16&timezone=auto`;
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,uv_index_max,sunrise,sunset&hourly=temperature_2m&forecast_days=16&timezone=auto`;
 
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Weather API error: ${res.status}`);
 
   const data = await res.json();
+  // Build hourly lookup: date string → HourlyPoint[]
+  const hourlyByDate = new Map<string, HourlyPoint[]>();
+  if (data.hourly?.time) {
+    for (let i = 0; i < data.hourly.time.length; i++) {
+      const dt = data.hourly.time[i] as string; // "2024-03-21T14:00"
+      const dateKey = dt.slice(0, 10);
+      const hour = parseInt(dt.slice(11, 13), 10);
+      const temp = Math.round(data.hourly.temperature_2m[i]);
+      if (!hourlyByDate.has(dateKey)) hourlyByDate.set(dateKey, []);
+      hourlyByDate.get(dateKey)!.push({ hour, temperature: temp });
+    }
+  }
+
   const forecasts: DayForecast[] = data.daily.time.map((date: string, i: number) => ({
     date,
     weatherCode: data.daily.weather_code[i],
@@ -152,6 +171,7 @@ export async function fetchWeatherForecast(): Promise<DayForecast[]> {
     uvIndexMax: data.daily.uv_index_max[i] ?? 0,
     sunrise: data.daily.sunrise[i] ?? '',
     sunset: data.daily.sunset[i] ?? '',
+    hourly: hourlyByDate.get(date) ?? [],
   }));
 
   setCache({ forecasts, timestamp: Date.now(), latitude, longitude, locationKey });

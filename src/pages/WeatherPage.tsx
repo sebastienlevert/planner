@@ -3,7 +3,7 @@ import { CloudSun, Thermometer, Droplets, Wind, Sun, Sunrise, Sunset } from 'luc
 import { useWeather } from '../hooks/useWeather';
 import { useLocale } from '../contexts/LocaleContext';
 import { dateHelpers } from '../utils/dateHelpers';
-import { getWeatherInfo, type DayForecast } from '../services/weather.service';
+import { getWeatherInfo, type DayForecast, type HourlyPoint } from '../services/weather.service';
 import { addDays } from 'date-fns';
 
 /** Wind direction degrees → compass label */
@@ -27,6 +27,68 @@ function formatTime(iso: string): string {
   const d = new Date(iso);
   return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 }
+
+/** Mini SVG sparkline for hourly temperature */
+const HourlyChart: React.FC<{ points: HourlyPoint[] }> = ({ points }) => {
+  if (points.length < 2) return null;
+
+  const W = 200;
+  const H = 48;
+  const PAD_TOP = 12;
+  const PAD_BOT = 14;
+
+  const temps = points.map(p => p.temperature);
+  const minT = Math.min(...temps);
+  const maxT = Math.max(...temps);
+  const range = maxT - minT || 1;
+
+  const x = (i: number) => (i / (points.length - 1)) * W;
+  const y = (t: number) => PAD_TOP + (1 - (t - minT) / range) * (H - PAD_TOP - PAD_BOT);
+
+  const pathD = points.map((p, i) =>
+    `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${y(p.temperature).toFixed(1)}`
+  ).join(' ');
+
+  // Fill area under curve
+  const areaD = `${pathD} L${W},${H} L0,${H} Z`;
+
+  // Find min/max point positions for labels
+  const maxIdx = temps.indexOf(maxT);
+  const minIdx = temps.lastIndexOf(minT);
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-12" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="tempGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="currentColor" stopOpacity="0.15" />
+          <stop offset="100%" stopColor="currentColor" stopOpacity="0.02" />
+        </linearGradient>
+      </defs>
+      <path d={areaD} fill="url(#tempGrad)" className="text-primary" />
+      <path d={pathD} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary" />
+      {/* Max label */}
+      <text x={x(maxIdx)} y={y(maxT) - 3} textAnchor="middle" className="fill-foreground" style={{ fontSize: '8px', fontWeight: 600 }}>
+        {maxT}°
+      </text>
+      {/* Min label (only if different position) */}
+      {Math.abs(maxIdx - minIdx) > 2 && (
+        <text x={x(minIdx)} y={y(minT) + 10} textAnchor="middle" className="fill-muted-foreground" style={{ fontSize: '7px' }}>
+          {minT}°
+        </text>
+      )}
+      {/* Time markers */}
+      {[0, 6, 12, 18].map(h => {
+        const idx = points.findIndex(p => p.hour === h);
+        if (idx < 0) return null;
+        return (
+          <text key={h} x={x(idx)} y={H - 2} textAnchor="middle" className="fill-muted-foreground" style={{ fontSize: '6px' }}>
+            {h}h
+          </text>
+        );
+      })}
+    </svg>
+  );
+};
 
 export const WeatherPage: React.FC = () => {
   const { forecasts, loading } = useWeather();
@@ -147,6 +209,13 @@ export const WeatherPage: React.FC = () => {
                   />
                 </div>
               </div>
+
+              {/* Hourly temperature graph */}
+              {forecast.hourly.length > 0 && (
+                <div className="mt-1 -mx-1">
+                  <HourlyChart points={forecast.hourly} />
+                </div>
+              )}
 
               {/* Precipitation */}
               <div className="flex items-center gap-2">
