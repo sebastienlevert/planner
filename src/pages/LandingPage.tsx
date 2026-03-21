@@ -12,11 +12,9 @@ import {
   ArrowRight,
   Sparkles,
   MonitorSmartphone,
-  BookOpen,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { DocsSection } from '../components/common/DocsSection';
 
 const REPO_URL = 'https://github.com/sebastienlevert/nestly';
 const REPO_API = 'https://api.github.com/repos/sebastienlevert/nestly';
@@ -142,13 +140,6 @@ export const LandingPage: React.FC = () => {
           </div>
           <div className="flex items-center gap-4">
             <a
-              href="#docs"
-              className="hidden sm:flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <BookOpen size={16} />
-              Docs
-            </a>
-            <a
               href={REPO_URL}
               target="_blank"
               rel="noopener noreferrer"
@@ -182,14 +173,14 @@ export const LandingPage: React.FC = () => {
           </div>
 
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-            Your family's week,
+            Your nest,
             <br />
-            <span className="text-primary">beautifully organized.</span>
+            <span className="text-primary">perfectly in sync.</span>
           </h1>
 
           <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-            Nestly brings your Microsoft calendars, tasks, meals, and photos into one
-            gorgeous dashboard — designed for the Surface tablet on your kitchen counter.
+            Nestly is the always-on family hub for your kitchen counter. Calendars, meals,
+            tasks, and photos — everything your household needs, in one cozy place.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
@@ -245,48 +236,48 @@ export const LandingPage: React.FC = () => {
       <section className="max-w-6xl mx-auto px-6 py-20">
         <div className="text-center mb-14">
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            Everything your family needs
+            Everything your nest needs
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            A single dashboard that keeps everyone in sync — no more &ldquo;I didn&rsquo;t know about that.&rdquo;
+            One cozy dashboard that keeps every family member on the same page — mornings, mealtimes, and everything in between.
           </p>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <FeatureCard
             icon={Calendar}
-            title="Shared Calendars"
-            description="Sync multiple Microsoft 365 calendars from different accounts. See everyone's schedule in one beautiful agenda view."
+            title="Family Calendars"
+            description="See the whole household's week at a glance. Multiple Microsoft 365 accounts, one shared view — so nobody misses soccer practice again."
             delay={0}
           />
           <FeatureCard
             icon={Cloud}
-            title="14-Day Weather"
-            description="Weather forecasts right on your calendar — powered by Open-Meteo. Know what's coming without opening another app."
+            title="Weather at a Glance"
+            description="A 14-day forecast right on your calendar. Grab the umbrella or pack sunscreen — your nest knows what's coming."
             delay={100}
           />
           <FeatureCard
             icon={CheckSquare}
-            title="Microsoft To Do"
-            description="Manage shared grocery lists, chores, and family tasks. All your Microsoft To Do lists, right here."
+            title="Shared To-Do Lists"
+            description="Groceries, chores, school supplies — everyone sees the list, everyone can check things off. Powered by Microsoft To Do."
             delay={200}
           />
           <FeatureCard
             icon={Utensils}
-            title="AI Meal Planning"
-            description="Get meal suggestions powered by Azure OpenAI. Plan your week's meals and generate shopping lists effortlessly."
+            title="Meal Planning"
+            description="Plan breakfast, lunch, and dinner for the whole week. No more 'what's for dinner?' — your nest has the answer."
             delay={300}
           />
           <FeatureCard
             icon={Image}
-            title="Photo Slideshow"
-            description="Display family photos from OneDrive as a beautiful ambient slideshow. Your best memories, always visible."
+            title="Family Photo Frame"
+            description="Turn your tablet into a digital photo frame with OneDrive slideshows. Your favorite memories, always on display in the nest."
             delay={400}
           />
           <FeatureCard
             icon={MonitorSmartphone}
-            title="Touch-First Design"
-            description="Optimized for Surface tablets with large touch targets, screen wake lock, and a responsive layout that works anywhere."
+            title="Kitchen Counter Ready"
+            description="Designed for an always-on tablet in the heart of your home. Big touch targets, wake lock, and a layout that feels right at home."
             delay={500}
           />
         </div>
@@ -297,41 +288,36 @@ export const LandingPage: React.FC = () => {
         <div className="max-w-4xl mx-auto px-6 py-20">
           <div className="text-center mb-14">
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-              Why Nestly?
+              Why families love Nestly
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Built for real families by a real parent who needed something better than another app to check.
+              Built by a parent who was tired of juggling five apps before breakfast. Your nest deserves better.
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-8">
             <WhyCard
-              emoji="🔒"
-              title="100% Client-Side"
-              description="Your data never touches a server. Everything runs in the browser with direct Microsoft 365 API calls. Your family's info stays yours."
+              emoji="🏠"
+              title="Made for the Heart of Your Home"
+              description="Nestly is designed for the kitchen counter — the place where your family gathers, plans, and connects. Always on, always ready."
             />
             <WhyCard
-              emoji="⚡"
-              title="Instant & Always-On"
-              description="Designed for an always-on tablet on your kitchen counter. Screen wake lock keeps it visible, and auto-reload keeps it fresh."
+              emoji="🔒"
+              title="Your Nest, Your Data"
+              description="Everything runs in the browser. Your family's calendars, photos, and lists never touch a third-party server. Privacy by design."
             />
             <WhyCard
               emoji="🌍"
-              title="Multi-Language"
-              description="Built with full internationalization support. Currently available in English and French-Canadian, with more locales easy to add."
+              title="Speaks Your Language"
+              description="Full i18n support so every household feels at home. English and French-Canadian built in, with more locales easy to add."
             />
             <WhyCard
               emoji="🎨"
-              title="Beautiful Themes"
-              description="Multiple carefully crafted themes to match your home's vibe. Dark mode, light mode, and everything in between."
+              title="Fits Your Home's Vibe"
+              description="Multiple themes to match your kitchen, living room, or wherever your nest lives. Dark mode for movie nights, light mode for mornings."
             />
           </div>
         </div>
-      </section>
-
-      {/* ── Docs ───────────────────────────────────────────────── */}
-      <section className="border-y border-border bg-background">
-        <DocsSection />
       </section>
 
       {/* ── Open Source Banner ──────────────────────────────────── */}
@@ -348,11 +334,11 @@ export const LandingPage: React.FC = () => {
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-bold mb-3">
-            Free &amp; Open Source. Forever.
+            Open Source. Built for Nests Everywhere.
           </h2>
           <p className="text-muted-foreground max-w-lg mx-auto mb-6">
             Nestly is MIT-licensed and completely free. No subscriptions, no data collection,
-            no lock-in. Star us on GitHub and help us grow.
+            no lock-in. Help us build the best family hub — one nest at a time.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -376,7 +362,7 @@ export const LandingPage: React.FC = () => {
         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold">N</div>
-            <span>Nestly — Built with ❤️ for families</span>
+            <span>Nestly — Built with ❤️ for every nest</span>
           </div>
           <div className="flex items-center gap-4">
             <a href={REPO_URL} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors flex items-center gap-1">
