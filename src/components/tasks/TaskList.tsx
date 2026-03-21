@@ -84,13 +84,13 @@ export const TaskList: React.FC<TaskListProps> = ({ showCompleted = false }) => 
                   <div
                     key={task.id}
                     onClick={() => setSelectedTask(task)}
-                    className="flex items-start gap-3 p-3 sm:p-4 hover:bg-muted/50 transition-colors cursor-pointer"
+                    className={`flex items-center gap-3 hover:bg-muted/50 transition-colors cursor-pointer ${allowEdit ? 'px-3 py-2 sm:px-4 sm:py-2.5' : 'p-3 sm:p-4'}`}
                   >
                     {/* Checkbox — only if editing allowed */}
                     {allowEdit && (
                       <button
                         onClick={(e) => handleToggle(e, task)}
-                        className="touch-target flex-shrink-0 mt-1"
+                        className="flex-shrink-0"
                         aria-label={task.status === 'completed' ? t.actions.markIncomplete : t.actions.markComplete}
                       >
                         {task.status === 'completed' ? (
