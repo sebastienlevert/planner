@@ -32,8 +32,8 @@ function formatTime(iso: string): string {
 const HourlyChart: React.FC<{ points: HourlyPoint[] }> = ({ points }) => {
   if (points.length < 2) return null;
 
-  const PAD_LEFT = 12;
-  const PAD_RIGHT = 12;
+  const PAD_LEFT = 4;
+  const PAD_RIGHT = 4;
   const W = 200;
   const H = 80;
   const PAD_TOP = 14;
@@ -204,7 +204,7 @@ export const WeatherPage: React.FC = () => {
 
               {/* Hourly temperature graph */}
               {forecast.hourly && forecast.hourly.length > 0 && (
-                <div className="mt-1 -mx-1">
+                <div className="-mx-4 mt-1">
                   <HourlyChart points={forecast.hourly} />
                 </div>
               )}
