@@ -22,6 +22,7 @@ const routeTitles: Record<string, string> = {
   '/tasks': 'todos',
   '/meals': 'mealPlanner',
   '/weather': 'weather',
+  '/home': 'home',
   '/photos': 'photos',
   '/docs': 'docs',
   '/settings': 'settings',

@@ -14,8 +14,11 @@ import {
   MonitorSmartphone,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useProfilePhotos } from '../hooks/useProfilePhotos';
+import { UserAvatar } from '../components/common/UserAvatar';
 import { Button } from '@/components/ui/button';
 import { NestlyLogo } from '../components/common/NestlyLogo';
+import { useNavigate } from 'react-router-dom';
 
 const REPO_URL = 'https://github.com/sebastienlevert/nestly';
 const REPO_API = 'https://api.github.com/repos/sebastienlevert/nestly';
@@ -78,7 +81,9 @@ function WhyCard({ emoji, title, description }: {
 
 // ─── Main Landing Page ──────────────────────────────────────────────
 export const LandingPage: React.FC = () => {
-  const { addAccount, isLoading } = useAuth();
+  const { addAccount, isLoading, isAuthenticated, accounts } = useAuth();
+  const photos = useProfilePhotos();
+  const navigate = useNavigate();
   const [stars, setStars] = useState(0);
 
   useEffect(() => {
@@ -148,9 +153,22 @@ export const LandingPage: React.FC = () => {
               <Star size={14} className="text-yellow-500" />
               <span className="font-medium">{stars > 0 ? <AnimatedNumber target={stars} /> : '—'}</span>
             </a>
-            <Button onClick={handleGetStarted} disabled={isLoading} size="sm">
-              {isLoading ? 'Signing in…' : 'Get Started'}
-            </Button>
+            {isAuthenticated && accounts.length > 0 ? (
+              <button onClick={() => navigate('/calendar')} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                {accounts.map(account => (
+                  <UserAvatar
+                    key={account.homeAccountId}
+                    name={account.name || account.username}
+                    photoUrl={photos[account.homeAccountId]}
+                    size="sm"
+                  />
+                ))}
+              </button>
+            ) : (
+              <Button onClick={handleGetStarted} disabled={isLoading} size="sm">
+                {isLoading ? 'Signing in…' : 'Get Started'}
+              </Button>
+            )}
           </div>
         </div>
       </header>
@@ -184,11 +202,11 @@ export const LandingPage: React.FC = () => {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
             <Button
-              onClick={handleGetStarted}
+              onClick={isAuthenticated ? () => navigate('/calendar') : handleGetStarted}
               disabled={isLoading}
               className="h-12 px-8 text-base rounded-xl animate-pulse-glow"
             >
-              {isLoading ? 'Signing in…' : 'Start Using Nestly'}
+              {isLoading ? 'Signing in…' : isAuthenticated ? 'Go to Dashboard' : 'Start Using Nestly'}
               <ArrowRight size={18} className="ml-1" />
             </Button>
             <a
@@ -348,9 +366,9 @@ export const LandingPage: React.FC = () => {
                 {stars > 0 && <span className="ml-1.5 text-xs bg-muted px-2 py-0.5 rounded-full font-medium"><AnimatedNumber target={stars} /></span>}
               </Button>
             </a>
-            <Button onClick={handleGetStarted} disabled={isLoading} className="h-11 px-6 rounded-xl">
+            <Button onClick={isAuthenticated ? () => navigate('/calendar') : handleGetStarted} disabled={isLoading} className="h-11 px-6 rounded-xl">
               <Zap size={16} className="mr-1" />
-              {isLoading ? 'Signing in…' : 'Get Started — It\'s Free'}
+              {isLoading ? 'Signing in…' : isAuthenticated ? 'Go to Dashboard' : 'Get Started — It\'s Free'}
             </Button>
           </div>
         </div>

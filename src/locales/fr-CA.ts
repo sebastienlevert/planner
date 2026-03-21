@@ -7,6 +7,7 @@ export const frCA: TranslationKeys = {
     todos: 'Tâches',
     mealPlanner: 'Repas',
     weather: 'Météo',
+    home: 'Accueil',
     settings: 'Paramètres',
     docs: 'Docs',
   },

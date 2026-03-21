@@ -52,6 +52,7 @@ function AppRoutes() {
           <Route path="tasks" element={<TasksPage />} />
           <Route path="meals" element={<MealPlannerPage />} />
           <Route path="weather" element={<WeatherPage />} />
+          <Route path="home" element={<LandingPage />} />
           <Route path="docs" element={<DocsPage />} />
           <Route path="docs/:sectionId" element={<DocsPage />} />
           <Route path="docs/:sectionId/:articleId" element={<DocsPage />} />

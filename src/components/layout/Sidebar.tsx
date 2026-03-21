@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Calendar, CheckSquare, UtensilsCrossed, Settings, BookOpen, X, CloudSun } from 'lucide-react';
+import { Calendar, CheckSquare, UtensilsCrossed, Settings, BookOpen, X, CloudSun, Home } from 'lucide-react';
 import { useLocale } from '../../contexts/LocaleContext';
 
 interface NavItem {
@@ -57,6 +57,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose, c
       to: '/docs',
       icon: <BookOpen size={20} />,
       labelKey: 'docs',
+      section: 'bottom',
+    },
+    {
+      to: '/home',
+      icon: <Home size={20} />,
+      labelKey: 'home',
       section: 'bottom',
     },
     {

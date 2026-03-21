@@ -5,6 +5,7 @@ export const en = {
     todos: 'To Dos',
     mealPlanner: 'Meals',
     weather: 'Weather',
+    home: 'Home',
     settings: 'Settings',
     docs: 'Docs',
   },
