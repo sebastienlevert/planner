@@ -31,7 +31,9 @@ interface WeatherCache {
   locationKey: string; // tracks which location was cached
 }
 
-const CACHE_KEY = 'nestly_weather_cache';
+// Bump version when DayForecast shape changes to bust stale caches
+const CACHE_VERSION = 2;
+const CACHE_KEY = `nestly_weather_cache_v${CACHE_VERSION}`;
 const CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
 const DEFAULT_COORDS = { latitude: 45.50, longitude: -73.57 }; // Montreal
 
@@ -181,4 +183,7 @@ export async function fetchWeatherForecast(): Promise<DayForecast[]> {
 /** Clear the weather cache so the next fetch re-queries the API */
 export function clearWeatherCache(): void {
   StorageService.remove(CACHE_KEY);
+  // Clean up old versioned keys
+  StorageService.remove('nestly_weather_cache');
+  StorageService.remove('nestly_weather_cache_v1');
 }
