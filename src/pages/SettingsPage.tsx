@@ -36,7 +36,6 @@ export const SettingsPage: React.FC = () => {
   const [selectedLocale, setSelectedLocale] = useState<Locale>(locale);
   const [selectedTheme, setSelectedTheme] = useState<ThemeName>(themeName);
   const [isSaved, setIsSaved] = useState(false);
-  const [selectedAccountFilter, setSelectedAccountFilter] = useState<string>('all');
   const [colorPickerCalendarId, setColorPickerCalendarId] = useState<string | null>(null);
   const [emojiPickerCalendarId, setEmojiPickerCalendarId] = useState<string | null>(null);
   const [popupDirection, setPopupDirection] = useState<'down' | 'up'>('down');
@@ -130,9 +129,13 @@ export const SettingsPage: React.FC = () => {
     setTheme(newTheme);
   };
 
-  const filteredCalendars = selectedAccountFilter === 'all'
-    ? calendars
-    : calendars.filter(cal => cal.accountId === selectedAccountFilter);
+  // Group calendars by owner name
+  const calendarsByOwner = calendars.reduce<Record<string, typeof calendars>>((groups, cal) => {
+    const ownerName = cal.owner?.name || 'Unknown';
+    if (!groups[ownerName]) groups[ownerName] = [];
+    groups[ownerName].push(cal);
+    return groups;
+  }, {});
 
   const tabs = [
     { id: 'accounts' as SettingsTab, label: t.tabs.accounts, icon: Users },
@@ -225,151 +228,127 @@ export const SettingsPage: React.FC = () => {
               </p>
             </div>
 
-            {/* Account Filter */}
-            {accounts.length > 1 && (
-              <Card>
-                <CardContent className="pt-6">
-                  <Label htmlFor="account-filter">{t.auth.filterByAccount}</Label>
-                  <select
-                    id="account-filter"
-                    value={selectedAccountFilter}
-                    onChange={(e) => setSelectedAccountFilter(e.target.value)}
-                    className="w-full mt-2 flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  >
-                    <option value="all">{t.auth.allAccounts}</option>
-                    {accounts.map((account) => (
-                      <option key={account.homeAccountId} value={account.homeAccountId}>
-                        {account.username}
-                      </option>
-                    ))}
-                  </select>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Calendar List */}
+            {/* Calendar List — grouped by owner */}
             <Card>
               <CardContent className="pt-6">
-                {filteredCalendars.length > 0 ? (
-                  <div className="space-y-3">
-                    {filteredCalendars.map((calendar) => {
-                      const account = accounts.find(acc => acc.homeAccountId === calendar.accountId);
-                      return (
-                        <label
-                          key={calendar.id}
-                          className="flex items-center gap-3 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
-                        >
-                          <Checkbox
-                            checked={selectedCalendars.includes(calendar.id)}
-                            onCheckedChange={() => toggleCalendar(calendar.id)}
-                          />
-                          <div className="flex-1">
-                            <div className="font-medium text-foreground">{calendar.name}</div>
-                            {account && (
-                              <div className="text-xs text-muted-foreground">{account.username}</div>
-                            )}
-                            {calendar.owner && (
-                              <div className="text-xs text-muted-foreground/80">{calendar.owner.address}</div>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="relative" ref={emojiPickerCalendarId === calendar.id ? emojiPickerRef : undefined}>
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  setEmojiPickerCalendarId(prev => prev === calendar.id ? null : calendar.id);
-                                  setColorPickerCalendarId(null);
-                                }}
-                                className="w-7 h-7 rounded border border-muted-foreground/30 hover:border-foreground/50 transition-colors flex items-center justify-center text-sm bg-muted/50"
-                                title={t.settings.changeEmoji || 'Set emoji'}
-                              >
-                                {calendar.emoji || <span className="text-muted-foreground/50">—</span>}
-                              </button>
-                              {emojiPickerCalendarId === calendar.id && (
-                                <div
-                                  ref={popupRef}
-                                  className={`absolute right-0 z-50 bg-popover border rounded-lg shadow-lg p-3 w-64 ${popupDirection === 'up' ? 'bottom-9' : 'top-9'}`}
-                                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                                >
-                                  <div className="grid grid-cols-6 gap-2">
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setCalendarEmoji(calendar.id, '');
-                                        setEmojiPickerCalendarId(null);
-                                      }}
-                                      className={`w-9 h-9 rounded-lg border transition-transform hover:scale-110 flex items-center justify-center text-xs ${
-                                        !calendar.emoji ? 'border-foreground bg-muted ring-2 ring-foreground/20' : 'border-transparent hover:bg-muted/50'
-                                      }`}
-                                      title={t.settings.removeEmoji}
-                                    >
-                                      <span className="text-muted-foreground">✕</span>
-                                    </button>
-                                    {EMOJI_PALETTE.map((emoji) => (
-                                      <button
-                                        key={emoji}
-                                        type="button"
-                                        onClick={() => {
-                                          setCalendarEmoji(calendar.id, emoji);
-                                          setEmojiPickerCalendarId(null);
-                                        }}
-                                        className={`w-9 h-9 rounded-lg border transition-transform hover:scale-110 flex items-center justify-center text-lg ${
-                                          calendar.emoji === emoji ? 'border-foreground bg-muted ring-2 ring-foreground/20' : 'border-transparent hover:bg-muted/50'
-                                        }`}
-                                      >
-                                        {emoji}
-                                      </button>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                            <div className="relative" ref={colorPickerCalendarId === calendar.id ? colorPickerRef : undefined}>
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  setColorPickerCalendarId(prev => prev === calendar.id ? null : calendar.id);
-                                  setEmojiPickerCalendarId(null);
-                                }}
-                                className="w-7 h-7 rounded-full border-2 border-muted-foreground/30 hover:border-foreground/50 transition-colors"
-                                style={{ backgroundColor: calendar.color }}
-                                title={t.settings.changeColor}
+                {Object.keys(calendarsByOwner).length > 0 ? (
+                  <div className="space-y-6">
+                    {Object.entries(calendarsByOwner).map(([ownerName, ownerCalendars]) => (
+                      <div key={ownerName}>
+                        <div className="text-sm font-semibold text-muted-foreground mb-2">{ownerName}</div>
+                        <div className="space-y-2">
+                          {ownerCalendars.map((calendar) => (
+                            <label
+                              key={calendar.id}
+                              className="flex items-center gap-3 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
+                            >
+                              <Checkbox
+                                checked={selectedCalendars.includes(calendar.id)}
+                                onCheckedChange={() => toggleCalendar(calendar.id)}
                               />
-                              {colorPickerCalendarId === calendar.id && (
-                                <div
-                                  ref={popupRef}
-                                  className={`absolute right-0 z-50 bg-popover border rounded-lg shadow-lg p-3 grid grid-cols-5 gap-2 w-56 ${popupDirection === 'up' ? 'bottom-9' : 'top-9'}`}
-                                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                                >
-                                  {COLOR_PALETTE.map((color) => (
-                                    <button
-                                      key={color}
-                                      type="button"
-                                      onClick={() => {
-                                        setCalendarColor(calendar.id, color);
-                                        setColorPickerCalendarId(null);
-                                      }}
-                                      className={`w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 ${
-                                        calendar.color === color ? 'border-foreground ring-2 ring-foreground/20' : 'border-transparent'
-                                      }`}
-                                      style={{ backgroundColor: color }}
-                                    />
-                                  ))}
+                              <div className="flex-1">
+                                <div className="font-medium text-foreground">{calendar.name}</div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="relative" ref={emojiPickerCalendarId === calendar.id ? emojiPickerRef : undefined}>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      setEmojiPickerCalendarId(prev => prev === calendar.id ? null : calendar.id);
+                                      setColorPickerCalendarId(null);
+                                    }}
+                                    className="w-7 h-7 rounded border border-muted-foreground/30 hover:border-foreground/50 transition-colors flex items-center justify-center text-sm bg-muted/50"
+                                    title={t.settings.changeEmoji || 'Set emoji'}
+                                  >
+                                    {calendar.emoji || <span className="text-muted-foreground/50">—</span>}
+                                  </button>
+                                  {emojiPickerCalendarId === calendar.id && (
+                                    <div
+                                      ref={popupRef}
+                                      className={`absolute right-0 z-50 bg-popover border rounded-lg shadow-lg p-3 w-64 ${popupDirection === 'up' ? 'bottom-9' : 'top-9'}`}
+                                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                    >
+                                      <div className="grid grid-cols-6 gap-2">
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setCalendarEmoji(calendar.id, '');
+                                            setEmojiPickerCalendarId(null);
+                                          }}
+                                          className={`w-9 h-9 rounded-lg border transition-transform hover:scale-110 flex items-center justify-center text-xs ${
+                                            !calendar.emoji ? 'border-foreground bg-muted ring-2 ring-foreground/20' : 'border-transparent hover:bg-muted/50'
+                                          }`}
+                                          title={t.settings.removeEmoji}
+                                        >
+                                          <span className="text-muted-foreground">✕</span>
+                                        </button>
+                                        {EMOJI_PALETTE.map((emoji) => (
+                                          <button
+                                            key={emoji}
+                                            type="button"
+                                            onClick={() => {
+                                              setCalendarEmoji(calendar.id, emoji);
+                                              setEmojiPickerCalendarId(null);
+                                            }}
+                                            className={`w-9 h-9 rounded-lg border transition-transform hover:scale-110 flex items-center justify-center text-lg ${
+                                              calendar.emoji === emoji ? 'border-foreground bg-muted ring-2 ring-foreground/20' : 'border-transparent hover:bg-muted/50'
+                                            }`}
+                                          >
+                                            {emoji}
+                                          </button>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
-                              )}
-                            </div>
-                          </div>
-                        </label>
-                      );
-                    })}
+                                <div className="relative" ref={colorPickerCalendarId === calendar.id ? colorPickerRef : undefined}>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      setColorPickerCalendarId(prev => prev === calendar.id ? null : calendar.id);
+                                      setEmojiPickerCalendarId(null);
+                                    }}
+                                    className="w-7 h-7 rounded-full border-2 border-muted-foreground/30 hover:border-foreground/50 transition-colors"
+                                    style={{ backgroundColor: calendar.color }}
+                                    title={t.settings.changeColor}
+                                  />
+                                  {colorPickerCalendarId === calendar.id && (
+                                    <div
+                                      ref={popupRef}
+                                      className={`absolute right-0 z-50 bg-popover border rounded-lg shadow-lg p-3 grid grid-cols-5 gap-2 w-56 ${popupDirection === 'up' ? 'bottom-9' : 'top-9'}`}
+                                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                    >
+                                      {COLOR_PALETTE.map((color) => (
+                                        <button
+                                          key={color}
+                                          type="button"
+                                          onClick={() => {
+                                            setCalendarColor(calendar.id, color);
+                                            setColorPickerCalendarId(null);
+                                          }}
+                                          className={`w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 ${
+                                            calendar.color === color ? 'border-foreground ring-2 ring-foreground/20' : 'border-transparent'
+                                          }`}
+                                          style={{ backgroundColor: color }}
+                                        />
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground italic py-4 text-center">
-                    {selectedAccountFilter === 'all' ? t.settings.noCalendars : t.settings.noCalendarsForAccount}
+                    {t.settings.noCalendars}
                   </p>
                 )}
               </CardContent>
