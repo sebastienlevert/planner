@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import nestlyIcon from '/nestly-icon.svg';
 
 const REPO_URL = 'https://github.com/sebastienlevert/nestly';
 const REPO_API = 'https://api.github.com/repos/sebastienlevert/nestly';
@@ -133,7 +134,7 @@ export const LandingPage: React.FC = () => {
       <header className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-16">
           <div className="flex items-center gap-2.5">
-            <img src="/nestly-icon.svg" alt="Nestly" className="w-8 h-8 rounded-lg" />
+            <img src={nestlyIcon} alt="Nestly" className="w-8 h-8 rounded-lg" />
             <span className="text-xl font-bold tracking-tight">Nestly</span>
           </div>
           <div className="flex items-center gap-4">
@@ -359,7 +360,7 @@ export const LandingPage: React.FC = () => {
       <footer className="border-t border-border bg-muted/10">
         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
-            <img src="/nestly-icon.svg" alt="Nestly" className="w-6 h-6 rounded" />
+            <img src={nestlyIcon} alt="Nestly" className="w-6 h-6 rounded" />
             <span>Nestly — Built with ❤️ for every nest</span>
           </div>
           <div className="flex items-center gap-4">
