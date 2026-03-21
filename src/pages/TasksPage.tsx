@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CheckSquare, RefreshCw, Plus } from 'lucide-react';
+import { Check, CheckSquare, Loader2, Plus } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocale } from '../contexts/LocaleContext';
 import { useTask } from '../contexts/TaskContext';
@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 export const TasksPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const { t } = useLocale();
-  const { isSyncing, syncTasks, lastSyncTime } = useTask();
+  const { isSyncing, syncTasks, lastSyncTime, isLoading } = useTask();
   const [showCompleted, setShowCompleted] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
@@ -44,26 +44,37 @@ export const TasksPage: React.FC = () => {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-semibold text-foreground">{t.tasks.title}</h2>
-            <p className="text-muted-foreground">{t.tasks.subtitle}</p>
+          {/* Filter Tabs */}
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setShowCompleted(false)}
+              variant={!showCompleted ? 'default' : 'secondary'}
+              className="touch-optimized"
+            >
+              {t.tasks.active}
+            </Button>
+            <Button
+              onClick={() => setShowCompleted(true)}
+              variant={showCompleted ? 'default' : 'secondary'}
+              className="touch-optimized"
+            >
+              {t.tasks.completed}
+            </Button>
           </div>
 
           <div className="flex items-center gap-3">
-            {lastSyncTime && (
-              <span className="text-xs text-muted-foreground">
-                {t.tasks.lastSynced} {new Date(lastSyncTime).toLocaleTimeString()}
-              </span>
-            )}
-            <Button
-              onClick={syncTasks}
-              disabled={isSyncing}
-              variant="ghost"
-              size="icon"
-              aria-label="Refresh tasks"
-            >
-              <RefreshCw size={20} className={isSyncing ? 'animate-spin' : ''} />
-            </Button>
+            {/* Sync status — same as calendar */}
+            <div className="flex items-center">
+              {(isSyncing || isLoading) ? (
+                <div className="w-9 h-9 flex items-center justify-center">
+                  <Loader2 size={18} className="text-primary animate-spin" />
+                </div>
+              ) : lastSyncTime ? (
+                <div className="w-9 h-9 flex items-center justify-center text-green-500">
+                  <Check size={18} strokeWidth={3} />
+                </div>
+              ) : null}
+            </div>
             <Button
               onClick={() => setIsCreateModalOpen(true)}
               className="flex items-center gap-2"
@@ -72,24 +83,6 @@ export const TasksPage: React.FC = () => {
               {t.actions.newTask}
             </Button>
           </div>
-        </div>
-
-        {/* Filter Tabs */}
-        <div className="mt-4 flex gap-2">
-          <Button
-            onClick={() => setShowCompleted(false)}
-            variant={!showCompleted ? 'default' : 'secondary'}
-            className="touch-optimized"
-          >
-            {t.tasks.active}
-          </Button>
-          <Button
-            onClick={() => setShowCompleted(true)}
-            variant={showCompleted ? 'default' : 'secondary'}
-            className="touch-optimized"
-          >
-            {t.tasks.completed}
-          </Button>
         </div>
       </div>
 
