@@ -46,7 +46,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({ onMenuToggle, onSide
 
   return (
     <header className="bg-card border-b border-border sticky top-0 z-30">
-      <div className="flex items-center h-14 px-2 lg:px-0 gap-2">
+      <div className="flex items-center h-14 lg:h-16 px-2 lg:px-0 gap-2">
         {/* Left: hamburger + logo + title */}
         <div className="flex items-center min-w-0 shrink-0 h-full">
           {/* Mobile: open drawer */}
@@ -60,10 +60,10 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({ onMenuToggle, onSide
           {/* Desktop: toggle sidebar collapse — matches sidebar w-14 so icon aligns with nav icons */}
           <button
             onClick={onSidebarCollapse}
-            className="hidden lg:flex w-14 h-10 items-center justify-center rounded-lg text-foreground hover:bg-muted transition-colors"
+            className="hidden lg:flex w-14 h-12 items-center justify-center rounded-lg text-foreground hover:bg-muted transition-colors"
             aria-label="Toggle sidebar"
           >
-            <Menu size={20} />
+            <Menu size={22} />
           </button>
 
           {/* Mobile: page title */}
@@ -73,11 +73,11 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({ onMenuToggle, onSide
           <div className="hidden lg:flex items-center gap-2.5 lg:ml-0 min-w-0 h-full">
             {!sidebarCollapsed && (
               <>
-                <NestlyLogo size={32} className="rounded-lg shrink-0" />
-                <span className="font-display font-bold text-foreground text-base">Nestly</span>
+                <NestlyLogo size={36} className="rounded-lg shrink-0" />
+                <span className="font-display font-bold text-foreground text-lg">Nestly</span>
               </>
             )}
-            <span className="text-sm text-muted-foreground truncate">{pageTitle}</span>
+            <span className="text-base text-muted-foreground truncate">{pageTitle}</span>
           </div>
         </div>
 
