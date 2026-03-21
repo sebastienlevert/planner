@@ -202,19 +202,6 @@ export const WeatherPage: React.FC = () => {
                 </p>
               )}
 
-              {/* Temp bar */}
-              <div className="ml-[23px]">
-                <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full rounded-full"
-                    style={{
-                      width: `${Math.min(100, Math.max(10, ((forecast.temperatureMax + 10) / 50) * 100))}%`,
-                      background: getTempGradient(forecast.temperatureMax),
-                    }}
-                  />
-                </div>
-              </div>
-
               {/* Hourly temperature graph */}
               {forecast.hourly && forecast.hourly.length > 0 && (
                 <div className="mt-1 -mx-1">
@@ -310,13 +297,3 @@ export const WeatherPage: React.FC = () => {
     </div>
   );
 };
-
-function getTempGradient(temp: number): string {
-  if (temp <= -10) return '#60a5fa';
-  if (temp <= 0) return '#93c5fd';
-  if (temp <= 10) return '#67e8f9';
-  if (temp <= 20) return '#86efac';
-  if (temp <= 25) return '#fde047';
-  if (temp <= 30) return '#fb923c';
-  return '#ef4444';
-}
