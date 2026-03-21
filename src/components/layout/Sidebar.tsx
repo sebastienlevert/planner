@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Calendar, CheckSquare, UtensilsCrossed, Settings, BookOpen, X } from 'lucide-react';
+import { Calendar, CheckSquare, UtensilsCrossed, Settings, BookOpen, X, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { useLocale } from '../../contexts/LocaleContext';
 
 interface NavItem {
@@ -13,9 +13,11 @@ interface NavItem {
 interface SidebarProps {
   mobileOpen?: boolean;
   onClose?: () => void;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose, collapsed = false, onToggleCollapse }) => {
   const { t } = useLocale();
   const location = useLocation();
 
@@ -30,31 +32,31 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose })
   const navItems: NavItem[] = [
     {
       to: '/calendar',
-      icon: <Calendar size={26} />,
+      icon: <Calendar size={20} />,
       labelKey: 'calendar',
       section: 'top',
     },
     {
       to: '/tasks',
-      icon: <CheckSquare size={26} />,
+      icon: <CheckSquare size={20} />,
       labelKey: 'todos',
       section: 'top',
     },
     {
       to: '/meals',
-      icon: <UtensilsCrossed size={26} />,
+      icon: <UtensilsCrossed size={20} />,
       labelKey: 'mealPlanner',
       section: 'top',
     },
     {
       to: '/docs',
-      icon: <BookOpen size={26} />,
+      icon: <BookOpen size={20} />,
       labelKey: 'docs',
       section: 'bottom',
     },
     {
       to: '/settings',
-      icon: <Settings size={26} />,
+      icon: <Settings size={20} />,
       labelKey: 'settings',
       section: 'bottom',
     },
@@ -63,22 +65,46 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose })
   const topItems = navItems.filter(item => item.section === 'top');
   const bottomItems = navItems.filter(item => item.section === 'bottom');
 
-  const navLinkClass = (isActive: boolean, isMobile: boolean) =>
-    `flex items-center rounded-xl transition-all duration-200 touch-target ${
-      isMobile
-        ? `justify-start gap-4 w-full px-4 h-14 ${isActive ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:bg-primary/10 hover:text-primary'}`
-        : `justify-center flex-col w-18 h-18 ${isActive ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:bg-primary/10 hover:text-primary'}`
+  // Desktop nav link styles
+  const desktopNavClass = (isActive: boolean) =>
+    `flex items-center rounded-lg transition-all duration-200 ${
+      collapsed
+        ? `justify-center w-10 h-10 ${isActive ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-primary/10 hover:text-primary'}`
+        : `gap-3 px-3 h-10 ${isActive ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-primary/10 hover:text-primary'}`
     }`;
 
-  const renderNavItems = (items: NavItem[], isMobile: boolean) =>
+  // Mobile nav link styles
+  const mobileNavClass = (isActive: boolean) =>
+    `flex items-center rounded-xl transition-all duration-200 touch-target justify-start gap-4 w-full px-4 h-14 ${
+      isActive ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:bg-primary/10 hover:text-primary'
+    }`;
+
+  const renderDesktopItems = (items: NavItem[]) =>
     items.map((item) => (
       <NavLink
         key={item.to}
         to={item.to}
-        className={({ isActive }) => navLinkClass(isActive, isMobile)}
+        title={collapsed ? t.nav[item.labelKey as keyof typeof t.nav] : undefined}
+        className={({ isActive }) => desktopNavClass(isActive)}
+      >
+        <span className="shrink-0">{item.icon}</span>
+        {!collapsed && (
+          <span className="text-sm font-medium truncate">
+            {t.nav[item.labelKey as keyof typeof t.nav]}
+          </span>
+        )}
+      </NavLink>
+    ));
+
+  const renderMobileItems = (items: NavItem[]) =>
+    items.map((item) => (
+      <NavLink
+        key={item.to}
+        to={item.to}
+        className={({ isActive }) => mobileNavClass(isActive)}
       >
         {item.icon}
-        <span className={isMobile ? 'text-sm font-medium' : 'text-xs mt-1 font-medium leading-tight'}>
+        <span className="text-sm font-medium">
           {t.nav[item.labelKey as keyof typeof t.nav]}
         </span>
       </NavLink>
@@ -88,14 +114,29 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose })
   return (
     <>
       {/* Desktop sidebar — always visible on lg+ */}
-      <aside className="hidden lg:flex w-22 bg-card border-r border-border flex-col items-center py-6 shrink-0">
-        <div className="flex flex-col gap-4">
-          {renderNavItems(topItems, false)}
-        </div>
-        <div className="flex-1" />
-        <div className="flex flex-col gap-4">
-          {renderNavItems(bottomItems, false)}
-        </div>
+      <aside
+        className={`hidden lg:flex flex-col bg-card border-r border-border shrink-0 transition-all duration-200 ${
+          collapsed ? 'w-14 items-center px-1' : 'w-48 px-3'
+        } py-3`}
+      >
+        {/* Collapse toggle */}
+        <button
+          onClick={onToggleCollapse}
+          className="flex items-center justify-center w-10 h-10 rounded-lg text-muted-foreground hover:bg-muted transition-colors mb-2 self-center"
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+        </button>
+
+        <nav className="flex flex-col flex-1">
+          <div className="flex flex-col gap-1">
+            {renderDesktopItems(topItems)}
+          </div>
+          <div className="flex-1" />
+          <div className="flex flex-col gap-1">
+            {renderDesktopItems(bottomItems)}
+          </div>
+        </nav>
       </aside>
 
       {/* Mobile drawer overlay */}
@@ -135,12 +176,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose })
         {/* Nav items */}
         <nav className="flex-1 overflow-auto px-3 py-4 flex flex-col">
           <div className="flex flex-col gap-1">
-            {renderNavItems(topItems, true)}
+            {renderMobileItems(topItems)}
           </div>
           <div className="flex-1" />
           <div className="border-t border-border pt-3 mt-3">
             <div className="flex flex-col gap-1">
-              {renderNavItems(bottomItems, true)}
+              {renderMobileItems(bottomItems)}
             </div>
           </div>
         </nav>
