@@ -177,7 +177,7 @@ export const WeatherPage: React.FC = () => {
             )}
           </div>
           {info && (
-            <span className="text-3xl leading-none" title={conditionLabel(info.key)}>
+            <span className="text-4xl leading-none" title={conditionLabel(info.key)}>
               {info.icon}
             </span>
           )}
@@ -192,14 +192,14 @@ export const WeatherPage: React.FC = () => {
 
               {/* Temperature with feels-like */}
               <div className="flex items-center gap-2">
-                <Thermometer size={15} className="text-muted-foreground shrink-0" />
+                <Thermometer size={20} className="text-muted-foreground shrink-0" />
                 <div className="flex items-baseline gap-1.5">
-                  <span className="text-xl font-bold text-foreground">{forecast.temperatureMax}°</span>
-                  <span className="text-sm text-muted-foreground">/ {forecast.temperatureMin}°</span>
+                  <span className="text-3xl font-bold text-foreground">{forecast.temperatureMax}°</span>
+                  <span className="text-lg text-muted-foreground">/ {forecast.temperatureMin}°</span>
                 </div>
               </div>
               {forecast.apparentTemperatureMax != null && (
-                <p className="text-xs text-muted-foreground -mt-1 ml-[23px]">
+                <p className="text-xs text-muted-foreground -mt-1 ml-[28px]">
                   {t.weather?.feels ?? 'Feels'} {forecast.apparentTemperatureMax}° / {forecast.apparentTemperatureMin}°
                 </p>
               )}
@@ -214,7 +214,7 @@ export const WeatherPage: React.FC = () => {
               {/* Precipitation */}
               {forecast.precipitationProbabilityMax != null && (
                 <div className="flex items-center gap-2">
-                  <Droplets size={15} className="text-blue-400 shrink-0" />
+                  <Droplets size={18} className="text-blue-400 shrink-0" />
                   <span className="text-sm text-foreground">
                     {forecast.precipitationProbabilityMax}%
                     {(forecast.precipitationSum ?? 0) > 0 && (
@@ -227,7 +227,7 @@ export const WeatherPage: React.FC = () => {
               {/* Wind */}
               {forecast.windSpeedMax != null && (
                 <div className="flex items-center gap-2">
-                  <Wind size={15} className="text-muted-foreground shrink-0" />
+                  <Wind size={18} className="text-muted-foreground shrink-0" />
                   <span className="text-sm text-foreground">
                     {forecast.windSpeedMax} km/h {windCompass(forecast.windDirection ?? 0)}
                     {(forecast.windGustsMax ?? 0) > (forecast.windSpeedMax ?? 0) && (
@@ -240,7 +240,7 @@ export const WeatherPage: React.FC = () => {
               {/* UV Index */}
               {forecast.uvIndexMax != null && (
                 <div className="flex items-center gap-2">
-                  <Sun size={15} className={`shrink-0 ${uvLevel(forecast.uvIndexMax).color}`} />
+                  <Sun size={18} className={`shrink-0 ${uvLevel(forecast.uvIndexMax).color}`} />
                   <span className="text-sm text-foreground">
                     UV {Math.round(forecast.uvIndexMax)}
                     <span className={`ml-1 text-xs font-medium ${uvLevel(forecast.uvIndexMax).color}`}>
@@ -255,13 +255,13 @@ export const WeatherPage: React.FC = () => {
                 <div className="flex items-center gap-3 mt-auto pt-1 border-t border-border/50">
                   {forecast.sunrise && (
                     <div className="flex items-center gap-1.5">
-                      <Sunrise size={14} className="text-orange-400" />
+                      <Sunrise size={16} className="text-orange-400" />
                       <span className="text-xs text-muted-foreground">{formatTime(forecast.sunrise)}</span>
                     </div>
                   )}
                   {forecast.sunset && (
                     <div className="flex items-center gap-1.5">
-                      <Sunset size={14} className="text-indigo-400" />
+                      <Sunset size={16} className="text-indigo-400" />
                       <span className="text-xs text-muted-foreground">{formatTime(forecast.sunset)}</span>
                     </div>
                   )}
