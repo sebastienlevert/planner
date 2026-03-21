@@ -13,6 +13,7 @@ const routeTitles: Record<string, string> = {
   '/meal-planner': 'mealPlanner',
   '/photos': 'photos',
   '/meals': 'meals',
+  '/docs': 'docs',
   '/settings': 'settings',
 };
 
