@@ -44,21 +44,21 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({ onMenuToggle, onSide
 
   return (
     <header className="bg-card border-b border-border sticky top-0 z-30">
-      <div className="flex items-center h-14 px-4 gap-2">
+      <div className="flex items-center h-14 px-2 lg:px-0 gap-2">
         {/* Left: hamburger + logo + title */}
         <div className="flex items-center min-w-0 shrink-0">
           {/* Mobile: open drawer */}
           <button
             onClick={onMenuToggle}
-            className="lg:hidden w-11 h-11 flex items-center justify-center rounded-lg text-foreground hover:bg-muted transition-colors touch-target -ml-1"
+            className="lg:hidden w-11 h-11 flex items-center justify-center rounded-lg text-foreground hover:bg-muted transition-colors touch-target ml-1"
             aria-label="Open menu"
           >
             <Menu size={24} />
           </button>
-          {/* Desktop: toggle sidebar collapse */}
+          {/* Desktop: toggle sidebar collapse — matches sidebar w-14 so icon aligns with nav icons */}
           <button
             onClick={onSidebarCollapse}
-            className="hidden lg:flex w-10 h-10 items-center justify-center rounded-lg text-foreground hover:bg-muted transition-colors -ml-1"
+            className="hidden lg:flex w-14 h-10 items-center justify-center rounded-lg text-foreground hover:bg-muted transition-colors"
             aria-label="Toggle sidebar"
           >
             <Menu size={20} />
@@ -77,7 +77,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({ onMenuToggle, onSide
         <div className="flex-1" />
 
         {/* Right: module controls + user avatars */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 pr-2 lg:pr-4">
           {headerControls}
 
           {isAuthenticated && accounts.length > 0 && (
