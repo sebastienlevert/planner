@@ -32,43 +32,43 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose, c
   const navItems: NavItem[] = [
     {
       to: '/calendar',
-      icon: <Calendar size={20} />,
+      icon: <Calendar size={22} />,
       labelKey: 'calendar',
       section: 'top',
     },
     {
       to: '/tasks',
-      icon: <CheckSquare size={20} />,
+      icon: <CheckSquare size={22} />,
       labelKey: 'todos',
       section: 'top',
     },
     {
       to: '/meals',
-      icon: <UtensilsCrossed size={20} />,
+      icon: <UtensilsCrossed size={22} />,
       labelKey: 'mealPlanner',
       section: 'top',
     },
     {
       to: '/weather',
-      icon: <CloudSun size={20} />,
+      icon: <CloudSun size={22} />,
       labelKey: 'weather',
       section: 'top',
     },
     {
       to: '/docs',
-      icon: <BookOpen size={20} />,
+      icon: <BookOpen size={22} />,
       labelKey: 'docs',
       section: 'bottom',
     },
     {
       to: '/home',
-      icon: <Home size={20} />,
+      icon: <Home size={22} />,
       labelKey: 'home',
       section: 'bottom',
     },
     {
       to: '/settings',
-      icon: <Settings size={20} />,
+      icon: <Settings size={22} />,
       labelKey: 'settings',
       section: 'bottom',
     },
@@ -129,11 +129,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose, c
         } py-3`}
       >
         <nav className="flex flex-col flex-1">
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-2">
             {renderDesktopItems(topItems)}
           </div>
           <div className="flex-1" />
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-2">
             {renderDesktopItems(bottomItems)}
           </div>
         </nav>
