@@ -107,9 +107,12 @@ export const MealPlannerPage: React.FC = () => {
 
   // Auto-scroll to today on mobile
   useEffect(() => {
-    if (todayRef.current) {
-      todayRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    const timer = setTimeout(() => {
+      if (todayRef.current) {
+        todayRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+    return () => clearTimeout(timer);
   }, [currentDate]);
 
   const openAddMeal = useCallback((day: Date, type: MealKey = 'breakfast') => {

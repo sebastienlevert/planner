@@ -129,9 +129,13 @@ export const AgendaView: React.FC<AgendaViewProps> = ({ currentDate, onCreateEve
 
   // Auto-scroll to today on mobile
   useEffect(() => {
-    if (todayRef.current) {
-      todayRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    // Small delay to ensure DOM is fully rendered before scrolling
+    const timer = setTimeout(() => {
+      if (todayRef.current) {
+        todayRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+    return () => clearTimeout(timer);
   }, [currentDate]);
 
   // Top row: Mon–Thu, Bottom row: Fri–Sun + next week preview (desktop layout)
