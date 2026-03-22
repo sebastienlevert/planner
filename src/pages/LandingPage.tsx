@@ -14,6 +14,7 @@ import {
   MonitorSmartphone,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useLocale } from '../contexts/LocaleContext';
 import { useProfilePhotos } from '../hooks/useProfilePhotos';
 import { UserAvatar } from '../components/common/UserAvatar';
 import { Button } from '@/components/ui/button';
@@ -82,9 +83,11 @@ function WhyCard({ emoji, title, description }: {
 // ─── Main Landing Page ──────────────────────────────────────────────
 export const LandingPage: React.FC = () => {
   const { addAccount, isLoading, isAuthenticated, accounts } = useAuth();
+  const { t } = useLocale();
   const photos = useProfilePhotos();
   const navigate = useNavigate();
   const [stars, setStars] = useState(0);
+  const l = t.landing;
 
   useEffect(() => {
     fetch(REPO_API)
@@ -166,7 +169,7 @@ export const LandingPage: React.FC = () => {
               </button>
             ) : (
               <Button onClick={handleGetStarted} disabled={isLoading} size="sm">
-                {isLoading ? 'Signing in…' : 'Get Started'}
+                {isLoading ? l.signingIn : l.getStarted}
               </Button>
             )}
           </div>
@@ -185,19 +188,18 @@ export const LandingPage: React.FC = () => {
           <div className="animate-fade-in-up">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary mb-6">
               <Sparkles size={14} />
-              Free &amp; Open Source
+              {l.badge}
             </span>
           </div>
 
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-            Your nest,
+            {l.heroTitle1}
             <br />
-            <span className="text-primary">perfectly in sync.</span>
+            <span className="text-primary">{l.heroTitle2}</span>
           </h1>
 
           <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-            Nestly is the always-on family hub for your kitchen counter. Calendars, meals,
-            tasks, and photos — everything your household needs, in one cozy place.
+            {l.heroDescription}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
@@ -206,7 +208,7 @@ export const LandingPage: React.FC = () => {
               disabled={isLoading}
               className="h-12 px-8 text-base rounded-xl animate-pulse-glow"
             >
-              {isLoading ? 'Signing in…' : isAuthenticated ? 'Go to Dashboard' : 'Start Using Nestly'}
+              {isLoading ? l.signingIn : isAuthenticated ? l.goToDashboard : l.startUsing}
               <ArrowRight size={18} className="ml-1" />
             </Button>
             <a
@@ -216,7 +218,7 @@ export const LandingPage: React.FC = () => {
             >
               <Button variant="outline" className="h-12 px-8 text-base rounded-xl">
                 <Github size={18} className="mr-1" />
-                View on GitHub
+                {l.viewOnGithub}
               </Button>
             </a>
           </div>
@@ -229,7 +231,7 @@ export const LandingPage: React.FC = () => {
                 <div className="w-3 h-3 rounded-full bg-red-400" />
                 <div className="w-3 h-3 rounded-full bg-yellow-400" />
                 <div className="w-3 h-3 rounded-full bg-green-400" />
-                <span className="ml-3 text-xs text-muted-foreground font-medium">Nestly — Your Week</span>
+                <span className="ml-3 text-xs text-muted-foreground font-medium">{l.mockupBar}</span>
               </div>
               {/* Fake agenda grid */}
               <div className="grid grid-cols-4 gap-2 p-4">
@@ -253,48 +255,48 @@ export const LandingPage: React.FC = () => {
       <section className="max-w-6xl mx-auto px-6 py-20">
         <div className="text-center mb-14">
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            Everything your nest needs
+            {l.featuresTitle}
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            One cozy dashboard that keeps every family member on the same page — mornings, mealtimes, and everything in between.
+            {l.featuresSubtitle}
           </p>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <FeatureCard
             icon={Calendar}
-            title="Family Calendars"
-            description="See the whole household's week at a glance. Multiple Microsoft 365 accounts, one shared view — so nobody misses soccer practice again."
+            title={l.featureCalendarTitle}
+            description={l.featureCalendarDesc}
             delay={0}
           />
           <FeatureCard
             icon={Cloud}
-            title="Weather at a Glance"
-            description="A 14-day forecast right on your calendar. Grab the umbrella or pack sunscreen — your nest knows what's coming."
+            title={l.featureWeatherTitle}
+            description={l.featureWeatherDesc}
             delay={100}
           />
           <FeatureCard
             icon={CheckSquare}
-            title="Shared To-Do Lists"
-            description="Groceries, chores, school supplies — everyone sees the list, everyone can check things off. Powered by Microsoft To Do."
+            title={l.featureTodosTitle}
+            description={l.featureTodosDesc}
             delay={200}
           />
           <FeatureCard
             icon={Utensils}
-            title="Meal Planning"
-            description="Plan breakfast, lunch, and dinner for the whole week. No more 'what's for dinner?' — your nest has the answer."
+            title={l.featureMealsTitle}
+            description={l.featureMealsDesc}
             delay={300}
           />
           <FeatureCard
             icon={Image}
-            title="Family Photo Frame"
-            description="Turn your tablet into a digital photo frame with OneDrive slideshows. Your favorite memories, always on display in the nest."
+            title={l.featurePhotosTitle}
+            description={l.featurePhotosDesc}
             delay={400}
           />
           <FeatureCard
             icon={MonitorSmartphone}
-            title="Kitchen Counter Ready"
-            description="Designed for an always-on tablet in the heart of your home. Big touch targets, wake lock, and a layout that feels right at home."
+            title={l.featureKitchenTitle}
+            description={l.featureKitchenDesc}
             delay={500}
           />
         </div>
@@ -305,33 +307,33 @@ export const LandingPage: React.FC = () => {
         <div className="max-w-4xl mx-auto px-6 py-20">
           <div className="text-center mb-14">
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-              Why families love Nestly
+              {l.whyTitle}
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Built by a parent who was tired of juggling five apps before breakfast. Your nest deserves better.
+              {l.whySubtitle}
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-8">
             <WhyCard
               emoji="🏠"
-              title="Made for the Heart of Your Home"
-              description="Nestly is designed for the kitchen counter — the place where your family gathers, plans, and connects. Always on, always ready."
+              title={l.whyHomeTitle}
+              description={l.whyHomeDesc}
             />
             <WhyCard
               emoji="🔒"
-              title="Your Nest, Your Data"
-              description="Everything runs in the browser. Your family's calendars, photos, and lists never touch a third-party server. Privacy by design."
+              title={l.whyPrivacyTitle}
+              description={l.whyPrivacyDesc}
             />
             <WhyCard
               emoji="🌍"
-              title="Speaks Your Language"
-              description="Full i18n support so every household feels at home. English and French-Canadian built in, with more locales easy to add."
+              title={l.whyI18nTitle}
+              description={l.whyI18nDesc}
             />
             <WhyCard
               emoji="🎨"
-              title="Fits Your Home's Vibe"
-              description="Multiple themes to match your kitchen, living room, or wherever your nest lives. Dark mode for movie nights, light mode for mornings."
+              title={l.whyThemesTitle}
+              description={l.whyThemesDesc}
             />
           </div>
         </div>
@@ -351,24 +353,23 @@ export const LandingPage: React.FC = () => {
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-bold mb-3">
-            Open Source. Built for Nests Everywhere.
+            {l.openSourceTitle}
           </h2>
           <p className="text-muted-foreground max-w-lg mx-auto mb-6">
-            Nestly is MIT-licensed and completely free. No subscriptions, no data collection,
-            no lock-in. Help us build the best family hub — one nest at a time.
+            {l.openSourceDesc}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
               <Button variant="outline" className="h-11 px-6 rounded-xl">
                 <Star size={16} className="mr-1 text-yellow-500" />
-                Star on GitHub
+                {l.starOnGithub}
                 {stars > 0 && <span className="ml-1.5 text-xs bg-muted px-2 py-0.5 rounded-full font-medium"><AnimatedNumber target={stars} /></span>}
               </Button>
             </a>
             <Button onClick={isAuthenticated ? () => navigate('/calendar') : handleGetStarted} disabled={isLoading} className="h-11 px-6 rounded-xl">
               <Zap size={16} className="mr-1" />
-              {isLoading ? 'Signing in…' : isAuthenticated ? 'Go to Dashboard' : 'Get Started — It\'s Free'}
+              {isLoading ? l.signingIn : isAuthenticated ? l.goToDashboard : l.getStartedFree}
             </Button>
           </div>
         </div>
@@ -379,14 +380,14 @@ export const LandingPage: React.FC = () => {
         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <NestlyLogo size={24} className="rounded" />
-            <span>Nestly — Built with ❤️ for every nest</span>
+            <span>{l.footer}</span>
           </div>
           <div className="flex items-center gap-4">
             <a href={REPO_URL} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors flex items-center gap-1">
               <Github size={16} /> GitHub
             </a>
             <span>•</span>
-            <span>Free &amp; Open Source</span>
+            <span>{l.freeOpenSource}</span>
           </div>
         </div>
       </footer>
