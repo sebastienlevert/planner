@@ -286,10 +286,10 @@ export const MealModal: React.FC<MealModalProps> = ({
                 disabled={isSubmitting || !name.trim()}
               >
                 {isSubmitting
-                  ? (t.common?.loading || 'Loading...')
+                  ? (t.actions.saving)
                   : isEditMode
-                    ? (t.mealPlanner?.save || 'Save')
-                    : (t.mealPlanner?.add || 'Add')}
+                    ? t.actions.save
+                    : t.actions.create}
               </Button>
             </div>
           </DialogFooter>

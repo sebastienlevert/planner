@@ -295,7 +295,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
               type="submit"
               disabled={isSubmitting || availableCalendars.length === 0}
             >
-              {isSubmitting ? t.actions.saving : t.actions.save}
+              {isSubmitting ? t.actions.creating : t.actions.create}
             </Button>
           </DialogFooter>
         </form>
