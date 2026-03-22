@@ -24,7 +24,7 @@ export class TodoService {
   async getTasksFromList(listId: string, accessToken: string, accountId: string): Promise<TodoTask[]> {
     try {
       const response: any = await graphService.get(
-        `/me/todo/lists/${listId}/tasks?$top=100`,
+        `/me/todo/lists/${listId}/tasks?$top=100&$expand=checklistItems($select=id)`,
         accessToken
       );
 
@@ -272,6 +272,7 @@ export class TodoService {
       completedDateTime: task.completedDateTime,
       createdDateTime: task.createdDateTime,
       lastModifiedDateTime: task.lastModifiedDateTime,
+      checklistItemCount: Array.isArray(task.checklistItems) ? task.checklistItems.length : undefined,
     };
   }
 }

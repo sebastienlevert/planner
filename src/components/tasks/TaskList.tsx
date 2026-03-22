@@ -156,6 +156,9 @@ export const TaskList: React.FC = () => {
                           }`}
                         >
                           {task.title}
+                          {task.checklistItemCount && task.checklistItemCount > 0 && (
+                            <span className="text-muted-foreground font-normal ml-1">({task.checklistItemCount})</span>
+                          )}
                         </p>
 
                         {task.importance === 'high' && (

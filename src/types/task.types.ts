@@ -46,6 +46,7 @@ export interface TodoTask {
   };
   createdDateTime: string;
   lastModifiedDateTime: string;
+  checklistItemCount?: number;
 }
 
 export interface CreateTaskInput {
