@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Calendar, CheckSquare, UtensilsCrossed, Settings, BookOpen, X, CloudSun, Home } from 'lucide-react';
 import { useLocale } from '../../contexts/LocaleContext';
+import { NestlyLogo } from '../common/NestlyLogo';
 
 interface NavItem {
   to: string;
@@ -156,9 +157,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onClose, c
         {/* Drawer header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-sm">
-              N
-            </div>
+            <NestlyLogo size={36} className="rounded-lg shrink-0" />
             <span className="font-display font-semibold text-foreground">{t.header.title}</span>
           </div>
           <div className="flex items-center gap-2">
