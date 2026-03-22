@@ -5,6 +5,7 @@ import { useLocale } from '../../contexts/LocaleContext';
 import type { CalendarEvent } from '../../types/calendar.types';
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -167,7 +168,7 @@ export const MealModal: React.FC<MealModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[480px] max-h-[90vh] overflow-y-auto">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>
             {isEditMode
@@ -181,74 +182,75 @@ export const MealModal: React.FC<MealModalProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm">
-              {error}
+        <form onSubmit={handleSubmit}>
+          <DialogBody className="space-y-4">
+            {error && (
+              <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm">
+                {error}
+              </div>
+            )}
+
+            {/* Meal type */}
+            <div className="space-y-2">
+              <Label>{t.mealPlanner?.mealType || 'Meal type'}</Label>
+              <div className="flex gap-2">
+                {MEAL_TYPES.map(type => (
+                  <button
+                    key={type.key}
+                    type="button"
+                    onClick={() => setMealType(type.key)}
+                    className={`flex-1 py-2.5 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-colors ${
+                      mealType === type.key
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                    }`}
+                  >
+                    <span>{type.emoji}</span>
+                    <span>{t.mealPlanner?.[type.key] || type.key}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-          )}
 
-          {/* Meal type */}
-          <div className="space-y-2">
-            <Label>{t.mealPlanner?.mealType || 'Meal type'}</Label>
-            <div className="flex gap-2">
-              {MEAL_TYPES.map(type => (
-                <button
-                  key={type.key}
-                  type="button"
-                  onClick={() => setMealType(type.key)}
-                  className={`flex-1 py-2.5 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-colors ${
-                    mealType === type.key
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted/50 text-muted-foreground hover:bg-muted'
-                  }`}
-                >
-                  <span>{type.emoji}</span>
-                  <span>{t.mealPlanner?.[type.key] || type.key}</span>
-                </button>
-              ))}
+            {/* Name */}
+            <div className="space-y-2">
+              <Label htmlFor="meal-name">{t.mealPlanner?.mealName || 'Meal name'} *</Label>
+              <Input
+                id="meal-name"
+                type="text"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                placeholder={t.mealPlanner?.placeholder || "What's cooking?"}
+                required
+                autoFocus
+              />
             </div>
-          </div>
 
-          {/* Name */}
-          <div className="space-y-2">
-            <Label htmlFor="meal-name">{t.mealPlanner?.mealName || 'Meal name'} *</Label>
-            <Input
-              id="meal-name"
-              type="text"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              placeholder={t.mealPlanner?.placeholder || "What's cooking?"}
-              required
-              autoFocus
-            />
-          </div>
+            {/* Date */}
+            <div className="space-y-2">
+              <Label htmlFor="meal-date">{t.mealPlanner?.date || 'Date'} *</Label>
+              <Input
+                id="meal-date"
+                type="date"
+                value={date}
+                onChange={e => setDate(e.target.value)}
+                required
+              />
+            </div>
 
-          {/* Date */}
-          <div className="space-y-2">
-            <Label htmlFor="meal-date">{t.mealPlanner?.date || 'Date'} *</Label>
-            <Input
-              id="meal-date"
-              type="date"
-              value={date}
-              onChange={e => setDate(e.target.value)}
-              required
-            />
-          </div>
+            {/* Recipe link */}
+            <div className="space-y-2">
+              <Label htmlFor="meal-recipe">{t.mealPlanner?.recipeLink || 'Recipe link'}</Label>
+              <Input
+                id="meal-recipe"
+                type="url"
+                value={recipeLink}
+                onChange={e => setRecipeLink(e.target.value)}
+                placeholder={t.mealPlanner?.recipeLinkPlaceholder || 'Recipe link (optional)'}
+              />
+            </div>
+          </DialogBody>
 
-          {/* Recipe link */}
-          <div className="space-y-2">
-            <Label htmlFor="meal-recipe">{t.mealPlanner?.recipeLink || 'Recipe link'}</Label>
-            <Input
-              id="meal-recipe"
-              type="url"
-              value={recipeLink}
-              onChange={e => setRecipeLink(e.target.value)}
-              placeholder={t.mealPlanner?.recipeLinkPlaceholder || 'Recipe link (optional)'}
-            />
-          </div>
-
-          {/* Actions */}
           <DialogFooter className="flex-row justify-between sm:justify-between">
             {isEditMode ? (
               <Button

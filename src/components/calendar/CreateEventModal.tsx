@@ -6,6 +6,7 @@ import { useLocale } from '../../contexts/LocaleContext';
 import type { CreateEventInput } from '../../types/calendar.types';
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -152,164 +153,165 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{t.events.createEvent}</DialogTitle>
           <DialogDescription>
             {t.events.addEventDescription}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm">
-              {error}
+        <form onSubmit={handleSubmit}>
+          <DialogBody className="space-y-4">
+            {error && (
+              <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm">
+                {error}
+              </div>
+            )}
+
+            {availableCalendars.length === 0 && (
+              <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-yellow-700 dark:text-yellow-400 text-sm">
+                {t.events.noCalendarsWarning}
+              </div>
+            )}
+
+            {/* Title */}
+            <div className="space-y-2">
+              <Label htmlFor="title">{t.events.title} *</Label>
+              <Input
+                id="title"
+                type="text"
+                value={formData.subject}
+                onChange={e => setFormData(prev => ({ ...prev, subject: e.target.value }))}
+                placeholder={t.events.eventTitle}
+                required
+              />
             </div>
-          )}
 
-          {availableCalendars.length === 0 && (
-            <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-yellow-700 dark:text-yellow-400 text-sm">
-              {t.events.noCalendarsWarning}
+            {/* Calendar Selection */}
+            <div className="space-y-2">
+              <Label htmlFor="calendar">{t.events.calendar} *</Label>
+              <select
+                id="calendar"
+                value={formData.calendarId}
+                onChange={e => handleCalendarChange(e.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                required
+              >
+                {availableCalendars.map(cal => {
+                  const account = accounts.find(acc => acc.homeAccountId === cal.accountId);
+                  return (
+                    <option key={cal.id} value={cal.id}>
+                      {cal.name} ({account?.email || t.events.unknown})
+                    </option>
+                  );
+                })}
+              </select>
             </div>
-          )}
 
-          {/* Title */}
-          <div className="space-y-2">
-            <Label htmlFor="title">{t.events.title} *</Label>
-            <Input
-              id="title"
-              type="text"
-              value={formData.subject}
-              onChange={e => setFormData(prev => ({ ...prev, subject: e.target.value }))}
-              placeholder={t.events.eventTitle}
-              required
-            />
-          </div>
+            {/* All Day Toggle */}
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="allDay"
+                checked={formData.isAllDay}
+                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isAllDay: checked as boolean }))}
+              />
+              <Label htmlFor="allDay" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                {t.events.allDayEvent}
+              </Label>
+            </div>
 
-          {/* Calendar Selection */}
-          <div className="space-y-2">
-            <Label htmlFor="calendar">{t.events.calendar} *</Label>
-            <select
-              id="calendar"
-              value={formData.calendarId}
-              onChange={e => handleCalendarChange(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              required
+            {/* Date and Time */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="startDate">{t.events.startDate} *</Label>
+                <Input
+                  id="startDate"
+                  type="date"
+                  value={formData.startDate}
+                  onChange={e => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
+                  required
+                />
+              </div>
+
+              {!formData.isAllDay && (
+                <div className="space-y-2">
+                  <Label htmlFor="startTime">{t.events.startTime} *</Label>
+                  <Input
+                    id="startTime"
+                    type="time"
+                    value={formData.startTime}
+                    onChange={e => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
+                    required
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="endDate">{t.events.endDate} *</Label>
+                <Input
+                  id="endDate"
+                  type="date"
+                  value={formData.endDate}
+                  onChange={e => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
+                  required
+                />
+              </div>
+
+              {!formData.isAllDay && (
+                <div className="space-y-2">
+                  <Label htmlFor="endTime">{t.events.endTime} *</Label>
+                  <Input
+                    id="endTime"
+                    type="time"
+                    value={formData.endTime}
+                    onChange={e => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
+                    required
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Expandable section for less important fields */}
+            <button
+              type="button"
+              className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => setShowMore(!showMore)}
             >
-              {availableCalendars.map(cal => {
-                const account = accounts.find(acc => acc.homeAccountId === cal.accountId);
-                return (
-                  <option key={cal.id} value={cal.id}>
-                    {cal.name} ({account?.email || t.events.unknown})
-                  </option>
-                );
-              })}
-            </select>
-          </div>
+              {showMore ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+              {t.events.moreOptions}
+            </button>
 
-          {/* All Day Toggle */}
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="allDay"
-              checked={formData.isAllDay}
-              onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isAllDay: checked as boolean }))}
-            />
-            <Label htmlFor="allDay" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              {t.events.allDayEvent}
-            </Label>
-          </div>
+            {showMore && (
+              <div className="space-y-4 pl-1">
+                {/* Location */}
+                <div className="space-y-2">
+                  <Label htmlFor="location">{t.events.location}</Label>
+                  <Input
+                    id="location"
+                    type="text"
+                    value={formData.location}
+                    onChange={e => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                    placeholder={t.events.addLocation}
+                  />
+                </div>
 
-          {/* Date and Time */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="startDate">{t.events.startDate} *</Label>
-              <Input
-                id="startDate"
-                type="date"
-                value={formData.startDate}
-                onChange={e => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
-                required
-              />
-            </div>
-
-            {!formData.isAllDay && (
-              <div className="space-y-2">
-                <Label htmlFor="startTime">{t.events.startTime} *</Label>
-                <Input
-                  id="startTime"
-                  type="time"
-                  value={formData.startTime}
-                  onChange={e => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
-                  required
-                />
+                {/* Description */}
+                <div className="space-y-2">
+                  <Label htmlFor="description">{t.events.description}</Label>
+                  <Textarea
+                    id="description"
+                    value={formData.body}
+                    onChange={e => setFormData(prev => ({ ...prev, body: e.target.value }))}
+                    rows={3}
+                    placeholder={t.events.addDescription}
+                  />
+                </div>
               </div>
             )}
-          </div>
+          </DialogBody>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="endDate">{t.events.endDate} *</Label>
-              <Input
-                id="endDate"
-                type="date"
-                value={formData.endDate}
-                onChange={e => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
-                required
-              />
-            </div>
-
-            {!formData.isAllDay && (
-              <div className="space-y-2">
-                <Label htmlFor="endTime">{t.events.endTime} *</Label>
-                <Input
-                  id="endTime"
-                  type="time"
-                  value={formData.endTime}
-                  onChange={e => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
-                  required
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Expandable section for less important fields */}
-          <button
-            type="button"
-            className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            onClick={() => setShowMore(!showMore)}
-          >
-            {showMore ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-            {t.events.moreOptions}
-          </button>
-
-          {showMore && (
-            <div className="space-y-4 pl-1">
-              {/* Location */}
-              <div className="space-y-2">
-                <Label htmlFor="location">{t.events.location}</Label>
-                <Input
-                  id="location"
-                  type="text"
-                  value={formData.location}
-                  onChange={e => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                  placeholder={t.events.addLocation}
-                />
-              </div>
-
-              {/* Description */}
-              <div className="space-y-2">
-                <Label htmlFor="description">{t.events.description}</Label>
-                <Textarea
-                  id="description"
-                  value={formData.body}
-                  onChange={e => setFormData(prev => ({ ...prev, body: e.target.value }))}
-                  rows={3}
-                  placeholder={t.events.addDescription}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Actions */}
           <DialogFooter>
             <Button
               type="button"

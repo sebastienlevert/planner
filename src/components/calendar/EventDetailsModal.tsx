@@ -7,6 +7,7 @@ import { dateHelpers } from '../../utils/dateHelpers';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -149,19 +150,159 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent>
           <DialogHeader>
-            <div className="flex items-start justify-between gap-4">
-              <DialogTitle className="text-xl flex-1">
-                {isEditing ? t.events.editEvent : t.events.eventDetails}
-              </DialogTitle>
-              {!isEditing && event && (
-                <DialogDescription className="sr-only">
-                  View details for {event.subject}
-                </DialogDescription>
+            <DialogTitle className="text-xl">
+              {isEditing ? t.events.editEvent : t.events.eventDetails}
+            </DialogTitle>
+            {!isEditing && event && (
+              <DialogDescription className="sr-only">
+                View details for {event.subject}
+              </DialogDescription>
+            )}
+          </DialogHeader>
+
+          {/* Content */}
+          {isEditing ? (
+            <form onSubmit={handleSubmit}>
+              <DialogBody className="space-y-4">
+                {error && (
+                  <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm">
+                    {error}
+                  </div>
+                )}
+
+                {/* Title */}
+                <div className="space-y-2">
+                  <Label htmlFor="title">{t.events.title} *</Label>
+                  <Input
+                    id="title"
+                    type="text"
+                    value={formData.subject}
+                    onChange={e => setFormData(prev => ({ ...prev, subject: e.target.value }))}
+                    placeholder={t.events.eventTitle}
+                    required
+                  />
+                </div>
+
+                {/* All Day Toggle */}
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="allDay"
+                    checked={formData.isAllDay}
+                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isAllDay: checked as boolean }))}
+                  />
+                  <Label htmlFor="allDay" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    {t.events.allDayEvent}
+                  </Label>
+                </div>
+
+                {/* Date and Time */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="startDate">{t.events.startDate} *</Label>
+                    <Input
+                      id="startDate"
+                      type="date"
+                      value={formData.startDate}
+                      onChange={e => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
+                      required
+                    />
+                  </div>
+
+                  {!formData.isAllDay && (
+                    <div className="space-y-2">
+                      <Label htmlFor="startTime">{t.events.startTime} *</Label>
+                      <Input
+                        id="startTime"
+                        type="time"
+                        value={formData.startTime}
+                        onChange={e => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
+                        required
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="endDate">{t.events.endDate} *</Label>
+                    <Input
+                      id="endDate"
+                      type="date"
+                      value={formData.endDate}
+                      onChange={e => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
+                      required
+                    />
+                  </div>
+
+                  {!formData.isAllDay && (
+                    <div className="space-y-2">
+                      <Label htmlFor="endTime">{t.events.endTime} *</Label>
+                      <Input
+                        id="endTime"
+                        type="time"
+                        value={formData.endTime}
+                        onChange={e => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
+                        required
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Location */}
+                <div className="space-y-2">
+                  <Label htmlFor="location">{t.events.location}</Label>
+                  <Input
+                    id="location"
+                    type="text"
+                    value={formData.location}
+                    onChange={e => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                    placeholder={t.events.addLocation}
+                  />
+                </div>
+
+                {/* Description */}
+                <div className="space-y-2">
+                  <Label htmlFor="description">{t.events.description}</Label>
+                  <Textarea
+                    id="description"
+                    value={formData.body}
+                    onChange={e => setFormData(prev => ({ ...prev, body: e.target.value }))}
+                    rows={3}
+                    placeholder={t.events.addDescription}
+                  />
+                </div>
+              </DialogBody>
+
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={handleCancelEdit}
+                  disabled={isSubmitting}
+                >
+                  {t.actions.cancel}
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? t.actions.saving : t.actions.saveChanges}
+                </Button>
+              </DialogFooter>
+            </form>
+          ) : (
+            <DialogBody className="space-y-4">
+              {error && (
+                <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm">
+                  {error}
+                </div>
               )}
-              {!isEditing && canEdit && (
-                <div className="flex items-center gap-2 flex-shrink-0">
+
+              {/* Action buttons */}
+              {canEdit && (
+                <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -183,145 +324,6 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                   >
                     <Trash2 size={20} />
                   </Button>
-                </div>
-              )}
-            </div>
-          </DialogHeader>
-
-          {/* Content */}
-          {isEditing ? (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm">
-                  {error}
-                </div>
-              )}
-
-              {/* Title */}
-              <div className="space-y-2">
-                <Label htmlFor="title">{t.events.title} *</Label>
-                <Input
-                  id="title"
-                  type="text"
-                  value={formData.subject}
-                  onChange={e => setFormData(prev => ({ ...prev, subject: e.target.value }))}
-                  placeholder={t.events.eventTitle}
-                  required
-                />
-              </div>
-
-              {/* All Day Toggle */}
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="allDay"
-                  checked={formData.isAllDay}
-                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isAllDay: checked as boolean }))}
-                />
-                <Label htmlFor="allDay" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                  {t.events.allDayEvent}
-                </Label>
-              </div>
-
-              {/* Date and Time */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="startDate">{t.events.startDate} *</Label>
-                  <Input
-                    id="startDate"
-                    type="date"
-                    value={formData.startDate}
-                    onChange={e => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
-                    required
-                  />
-                </div>
-
-                {!formData.isAllDay && (
-                  <div className="space-y-2">
-                    <Label htmlFor="startTime">{t.events.startTime} *</Label>
-                    <Input
-                      id="startTime"
-                      type="time"
-                      value={formData.startTime}
-                      onChange={e => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
-                      required
-                    />
-                  </div>
-                )}
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="endDate">{t.events.endDate} *</Label>
-                  <Input
-                    id="endDate"
-                    type="date"
-                    value={formData.endDate}
-                    onChange={e => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
-                    required
-                  />
-                </div>
-
-                {!formData.isAllDay && (
-                  <div className="space-y-2">
-                    <Label htmlFor="endTime">{t.events.endTime} *</Label>
-                    <Input
-                      id="endTime"
-                      type="time"
-                      value={formData.endTime}
-                      onChange={e => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
-                      required
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* Location */}
-              <div className="space-y-2">
-                <Label htmlFor="location">{t.events.location}</Label>
-                <Input
-                  id="location"
-                  type="text"
-                  value={formData.location}
-                  onChange={e => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                  placeholder={t.events.addLocation}
-                />
-              </div>
-
-              {/* Description */}
-              <div className="space-y-2">
-                <Label htmlFor="description">{t.events.description}</Label>
-                <Textarea
-                  id="description"
-                  value={formData.body}
-                  onChange={e => setFormData(prev => ({ ...prev, body: e.target.value }))}
-                  rows={3}
-                  placeholder={t.events.addDescription}
-                />
-              </div>
-
-              {/* Actions */}
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={handleCancelEdit}
-                  disabled={isSubmitting}
-                >
-                  {t.actions.cancel}
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? t.actions.saving : t.actions.saveChanges}
-                </Button>
-              </DialogFooter>
-            </form>
-          ) : (
-            <div className="space-y-4">
-              {error && (
-                <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm">
-                  {error}
                 </div>
               )}
 
@@ -450,7 +452,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                   </Badge>
                 )}
               </div>
-            </div>
+            </DialogBody>
           )}
         </DialogContent>
       </Dialog>

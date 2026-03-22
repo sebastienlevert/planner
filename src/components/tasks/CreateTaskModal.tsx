@@ -5,6 +5,7 @@ import { useLocale } from '../../contexts/LocaleContext';
 import type { CreateTaskInput } from '../../types/task.types';
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -90,94 +91,95 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClos
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{t.tasks.createTask}</DialogTitle>
           <DialogDescription>
             {t.tasks.addTaskDescription}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm">
-              {error}
+        <form onSubmit={handleSubmit}>
+          <DialogBody className="space-y-4">
+            {error && (
+              <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm">
+                {error}
+              </div>
+            )}
+
+            {/* Title */}
+            <div className="space-y-2">
+              <Label htmlFor="taskTitle">{t.tasks.taskTitle} *</Label>
+              <Input
+                id="taskTitle"
+                type="text"
+                value={formData.title}
+                onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                placeholder={t.tasks.taskTitlePlaceholder}
+                required
+                autoFocus
+              />
             </div>
-          )}
 
-          {/* Title */}
-          <div className="space-y-2">
-            <Label htmlFor="taskTitle">{t.tasks.taskTitle} *</Label>
-            <Input
-              id="taskTitle"
-              type="text"
-              value={formData.title}
-              onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))}
-              placeholder={t.tasks.taskTitlePlaceholder}
-              required
-              autoFocus
-            />
-          </div>
+            {/* List Selection */}
+            <div className="space-y-2">
+              <Label htmlFor="list">{t.tasks.list} *</Label>
+              <select
+                id="list"
+                value={formData.listId}
+                onChange={e => handleListChange(e.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                required
+              >
+                {editableLists.map(list => {
+                  const account = accounts.find(acc => acc.homeAccountId === list.accountId);
+                  return (
+                    <option key={list.id} value={list.id}>
+                      {list.displayName} ({account?.email || t.events.unknown})
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
 
-          {/* List Selection */}
-          <div className="space-y-2">
-            <Label htmlFor="list">{t.tasks.list} *</Label>
-            <select
-              id="list"
-              value={formData.listId}
-              onChange={e => handleListChange(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              required
-            >
-              {editableLists.map(list => {
-                const account = accounts.find(acc => acc.homeAccountId === list.accountId);
-                return (
-                  <option key={list.id} value={list.id}>
-                    {list.displayName} ({account?.email || t.events.unknown})
-                  </option>
-                );
-              })}
-            </select>
-          </div>
+            {/* Importance */}
+            <div className="space-y-2">
+              <Label htmlFor="importance">{t.tasks.importance}</Label>
+              <select
+                id="importance"
+                value={formData.importance}
+                onChange={e => setFormData(prev => ({ ...prev, importance: e.target.value as any }))}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="low">{t.tasks.importanceLow}</option>
+                <option value="normal">{t.tasks.importanceNormal}</option>
+                <option value="high">{t.tasks.importanceHigh}</option>
+              </select>
+            </div>
 
-          {/* Importance */}
-          <div className="space-y-2">
-            <Label htmlFor="importance">{t.tasks.importance}</Label>
-            <select
-              id="importance"
-              value={formData.importance}
-              onChange={e => setFormData(prev => ({ ...prev, importance: e.target.value as any }))}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <option value="low">{t.tasks.importanceLow}</option>
-              <option value="normal">{t.tasks.importanceNormal}</option>
-              <option value="high">{t.tasks.importanceHigh}</option>
-            </select>
-          </div>
+            {/* Due Date */}
+            <div className="space-y-2">
+              <Label htmlFor="dueDate">{t.tasks.dueDate}</Label>
+              <Input
+                id="dueDate"
+                type="date"
+                value={formData.dueDate}
+                onChange={e => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
+              />
+            </div>
 
-          {/* Due Date */}
-          <div className="space-y-2">
-            <Label htmlFor="dueDate">{t.tasks.dueDate}</Label>
-            <Input
-              id="dueDate"
-              type="date"
-              value={formData.dueDate}
-              onChange={e => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
-            />
-          </div>
+            {/* Notes */}
+            <div className="space-y-2">
+              <Label htmlFor="notes">{t.tasks.notes}</Label>
+              <Textarea
+                id="notes"
+                value={formData.body}
+                onChange={e => setFormData(prev => ({ ...prev, body: e.target.value }))}
+                rows={3}
+                placeholder={t.tasks.notesPlaceholder}
+              />
+            </div>
+          </DialogBody>
 
-          {/* Notes */}
-          <div className="space-y-2">
-            <Label htmlFor="notes">{t.tasks.notes}</Label>
-            <Textarea
-              id="notes"
-              value={formData.body}
-              onChange={e => setFormData(prev => ({ ...prev, body: e.target.value }))}
-              rows={3}
-              placeholder={t.tasks.notesPlaceholder}
-            />
-          </div>
-
-          {/* Actions */}
           <DialogFooter>
             <Button
               type="button"

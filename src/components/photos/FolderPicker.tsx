@@ -7,6 +7,7 @@ import { onedriveService } from '../../services/onedrive.service';
 import type { DriveItem } from '../../services/onedrive.service';
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -85,22 +86,17 @@ export const FolderPicker: React.FC<FolderPickerProps> = ({ isOpen, onClose }) =
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] flex flex-col">
+      <DialogContent>
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <DialogTitle className="text-xl">{t.photos.selectFolder}</DialogTitle>
-              <DialogDescription className="sr-only">
-                Choose a folder from OneDrive to display photos
-              </DialogDescription>
-            </div>
-            <Button variant="secondary" onClick={onClose}>
-              {t.actions.cancel}
-            </Button>
-          </div>
+          <DialogTitle className="text-xl">{t.photos.selectFolder}</DialogTitle>
+          <DialogDescription className="sr-only">
+            Choose a folder from OneDrive to display photos
+          </DialogDescription>
+        </DialogHeader>
 
+        <DialogBody className="space-y-4">
           {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm overflow-x-auto pt-4">
+          <div className="flex items-center gap-2 text-sm overflow-x-auto">
             {breadcrumb.map((crumb, index) => (
               <React.Fragment key={crumb.id}>
                 <Button
@@ -117,10 +113,7 @@ export const FolderPicker: React.FC<FolderPickerProps> = ({ isOpen, onClose }) =
               </React.Fragment>
             ))}
           </div>
-        </DialogHeader>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto space-y-4">
           {error && (
             <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm">
               {error}
@@ -194,7 +187,7 @@ export const FolderPicker: React.FC<FolderPickerProps> = ({ isOpen, onClose }) =
               </div>
             </div>
           )}
-        </div>
+        </DialogBody>
       </DialogContent>
     </Dialog>
   );

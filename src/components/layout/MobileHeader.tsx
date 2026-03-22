@@ -9,7 +9,6 @@ import { useSettings } from '../../contexts/SettingsContext';
 import { useProfilePhotos } from '../../hooks/useProfilePhotos';
 import { useHeaderControlsSlot } from '../../contexts/HeaderControlsContext';
 import { UserAvatar } from '../common/UserAvatar';
-import { NestlyLogo } from '../common/NestlyLogo';
 
 interface MobileHeaderProps {
   onMenuToggle: () => void;

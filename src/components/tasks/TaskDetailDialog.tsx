@@ -6,6 +6,7 @@ import type { TodoTask, ChecklistItem } from '../../types/task.types';
 import { dateHelpers } from '../../utils/dateHelpers';
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -99,12 +100,12 @@ export const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-xl">{t.tasks.taskDetails}</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <DialogBody className="space-y-4">
           {/* Task title */}
           <div>
             <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
@@ -211,7 +212,7 @@ export const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
               </div>
             )}
           </div>
-        </div>
+        </DialogBody>
       </DialogContent>
     </Dialog>
   );
