@@ -180,14 +180,14 @@ export const WeatherPage: React.FC = () => {
           className="px-4 py-3 border-b border-border flex items-center justify-between bg-muted/30"
         >
           <div className="flex items-baseline gap-2">
-            <span className={`text-xl font-bold ${isToday ? 'text-primary' : 'text-foreground'}`}>
+            <span className={`text-2xl font-bold ${isToday ? 'text-primary' : 'text-foreground'}`}>
               {dateHelpers.formatDate(day, 'd')}
             </span>
-            <span className={`text-base font-medium ${isToday ? 'text-primary' : 'text-muted-foreground'}`}>
+            <span className={`text-lg font-medium ${isToday ? 'text-primary' : 'text-muted-foreground'}`}>
               {capitalize(dateHelpers.formatDate(day, 'EEE', locale))}
             </span>
             {isMobile && (
-              <span className={`text-sm ${isToday ? 'text-primary/70' : 'text-muted-foreground/70'}`}>
+              <span className={`text-base ${isToday ? 'text-primary/70' : 'text-muted-foreground/70'}`}>
                 {dateHelpers.formatDate(day, 'MMM', locale)}
               </span>
             )}
