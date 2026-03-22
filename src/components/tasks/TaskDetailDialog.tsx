@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CheckCircle2, Circle, Plus, Trash2, Calendar as CalendarIcon, Loader2 } from 'lucide-react';
 import { useTask } from '../../contexts/TaskContext';
 import { useLocale } from '../../contexts/LocaleContext';
@@ -36,6 +36,7 @@ export const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
   const [newItemName, setNewItemName] = useState('');
   const [isAdding, setIsAdding] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+  const newItemInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isOpen && task) {
@@ -67,6 +68,7 @@ export const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
       const newItem = await createChecklistItem(task, newItemName.trim());
       setItems(prev => [...prev, newItem]);
       setNewItemName('');
+      setTimeout(() => newItemInputRef.current?.focus(), 50);
     } catch (err) {
       console.error('Failed to add checklist item:', err);
     } finally {
@@ -188,6 +190,7 @@ export const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
           <form onSubmit={handleAddItem} className="flex items-center gap-2 w-full">
             <Plus size={20} className="text-muted-foreground flex-shrink-0" />
             <Input
+              ref={newItemInputRef}
               type="text"
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}
