@@ -225,11 +225,11 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                   <Button
                     type="button"
                     variant="destructive"
+                    size="icon"
                     onClick={handleDelete}
                     disabled={isSubmitting || isDeleting}
                   >
                     <Trash2 size={18} />
-                    {t.actions.delete}
                   </Button>
                 ) : (
                   <div />
@@ -247,7 +247,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                     type="submit"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? t.actions.saving : t.actions.saveChanges}
+                    {isSubmitting ? t.actions.saving : t.actions.save}
                   </Button>
                 </div>
               </DialogFooter>

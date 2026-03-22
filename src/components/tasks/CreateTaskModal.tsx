@@ -190,7 +190,7 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClos
               type="submit"
               disabled={isSubmitting}
             >
-              {isSubmitting ? t.actions.creating : t.tasks.createTask}
+              {isSubmitting ? t.actions.saving : t.actions.save}
             </Button>
           </DialogFooter>
         </form>
