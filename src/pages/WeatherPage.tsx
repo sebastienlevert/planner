@@ -48,8 +48,8 @@ const HourlyChart: React.FC<{ points: HourlyPoint[] }> = ({ points }) => {
 
   const PAD_LEFT = 8;
   const PAD_RIGHT = 8;
-  const H = 80;
   const W = width || 200;
+  const H = Math.max(50, Math.round(W * 0.22));
   const PAD_TOP = 14;
   const PAD_BOT = 16;
 
